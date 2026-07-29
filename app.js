@@ -1,5 +1,7 @@
 import {
   APP_VERSION,
+  EXTRA_ACTIVITY_MEASUREMENTS,
+  EXTRA_ACTIVITY_TYPES,
   LONG_RUNS,
   MEASUREMENT_TYPES,
   PULL_UP_STEPS,
@@ -16,6 +18,7 @@ import {
   normalizeResponseRating,
   normalizeState,
   startOfWeek,
+  summarizeCardioRange,
   summarizeExercise,
   toIsoDate,
   validateBackup,
@@ -29,6 +32,14 @@ import {
 } from "./crypto-vault.js";
 
 const DAY_KEYS = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
+const ACTIVITY_TYPE_LABELS = {
+  walking: "Walking",
+  cycling: "Cycling",
+  elliptical: "Elliptical",
+  swimming: "Swimming",
+  running: "Running",
+  custom: "Custom",
+};
 const numberFormatter = new Intl.NumberFormat(undefined, { maximumFractionDigits: 1 });
 const RUNNING_PHASES = {
   1: {
@@ -95,6 +106,8 @@ const els = {
   warmupList: $("#warmup-list"),
   warmupCount: $("#warmup-count"),
   exerciseList: $("#exercise-list"),
+  extraActivitySection: $("#extra-activity-section"),
+  extraActivityList: $("#extra-activity-list"),
   loadSession: $("#load-session-button"),
   longRunCallout: $("#long-run-callout"),
   phaseGuide: $("#phase-guide"),
@@ -388,6 +401,42 @@ function activeWorkoutLogs() {
   );
 }
 
+function createActivityId(prefix = "extra") {
+  const suffix = globalThis.crypto?.randomUUID
+    ? globalThis.crypto.randomUUID()
+    : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+  return `${prefix}-${suffix}`.toLowerCase();
+}
+
+function plannedCardioExerciseIds() {
+  return [
+    ...new Set(
+      Object.values(activePlan.days)
+        .flatMap((day) => day.exercises)
+        .filter((exercise) => exercise.category === "Cardio")
+        .map((exercise) => exercise.id),
+    ),
+  ];
+}
+
+function cardioSummaryForWeek(weekStart) {
+  const start = toIsoDate(weekStart);
+  const end = toIsoDate(addDays(weekStart, 7));
+  return summarizeCardioRange(activeWorkoutLogs(), start, end, plannedCardioExerciseIds());
+}
+
+function formatCardioTime(seconds) {
+  const minutes = Math.round(Number(seconds || 0) / 60);
+  if (minutes < 60) return `${minutes} min`;
+  const hours = Math.floor(minutes / 60);
+  const remainder = minutes % 60;
+  return remainder ? `${hours}h ${remainder}m` : `${hours}h`;
+}
+
+function formatCardioDistance(distance) {
+  return `${numberFormatter.format(Number(distance || 0))} km`;
+}
+
 function targetLongRun() {
   const runs = activePlan.longRuns || [];
   return runs[Math.max(0, Math.min(runs.length - 1, Number(state.settings.longRunWeek || 1) - 1))];
@@ -463,6 +512,7 @@ function renderToday() {
 
   renderWarmup(day, log);
   renderExercises(day, log);
+  renderExtraActivities(day, log);
   loadResponseFields(log);
   updateSessionProgress();
 
@@ -513,6 +563,155 @@ function renderExercises(day, log) {
   day.exercises.forEach((exercise, index) => {
     els.exerciseList.append(createExerciseCard(exercise, index, log?.exercises?.[exercise.id]));
   });
+}
+
+function renderExtraActivities(day, log) {
+  els.extraActivityList.replaceChildren();
+  const activities = Array.isArray(log?.extraActivities) ? log.extraActivities : [];
+  activities.forEach((activity) => els.extraActivityList.append(createExtraActivityCard(activity)));
+  els.extraActivitySection.classList.toggle("is-hidden", !day.exercises.length && !activities.length);
+}
+
+function createExtraActivityCard(activity) {
+  const card = $("#extra-activity-template").content.firstElementChild.cloneNode(true);
+  const type = EXTRA_ACTIVITY_TYPES.includes(activity.type) ? activity.type : "custom";
+  const measurement = EXTRA_ACTIVITY_MEASUREMENTS.includes(activity.measurement)
+    ? activity.measurement
+    : "duration";
+  card.dataset.activityId = activity.id || createActivityId();
+  card.dataset.reusableId = activity.reusableId || "";
+  card.dataset.activityType = type;
+  card.dataset.activityName = activity.name || ACTIVITY_TYPE_LABELS[type];
+  $(".extra-activity-type", card).textContent = `${ACTIVITY_TYPE_LABELS[type]} · EXTRA`;
+  $(".extra-activity-name", card).textContent = card.dataset.activityName;
+
+  const measurementSelect = $(".extra-measurement-select", card);
+  measurementSelect.value = measurement;
+  const sets = Array.isArray(activity.sets) && activity.sets.length ? activity.sets : [{}];
+  renderSetRows(card, measurement, sets, { rowLabel: "Done", removable: false });
+
+  measurementSelect.addEventListener("change", () => {
+    renderSetRows(card, measurementSelect.value, [{}], { rowLabel: "Done", removable: false });
+    markWorkoutDirty();
+    updateSessionProgress();
+  });
+  $(".remove-extra-activity", card).addEventListener("click", () => {
+    card.remove();
+    markWorkoutDirty();
+    updateSessionProgress();
+  });
+  return card;
+}
+
+function collectExtraActivities() {
+  return $$(".extra-activity-card", els.extraActivityList)
+    .map((card) => ({
+      id: card.dataset.activityId,
+      reusableId: card.dataset.reusableId || undefined,
+      type: card.dataset.activityType,
+      name: card.dataset.activityName,
+      measurement: $(".extra-measurement-select", card).value,
+      sets: collectSetRows(card, $(".extra-measurement-select", card).value),
+    }))
+    .filter((activity) => activity.sets.some(hasSetContent));
+}
+
+function renderSavedActivityOptions(selectedId = "") {
+  const select = $("#saved-activity-select");
+  select.replaceChildren();
+  const createOption = document.createElement("option");
+  createOption.value = "";
+  createOption.textContent = "Create a new activity";
+  select.append(createOption);
+  state.savedActivities.forEach((activity) => {
+    const option = document.createElement("option");
+    option.value = activity.id;
+    option.textContent = `${activity.name} · ${MEASUREMENT_TYPES[activity.measurement].label}`;
+    select.append(option);
+  });
+  select.value = selectedId;
+  $("#forget-saved-activity").classList.toggle("is-hidden", !selectedId);
+}
+
+function setNewActivityDefaults() {
+  $("#extra-activity-type").value = "walking";
+  $("#extra-activity-name").value = "Walking";
+  $("#extra-activity-measurement").value = "duration";
+  $("#save-extra-activity").checked = false;
+}
+
+function openExtraActivityDialog() {
+  const dialog = $("#extra-activity-dialog");
+  $("#extra-activity-form").reset();
+  setNewActivityDefaults();
+  renderSavedActivityOptions();
+  dialog.showModal();
+  requestAnimationFrame(() => $("#extra-activity-type").focus());
+}
+
+function closeExtraActivityDialog() {
+  $("#extra-activity-dialog").close();
+}
+
+async function forgetSavedActivity() {
+  const savedId = $("#saved-activity-select").value;
+  const activity = state.savedActivities.find((item) => item.id === savedId);
+  if (!activity) return;
+  const approved = window.confirm(`Forget “${activity.name}” as a reusable activity? Existing workout logs stay intact.`);
+  if (!approved) return;
+  state.savedActivities = state.savedActivities.filter((item) => item.id !== savedId);
+  await persistState();
+  setNewActivityDefaults();
+  renderSavedActivityOptions();
+  showToast("Reusable activity removed.");
+}
+
+async function addExtraActivity(event) {
+  event.preventDefault();
+  const type = $("#extra-activity-type").value;
+  const name = $("#extra-activity-name").value.trim();
+  const measurement = $("#extra-activity-measurement").value;
+  if (!EXTRA_ACTIVITY_TYPES.includes(type) || !EXTRA_ACTIVITY_MEASUREMENTS.includes(measurement) || !name) {
+    showToast("Choose a valid activity type, name, and measurement.", "error");
+    return;
+  }
+
+  let reusableId = $("#saved-activity-select").value || "";
+  if (!reusableId && $("#save-extra-activity").checked) {
+    const duplicate = state.savedActivities.find(
+      (activity) =>
+        activity.name.toLowerCase() === name.toLowerCase() &&
+        activity.type === type &&
+        activity.measurement === measurement,
+    );
+    if (duplicate) {
+      reusableId = duplicate.id;
+    } else {
+      reusableId = createActivityId("saved");
+      state.savedActivities.push({ id: reusableId, type, name, measurement });
+      state.savedActivities.sort((a, b) => a.name.localeCompare(b.name));
+      await persistState();
+    }
+  }
+
+  els.extraActivityList.append(
+    createExtraActivityCard({
+      id: createActivityId(),
+      reusableId: reusableId || undefined,
+      type,
+      name,
+      measurement,
+      sets: [{}],
+    }),
+  );
+  closeExtraActivityDialog();
+  markWorkoutDirty();
+  updateSessionProgress();
+  showToast(`${name} added. Enter the result, then save the workout.`);
+}
+
+function markWorkoutDirty() {
+  els.saveStatus.textContent = "Unsaved changes — tap Save workout";
 }
 
 function getPullupStep(stepId) {
@@ -594,6 +793,7 @@ function setupPullupGuide(card, exercise, savedExercise) {
     $(".progression-qualified", card).checked = false;
     applyPullupStep(card, exercise, step, true);
     persistState();
+    markWorkoutDirty();
     updateSessionProgress();
   });
   $(".progression-qualified", card).addEventListener("change", () => updatePullupProgressStatus(card));
@@ -660,6 +860,7 @@ function createExerciseCard(exercise, index, savedExercise) {
     state.exerciseConfigs[exerciseConfigKey(exercise.id)] = select.value;
     persistState();
     renderSetRows(card, select.value, Array.from({ length: Number(card.dataset.defaultSets) }, () => ({})));
+    markWorkoutDirty();
     updateSessionProgress();
   });
   $(".load-previous", card).addEventListener("click", () => {
@@ -669,23 +870,27 @@ function createExerciseCard(exercise, index, savedExercise) {
     state.exerciseConfigs[exerciseConfigKey(exercise.id)] = earlier.measurement;
     persistState();
     renderSetRows(card, earlier.measurement, structuredClone(earlier.sets));
+    markWorkoutDirty();
     showToast(`${exercise.name}: previous values loaded.`);
     updateSessionProgress();
   });
   $(".add-set", card).addEventListener("click", () => {
     const setList = $(".set-list", card);
     setList.append(createSetRow(select.value, setList.children.length, {}, Number(card.dataset.rest)));
+    markWorkoutDirty();
   });
   return card;
 }
 
-function renderSetRows(card, measurement, sets) {
+function renderSetRows(card, measurement, sets, options = {}) {
   const setList = $(".set-list", card);
   setList.replaceChildren();
-  sets.forEach((set, index) => setList.append(createSetRow(measurement, index, set, Number(card.dataset.rest))));
+  sets.forEach((set, index) =>
+    setList.append(createSetRow(measurement, index, set, Number(card.dataset.rest), options)),
+  );
 }
 
-function createSetRow(measurement, index, values, restSeconds) {
+function createSetRow(measurement, index, values, restSeconds, options = {}) {
   const row = document.createElement("div");
   row.className = "set-row";
   row.classList.toggle("is-check-only", MEASUREMENT_TYPES[measurement].fields.length === 0);
@@ -694,13 +899,15 @@ function createSetRow(measurement, index, values, restSeconds) {
 
   const done = document.createElement("label");
   done.className = "set-done";
+  const rowLabel = options.rowLabel || (measurement === "completion" ? `Round ${index + 1}` : index + 1);
   done.innerHTML = `
     <input type="checkbox" aria-label="Mark set ${index + 1} complete" ${values.completed ? "checked" : ""} />
-    <span>${measurement === "completion" ? `Round ${index + 1}` : index + 1}</span>
+    <span>${escapeHtml(rowLabel)}</span>
   `;
   done.querySelector("input").addEventListener("change", (event) => {
     row.classList.toggle("is-done", event.target.checked);
     if (event.target.checked && restSeconds > 0) setTimer(restSeconds, true);
+    markWorkoutDirty();
     updateSessionProgress();
   });
   row.classList.toggle("is-done", Boolean(values.completed));
@@ -728,6 +935,8 @@ function createSetRow(measurement, index, values, restSeconds) {
     row.append(label);
   });
 
+  if (options.removable === false) return row;
+
   const remove = document.createElement("button");
   remove.type = "button";
   remove.className = "remove-set";
@@ -748,6 +957,7 @@ function createSetRow(measurement, index, values, restSeconds) {
         $(".set-done span", item).textContent = measurement === "completion" ? `Round ${itemIndex + 1}` : itemIndex + 1;
       });
     }
+    markWorkoutDirty();
     updateSessionProgress();
   });
   row.append(remove);
@@ -768,8 +978,8 @@ function summarizeSetPreview(measurement, sets = []) {
   return `${set.distance || "—"} km`;
 }
 
-function collectSetRows(card) {
-  const measurement = $(".measurement-select", card).value;
+function collectSetRows(card, measurementOverride = "") {
+  const measurement = measurementOverride || $(".measurement-select", card).value;
   const fields = MEASUREMENT_TYPES[measurement].fields;
   return $$(".set-row", card).map((row) => {
     const set = { completed: $(".set-done input", row).checked };
@@ -805,12 +1015,14 @@ async function saveWorkout() {
     }
   });
   const warmup = $$("[data-warmup-index]", els.warmupList).map((input) => input.checked);
+  const extraActivities = collectExtraActivities();
   state.workoutLogs[workoutLogKey(selectedDate)] = {
     date: selectedDate,
     dayKey,
     planId: activePlan.id,
     warmup,
     exercises,
+    extraActivities,
     response: {
       scaleVersion: 2,
       painDuring: selectedResponseRating("painDuring"),
@@ -881,7 +1093,10 @@ function updateWarmupCount() {
 }
 
 function updateSessionProgress() {
-  const checks = $$(".set-done input", els.exerciseList);
+  const checks = [
+    ...$$(".set-done input", els.exerciseList),
+    ...$$(".set-done input", els.extraActivityList),
+  ];
   const completed = checks.filter((check) => check.checked).length;
   const percentage = checks.length ? Math.round((completed / checks.length) * 100) : 0;
   els.progressValue.textContent = `${percentage}%`;
@@ -907,6 +1122,11 @@ function renderWeek() {
   const base = addDays(startOfWeek(new Date()), Number(state.settings.weekOffset || 0) * 7);
   const end = addDays(base, 6);
   $("#week-range").textContent = `${new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric" }).format(base)} – ${new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric", year: "numeric" }).format(end)}`;
+  const cardio = cardioSummaryForWeek(base);
+  $("#week-cardio-time").textContent = formatCardioTime(cardio.seconds);
+  $("#week-cardio-distance").textContent = formatCardioDistance(cardio.distance);
+  $("#week-cardio-sessions").textContent = cardio.sessions;
+  $("#week-cardio-extra").textContent = cardio.extraSessions;
   const grid = $("#week-grid");
   grid.replaceChildren();
   DAY_KEYS.forEach((dayKey, index) => {
@@ -914,7 +1134,10 @@ function renderWeek() {
     const date = toIsoDate(addDays(base, index));
     const log = state.workoutLogs[workoutLogKey(date)];
     const completedSets = log
-      ? Object.values(log.exercises || {}).flatMap((exercise) => exercise.sets || []).filter((set) => set.completed).length
+      ? [
+          ...Object.values(log.exercises || {}).flatMap((exercise) => exercise.sets || []),
+          ...(log.extraActivities || []).flatMap((activity) => activity.sets || []),
+        ].filter((set) => set.completed).length
       : 0;
     const card = document.createElement("button");
     card.type = "button";
@@ -965,6 +1188,7 @@ function renderProgress() {
     select.append(option);
   });
   renderExerciseStats();
+  renderCardioStats();
   renderBody();
   renderSleep();
 }
@@ -979,6 +1203,31 @@ function renderExerciseStats() {
   const empty = $("#exercise-chart-empty");
   empty.classList.toggle("is-hidden", stats.points.length >= 2);
   drawLineChart($("#exercise-chart"), [{ points: stats.points, color: "#d8ff52" }]);
+}
+
+function renderCardioStats() {
+  const currentWeek = startOfWeek(new Date());
+  const summaries = Array.from({ length: 8 }, (_, index) => {
+    const week = addDays(currentWeek, (index - 7) * 7);
+    return { week, summary: cardioSummaryForWeek(week) };
+  });
+  const current = summaries.at(-1).summary;
+  $("#cardio-stat-time").textContent = formatCardioTime(current.seconds);
+  $("#cardio-stat-distance").textContent = formatCardioDistance(current.distance);
+  $("#cardio-stat-sessions").textContent = current.sessions;
+  $("#cardio-stat-rpe").textContent =
+    current.averageRpe === null ? "—" : numberFormatter.format(current.averageRpe);
+  const hasCardio = summaries.some(({ summary }) => summary.sessions > 0);
+  $("#cardio-chart-empty").classList.toggle("is-hidden", hasCardio);
+  drawLineChart($("#cardio-chart"), [
+    {
+      points: summaries.map(({ week, summary }) => ({
+        date: toIsoDate(week),
+        value: Math.round(summary.minutes * 10) / 10,
+      })),
+      color: "#2f6bff",
+    },
+  ]);
 }
 
 function upsertByDate(array, entry, key = "date") {
@@ -1252,6 +1501,41 @@ function bindEvents() {
   els.warmupList.addEventListener("change", updateWarmupCount);
   els.loadSession.addEventListener("click", loadLastSession);
   $("#save-workout").addEventListener("click", saveWorkout);
+  $("#view-today").addEventListener("input", (event) => {
+    if (event.target.matches(".set-row input, #session-notes")) markWorkoutDirty();
+  });
+  $("#view-today").addEventListener("change", (event) => {
+    if (
+      event.target.matches(
+        ".set-row input, [data-warmup-index], .response-option input, .progression-qualified",
+      )
+    ) {
+      markWorkoutDirty();
+    }
+  });
+
+  $("#add-extra-activity").addEventListener("click", openExtraActivityDialog);
+  $("#extra-activity-form").addEventListener("submit", addExtraActivity);
+  $("#extra-activity-cancel").addEventListener("click", closeExtraActivityDialog);
+  $("#extra-activity-cancel-icon").addEventListener("click", closeExtraActivityDialog);
+  $("#forget-saved-activity").addEventListener("click", forgetSavedActivity);
+  $("#extra-activity-type").addEventListener("change", (event) => {
+    $("#extra-activity-name").value =
+      event.target.value === "custom" ? "" : ACTIVITY_TYPE_LABELS[event.target.value];
+  });
+  $("#saved-activity-select").addEventListener("change", (event) => {
+    const activity = state.savedActivities.find((item) => item.id === event.target.value);
+    if (!activity) {
+      setNewActivityDefaults();
+      renderSavedActivityOptions();
+      return;
+    }
+    $("#extra-activity-type").value = activity.type;
+    $("#extra-activity-name").value = activity.name;
+    $("#extra-activity-measurement").value = activity.measurement;
+    $("#save-extra-activity").checked = false;
+    renderSavedActivityOptions(activity.id);
+  });
 
   $("#previous-week").addEventListener("click", () => {
     state.settings.weekOffset -= 1;

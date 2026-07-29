@@ -1098,6 +1098,120 @@ textarea {
   font-weight: 800;
 }
 
+.extra-activity-section {
+  margin-top: 34px;
+  padding: 22px;
+  border: 1px solid var(--ink);
+  border-radius: var(--radius);
+  background: #edf3ff;
+}
+
+.extra-activity-head {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.extra-activity-head h2 {
+  margin-bottom: 2px;
+  font-size: 25px;
+}
+
+.extra-activity-head .eyebrow {
+  margin-bottom: 2px;
+  color: var(--blue);
+}
+
+.extra-activity-head p:last-child {
+  margin-bottom: 0;
+  color: var(--ink-soft);
+  font-size: 12px;
+}
+
+.extra-activity-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.extra-activity-list:empty {
+  display: none;
+}
+
+.extra-activity-card {
+  overflow: hidden;
+  border: 1px solid #b9c9eb;
+  border-radius: 14px;
+  background: var(--card);
+}
+
+.extra-activity-card-head {
+  display: flex;
+  min-height: 62px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 14px 10px 18px;
+  border-bottom: 1px solid #d8e1f4;
+}
+
+.extra-activity-card-head span,
+.extra-activity-card-head strong {
+  display: block;
+}
+
+.extra-activity-card-head span {
+  color: var(--blue);
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+}
+
+.extra-activity-card-head strong {
+  margin-top: 2px;
+  font-size: 17px;
+}
+
+.remove-extra-activity {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 9px;
+  background: #f0ece3;
+  color: #7f443c;
+  font-size: 20px;
+}
+
+.extra-activity-card-body {
+  display: grid;
+  gap: 12px;
+  padding: 14px 18px 17px;
+}
+
+.extra-activity-card-body > label {
+  display: grid;
+  width: min(100%, 280px);
+  gap: 4px;
+}
+
+.extra-activity-card-body > label > span {
+  color: var(--ink-soft);
+  font-size: 9px;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.extra-activity-card .set-row {
+  grid-template-columns: 70px repeat(var(--field-count), minmax(80px, 1fr));
+}
+
+.extra-activity-card .set-done {
+  width: 64px;
+}
+
 .session-notes {
   margin-top: 24px;
 }
@@ -1343,6 +1457,47 @@ textarea {
   gap: 8px;
 }
 
+.cardio-week-summary {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  margin: 0 0 18px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--card);
+}
+
+.cardio-week-summary > div {
+  min-width: 0;
+  padding: 14px 16px;
+  border-right: 1px solid var(--line);
+}
+
+.cardio-week-summary > div:last-child {
+  border-right: 0;
+}
+
+.cardio-week-summary span,
+.cardio-week-summary strong {
+  display: block;
+}
+
+.cardio-week-summary span {
+  color: var(--ink-soft);
+  font-size: 9px;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.cardio-week-summary strong {
+  margin-top: 3px;
+  overflow: hidden;
+  font-size: 20px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .week-card {
   display: grid;
   width: 100%;
@@ -1559,6 +1714,15 @@ textarea {
   grid-template-columns: 1fr 1fr;
   gap: 16px;
   margin-top: 16px;
+}
+
+.cardio-stats-panel {
+  margin-top: 16px;
+}
+
+.cardio-stats-panel .panel-head > small {
+  color: var(--ink-soft);
+  font-size: 11px;
 }
 
 .inline-form {
@@ -1877,6 +2041,7 @@ textarea {
   background: #9d2e21;
 }
 
+.activity-dialog,
 .privacy-dialog {
   width: min(480px, calc(100% - 28px));
   padding: 0;
@@ -1888,9 +2053,116 @@ textarea {
   box-shadow: 0 30px 100px rgba(10, 18, 13, 0.35);
 }
 
+.activity-dialog {
+  width: min(580px, calc(100% - 28px));
+}
+
+.activity-dialog::backdrop,
 .privacy-dialog::backdrop {
   background: rgba(10, 18, 13, 0.82);
   backdrop-filter: blur(8px);
+}
+
+.activity-form {
+  display: grid;
+  gap: 15px;
+  padding: 26px;
+}
+
+.activity-dialog-head {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.activity-dialog-head .eyebrow {
+  margin-bottom: 2px;
+  color: var(--blue);
+}
+
+.activity-dialog-head h2 {
+  margin-bottom: 0;
+  font-size: 30px;
+}
+
+.dialog-close {
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  background: #f0ece3;
+  font-size: 22px;
+}
+
+.activity-form > label,
+.activity-form-grid label {
+  display: grid;
+  gap: 5px;
+}
+
+.activity-form > label > span,
+.activity-form-grid label > span {
+  color: var(--ink-soft);
+  font-size: 9px;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.activity-form-grid {
+  display: grid;
+  grid-template-columns: 0.8fr 1.2fr;
+  gap: 10px;
+}
+
+.saved-activity-control {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.saved-activity-control select {
+  flex: 1;
+  min-width: 0;
+}
+
+.reusable-check {
+  display: grid !important;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 10px !important;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  cursor: pointer;
+}
+
+.reusable-check input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--blue);
+}
+
+.reusable-check span {
+  color: var(--ink) !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+}
+
+.activity-form-note {
+  margin: -3px 0 0;
+  color: var(--ink-soft);
+  font-size: 11px;
+}
+
+.activity-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
 }
 
 .privacy-form {
@@ -2124,6 +2396,37 @@ textarea {
     text-align: left;
   }
 
+  .extra-activity-section {
+    padding: 16px 12px;
+  }
+
+  .extra-activity-head {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .extra-activity-head .button {
+    width: 100%;
+  }
+
+  .extra-activity-card-body {
+    padding-inline: 11px;
+  }
+
+  .extra-activity-card-body > label,
+  .extra-measurement-select {
+    width: 100%;
+  }
+
+  .extra-activity-card .set-row {
+    grid-template-columns: 64px repeat(var(--field-count), minmax(68px, 1fr));
+    min-width: calc(72px + (var(--field-count) * 78px));
+  }
+
+  .extra-activity-card .set-done {
+    width: 58px;
+  }
+
   .exercise-toggle {
     grid-template-columns: 42px minmax(0, 1fr) auto;
     gap: 10px;
@@ -2241,6 +2544,18 @@ textarea {
     width: 100%;
   }
 
+  .cardio-week-summary {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .cardio-week-summary > div:nth-child(2) {
+    border-right: 0;
+  }
+
+  .cardio-week-summary > div:nth-child(-n + 2) {
+    border-bottom: 1px solid var(--line);
+  }
+
   .week-card {
     grid-template-columns: 72px minmax(0, 1fr);
     gap: 12px;
@@ -2322,6 +2637,18 @@ textarea {
 
   .privacy-form {
     padding: 24px 20px;
+  }
+
+  .activity-form {
+    padding: 22px 16px;
+  }
+
+  .activity-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .activity-form-actions .button {
+    flex: 1;
   }
 
   .data-card-index {

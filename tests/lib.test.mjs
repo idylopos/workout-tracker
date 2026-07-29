@@ -7,6 +7,7 @@ import {
   findPreviousExerciseLog,
   normalizeResponseRating,
   normalizeState,
+  summarizeCardioRange,
   summarizeExercise,
   validateBackup,
 } from "../lib.js";
@@ -51,6 +52,10 @@ test("validates backup shape before restore", () => {
   const malformedWorkout = createDefaultState();
   malformedWorkout.workoutLogs["not-a-date"] = { exercises: {} };
   assert.equal(validateBackup(malformedWorkout).valid, false);
+
+  const malformedActivity = createDefaultState();
+  malformedActivity.savedActivities = [{ id: "bad", name: "", type: "flying", measurement: "duration" }];
+  assert.equal(validateBackup(malformedActivity).valid, false);
 });
 
 test("finds the most recent earlier exercise log", () => {
@@ -121,4 +126,58 @@ test("summarizes check-off mobility rounds", () => {
   );
   assert.equal(summary.latest, "1 / 2 rounds");
   assert.equal(summary.volume, "1");
+});
+
+test("keeps valid reusable activities when normalizing saved state", () => {
+  const state = normalizeState({
+    savedActivities: [
+      { id: "saved-incline-walk", name: "Incline walk", type: "walking", measurement: "duration" },
+      { id: "invalid", name: "", type: "custom", measurement: "duration" },
+    ],
+  });
+  assert.deepEqual(state.savedActivities, [
+    { id: "saved-incline-walk", name: "Incline walk", type: "walking", measurement: "duration" },
+  ]);
+});
+
+test("combines planned and extra cardio in weekly totals", () => {
+  const summary = summarizeCardioRange(
+    {
+      monday: {
+        date: "2026-07-27",
+        exercises: {
+          bike: {
+            measurement: "duration",
+            sets: [{ completed: true, minutes: 20, seconds: 0, rpe: 7 }],
+          },
+        },
+        extraActivities: [
+          {
+            id: "extra-incline-walk",
+            type: "walking",
+            name: "Incline walk",
+            measurement: "distance_time",
+            sets: [{ completed: true, distance: 2.5, minutes: 25, seconds: 0, rpe: 3 }],
+          },
+        ],
+      },
+      outside: {
+        date: "2026-08-03",
+        exercises: {
+          bike: {
+            measurement: "duration",
+            sets: [{ completed: true, minutes: 60, rpe: 5 }],
+          },
+        },
+      },
+    },
+    "2026-07-27",
+    "2026-08-03",
+    ["bike"],
+  );
+  assert.equal(summary.minutes, 45);
+  assert.equal(summary.distance, 2.5);
+  assert.equal(summary.sessions, 2);
+  assert.equal(summary.extraSessions, 1);
+  assert.equal(summary.averageRpe, 5);
 });

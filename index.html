@@ -126,6 +126,18 @@
           </div>
           <div class="exercise-list" id="exercise-list"></div>
 
+          <section class="extra-activity-section" id="extra-activity-section">
+            <div class="extra-activity-head">
+              <div>
+                <p class="eyebrow">OPTIONAL · EXTRA CARDIO</p>
+                <h2>Anything beyond the plan</h2>
+                <p>Log only what you actually perform. RPE is included with every measurement.</p>
+              </div>
+              <button class="button button-secondary" id="add-extra-activity" type="button">+ Add extra activity</button>
+            </div>
+            <div class="extra-activity-list" id="extra-activity-list"></div>
+          </section>
+
           <details class="session-notes" open>
             <summary>
               <span>
@@ -188,6 +200,12 @@
               <select id="long-run-week"></select>
             </label>
           </div>
+          <div class="cardio-week-summary" aria-label="Weekly cardio totals">
+            <div><span>Cardio time</span><strong id="week-cardio-time">0 min</strong></div>
+            <div><span>Distance</span><strong id="week-cardio-distance">0 km</strong></div>
+            <div><span>Activities</span><strong id="week-cardio-sessions">0</strong></div>
+            <div><span>Extra</span><strong id="week-cardio-extra">0</strong></div>
+          </div>
           <div class="week-grid" id="week-grid"></div>
           <aside class="safety-strip">
             <strong>Joint response rule</strong>
@@ -227,6 +245,26 @@
             <div class="chart-wrap">
               <canvas id="exercise-chart" aria-label="Exercise trend chart"></canvas>
               <div class="empty-chart" id="exercise-chart-empty">Log this exercise twice to see its trend.</div>
+            </div>
+          </article>
+
+          <article class="panel cardio-stats-panel">
+            <div class="panel-head">
+              <div>
+                <p class="eyebrow">CARDIO TOTALS</p>
+                <h2>Eight-week volume</h2>
+              </div>
+              <small>Planned + extra activities</small>
+            </div>
+            <div class="metric-grid">
+              <div class="metric-card"><span>This week</span><strong id="cardio-stat-time">0 min</strong></div>
+              <div class="metric-card"><span>Distance</span><strong id="cardio-stat-distance">0 km</strong></div>
+              <div class="metric-card"><span>Activities</span><strong id="cardio-stat-sessions">0</strong></div>
+              <div class="metric-card"><span>Average RPE</span><strong id="cardio-stat-rpe">—</strong></div>
+            </div>
+            <div class="chart-wrap">
+              <canvas id="cardio-chart" aria-label="Weekly cardio duration trend chart"></canvas>
+              <div class="empty-chart" id="cardio-chart-empty">Log cardio to see your weekly volume trend.</div>
             </div>
           </article>
 
@@ -279,7 +317,7 @@
               <div>
                 <p class="eyebrow">EXPORT</p>
                 <h2>Take a complete copy.</h2>
-                <p>Downloads workouts, exercise settings, body measurements, sleep, and plan settings in one JSON file.</p>
+                <p>Downloads workouts, reusable activities, exercise settings, body measurements, sleep, and plan settings in one JSON file.</p>
               </div>
               <button class="button button-dark" type="button" id="export-data">Download backup</button>
             </article>
@@ -353,6 +391,61 @@
 
       <div class="toast" id="toast" role="status" aria-live="polite"></div>
     </div>
+
+    <dialog class="activity-dialog" id="extra-activity-dialog" aria-labelledby="extra-activity-title">
+      <form class="activity-form" id="extra-activity-form">
+        <div class="activity-dialog-head">
+          <div>
+            <p class="eyebrow">EXTRA CARDIO</p>
+            <h2 id="extra-activity-title">Add an activity</h2>
+          </div>
+          <button class="dialog-close" id="extra-activity-cancel-icon" type="button" aria-label="Close">×</button>
+        </div>
+        <label>
+          <span>Use a reusable activity</span>
+          <div class="saved-activity-control">
+            <select id="saved-activity-select">
+              <option value="">Create a new activity</option>
+            </select>
+            <button class="text-button is-hidden" id="forget-saved-activity" type="button">Forget</button>
+          </div>
+        </label>
+        <div class="activity-form-grid">
+          <label>
+            <span>Type</span>
+            <select id="extra-activity-type" required>
+              <option value="walking">Walking</option>
+              <option value="cycling">Cycling</option>
+              <option value="elliptical">Elliptical</option>
+              <option value="swimming">Swimming</option>
+              <option value="running">Running</option>
+              <option value="custom">Custom</option>
+            </select>
+          </label>
+          <label>
+            <span>Activity name</span>
+            <input id="extra-activity-name" type="text" maxlength="80" value="Walking" required />
+          </label>
+        </div>
+        <label>
+          <span>Measurement</span>
+          <select id="extra-activity-measurement" required>
+            <option value="duration">Time only + RPE</option>
+            <option value="distance_time">Distance + time + RPE</option>
+            <option value="distance">Distance only + RPE</option>
+          </select>
+        </label>
+        <label class="reusable-check">
+          <input id="save-extra-activity" type="checkbox" />
+          <span>Save this setup as a reusable activity</span>
+        </label>
+        <p class="activity-form-note">The activity is added to this workout. Press <strong>Save workout</strong> when your entries are complete.</p>
+        <div class="activity-form-actions">
+          <button class="button button-secondary" id="extra-activity-cancel" type="button">Cancel</button>
+          <button class="button button-primary" type="submit">Add activity</button>
+        </div>
+      </form>
+    </dialog>
 
     <dialog class="privacy-dialog" id="privacy-dialog" aria-labelledby="privacy-dialog-title">
       <form class="privacy-form" id="privacy-form">
@@ -428,6 +521,29 @@
           <div class="previous-line"></div>
           <div class="set-list"></div>
           <button class="add-set" type="button">+ Add set</button>
+        </div>
+      </article>
+    </template>
+
+    <template id="extra-activity-template">
+      <article class="extra-activity-card">
+        <div class="extra-activity-card-head">
+          <div>
+            <span class="extra-activity-type"></span>
+            <strong class="extra-activity-name"></strong>
+          </div>
+          <button class="remove-extra-activity" type="button" aria-label="Remove extra activity">×</button>
+        </div>
+        <div class="extra-activity-card-body">
+          <label>
+            <span>Measure</span>
+            <select class="extra-measurement-select">
+              <option value="duration">Time only + RPE</option>
+              <option value="distance_time">Distance + time + RPE</option>
+              <option value="distance">Distance only + RPE</option>
+            </select>
+          </label>
+          <div class="set-list"></div>
         </div>
       </article>
     </template>

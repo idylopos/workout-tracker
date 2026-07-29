@@ -22,6 +22,16 @@ python3 -m http.server 8080
 
 Then open `http://localhost:8080`.
 
+## Log extra cardio
+
+On any scheduled training day, choose **+ Add extra activity** below the planned exercises. Select walking, cycling,
+elliptical, swimming, running, or a custom activity; then choose time, distance plus time, or distance-only logging.
+Every option includes RPE.
+
+Select **Save this setup as a reusable activity** to add the configuration to the activity picker. Reusable activities
+and completed extra-cardio records are stored inside the encrypted browser vault and included in JSON backups. The Week
+view shows the selected week’s combined planned and extra cardio, while Progress shows an eight-week duration trend.
+
 ## Publish on GitHub Pages
 
 1. Create a GitHub repository and add these files.

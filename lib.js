@@ -1,6 +1,9 @@
 export const APP_VERSION = 1;
 export const STORAGE_KEY = "formflow.training.v1";
 
+export const EXTRA_ACTIVITY_TYPES = ["walking", "cycling", "elliptical", "swimming", "running", "custom"];
+export const EXTRA_ACTIVITY_MEASUREMENTS = ["duration", "distance_time", "distance"];
+
 export const MEASUREMENT_TYPES = {
   completion: {
     label: "Check-off only",
@@ -446,9 +449,37 @@ export function createDefaultState() {
     },
     exerciseConfigs: {},
     workoutLogs: {},
+    savedActivities: [],
     bodyLogs: [],
     sleepLogs: [],
   };
+}
+
+function isValidExtraActivity(activity, requireSets = false) {
+  if (!activity || typeof activity !== "object" || Array.isArray(activity)) return false;
+  if (
+    typeof activity.id !== "string" ||
+    !/^[a-z0-9][a-z0-9-]{0,95}$/.test(activity.id) ||
+    typeof activity.name !== "string" ||
+    !activity.name.trim() ||
+    activity.name.length > 80 ||
+    !EXTRA_ACTIVITY_TYPES.includes(activity.type) ||
+    !EXTRA_ACTIVITY_MEASUREMENTS.includes(activity.measurement)
+  ) {
+    return false;
+  }
+  if (
+    activity.reusableId !== undefined &&
+    activity.reusableId !== "" &&
+    (typeof activity.reusableId !== "string" || !/^[a-z0-9][a-z0-9-]{0,95}$/.test(activity.reusableId))
+  ) {
+    return false;
+  }
+  if (!requireSets) return activity.sets === undefined;
+  return (
+    Array.isArray(activity.sets) &&
+    activity.sets.every((set) => set && typeof set === "object" && !Array.isArray(set))
+  );
 }
 
 export function normalizeState(value) {
@@ -462,6 +493,9 @@ export function normalizeState(value) {
     settings,
     exerciseConfigs: value.exerciseConfigs && typeof value.exerciseConfigs === "object" ? value.exerciseConfigs : {},
     workoutLogs: value.workoutLogs && typeof value.workoutLogs === "object" ? value.workoutLogs : {},
+    savedActivities: Array.isArray(value.savedActivities)
+      ? value.savedActivities.filter((activity) => isValidExtraActivity(activity))
+      : [],
     bodyLogs: Array.isArray(value.bodyLogs) ? value.bodyLogs : [],
     sleepLogs: Array.isArray(value.sleepLogs) ? value.sleepLogs : [],
   };
@@ -477,6 +511,14 @@ export function validateBackup(value) {
   }
   if (!Array.isArray(value.bodyLogs) || !Array.isArray(value.sleepLogs)) {
     return { valid: false, reason: "Body or sleep logs are malformed." };
+  }
+  if (value.savedActivities !== undefined) {
+    if (
+      !Array.isArray(value.savedActivities) ||
+      !value.savedActivities.every((activity) => isValidExtraActivity(activity))
+    ) {
+      return { valid: false, reason: "Saved extra activities are malformed." };
+    }
   }
   const validDate = (date) => typeof date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(date) && !Number.isNaN(Date.parse(`${date}T12:00:00`));
   const validNumber = (number) => Number.isFinite(Number(number)) && Number(number) >= 0;
@@ -495,13 +537,18 @@ export function validateBackup(value) {
       return false;
     }
     if (!log.exercises || typeof log.exercises !== "object" || Array.isArray(log.exercises)) return false;
-    return Object.values(log.exercises).every(
+    const exercisesValid = Object.values(log.exercises).every(
       (exercise) =>
         exercise &&
         Object.hasOwn(MEASUREMENT_TYPES, exercise.measurement) &&
         Array.isArray(exercise.sets) &&
         exercise.sets.every((set) => set && typeof set === "object" && !Array.isArray(set)),
     );
+    const extraActivitiesValid =
+      log.extraActivities === undefined ||
+      (Array.isArray(log.extraActivities) &&
+        log.extraActivities.every((activity) => isValidExtraActivity(activity, true)));
+    return exercisesValid && extraActivitiesValid;
   });
   if (!workoutsValid) {
     return { valid: false, reason: "A workout record contains an invalid date, measurement type, or set list." };
@@ -564,6 +611,72 @@ export function findPreviousSession(workoutLogs, dayKey, beforeDate, planId = "f
 function numeric(value) {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function cardioEntryMetrics(entry) {
+  if (!entry || !EXTRA_ACTIVITY_MEASUREMENTS.includes(entry.measurement) || !Array.isArray(entry.sets)) {
+    return { seconds: 0, distance: 0, rpeTotal: 0, rpeCount: 0, hasActivity: false };
+  }
+  return entry.sets.reduce(
+    (summary, set) => {
+      const seconds =
+        entry.measurement === "duration" || entry.measurement === "distance_time"
+          ? numeric(set.minutes) * 60 + numeric(set.seconds)
+          : 0;
+      const distance =
+        entry.measurement === "distance" || entry.measurement === "distance_time" ? numeric(set.distance) : 0;
+      const hasRpe = set.rpe !== "" && set.rpe !== null && set.rpe !== undefined && Number.isFinite(Number(set.rpe));
+      summary.seconds += seconds;
+      summary.distance += distance;
+      if (hasRpe) {
+        summary.rpeTotal += numeric(set.rpe);
+        summary.rpeCount += 1;
+      }
+      summary.hasActivity ||= Boolean(set.completed || seconds > 0 || distance > 0 || hasRpe);
+      return summary;
+    },
+    { seconds: 0, distance: 0, rpeTotal: 0, rpeCount: 0, hasActivity: false },
+  );
+}
+
+export function summarizeCardioRange(workoutLogs, startDate, endDate, cardioExerciseIds = []) {
+  const plannedIds = new Set(cardioExerciseIds);
+  const totals = {
+    seconds: 0,
+    minutes: 0,
+    distance: 0,
+    sessions: 0,
+    extraSessions: 0,
+    averageRpe: null,
+  };
+  let rpeTotal = 0;
+  let rpeCount = 0;
+  Object.values(workoutLogs).forEach((log) => {
+    if (!log || log.date < startDate || log.date >= endDate) return;
+    Object.entries(log.exercises || {}).forEach(([exerciseId, exercise]) => {
+      if (!plannedIds.has(exerciseId)) return;
+      const metrics = cardioEntryMetrics(exercise);
+      if (!metrics.hasActivity) return;
+      totals.seconds += metrics.seconds;
+      totals.distance += metrics.distance;
+      totals.sessions += 1;
+      rpeTotal += metrics.rpeTotal;
+      rpeCount += metrics.rpeCount;
+    });
+    (log.extraActivities || []).forEach((activity) => {
+      const metrics = cardioEntryMetrics(activity);
+      if (!metrics.hasActivity) return;
+      totals.seconds += metrics.seconds;
+      totals.distance += metrics.distance;
+      totals.sessions += 1;
+      totals.extraSessions += 1;
+      rpeTotal += metrics.rpeTotal;
+      rpeCount += metrics.rpeCount;
+    });
+  });
+  totals.minutes = totals.seconds / 60;
+  totals.averageRpe = rpeCount ? rpeTotal / rpeCount : null;
+  return totals;
 }
 
 function bestSetMetric(measurement, sets = []) {
