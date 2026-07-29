@@ -306,6 +306,7 @@ export function createDefaultState() {
       block: 1,
       longRunWeek: 1,
       weekOffset: 0,
+      activePlanId: "form-flow",
     },
     exerciseConfigs: {},
     workoutLogs: {},
@@ -349,8 +350,11 @@ export function validateBackup(value) {
   if (!bodyValid || !sleepValid) {
     return { valid: false, reason: "A body or sleep record contains an invalid date or value." };
   }
-  const workoutsValid = Object.entries(value.workoutLogs).every(([date, log]) => {
-    if (!validDate(date) || !log || typeof log !== "object") return false;
+  const workoutsValid = Object.values(value.workoutLogs).every((log) => {
+    if (!log || typeof log !== "object" || !validDate(log.date)) return false;
+    if (log.planId !== undefined && (typeof log.planId !== "string" || !/^[a-z0-9][a-z0-9-]{0,63}$/.test(log.planId))) {
+      return false;
+    }
     if (!log.exercises || typeof log.exercises !== "object" || Array.isArray(log.exercises)) return false;
     return Object.values(log.exercises).every(
       (exercise) =>
@@ -390,9 +394,9 @@ export function addDays(date, amount) {
   return result;
 }
 
-export function getAllExercises() {
+export function getAllExercises(weekPlan = WEEK_PLAN) {
   const unique = new Map();
-  Object.values(WEEK_PLAN).forEach((day) => {
+  Object.values(weekPlan).forEach((day) => {
     day.exercises.forEach((exercise) => {
       if (!unique.has(exercise.id)) unique.set(exercise.id, exercise);
     });
@@ -400,16 +404,21 @@ export function getAllExercises() {
   return [...unique.values()].sort((a, b) => a.name.localeCompare(b.name));
 }
 
-export function findPreviousExerciseLog(workoutLogs, exerciseId, beforeDate) {
+export function findPreviousExerciseLog(workoutLogs, exerciseId, beforeDate, planId = "form-flow") {
   return Object.values(workoutLogs)
-    .filter((log) => log.date < beforeDate && log.exercises?.[exerciseId]?.sets?.length)
+    .filter(
+      (log) =>
+        (log.planId || "form-flow") === planId &&
+        log.date < beforeDate &&
+        log.exercises?.[exerciseId]?.sets?.length,
+    )
     .sort((a, b) => b.date.localeCompare(a.date))
     .map((log) => ({ date: log.date, ...log.exercises[exerciseId] }))[0] || null;
 }
 
-export function findPreviousSession(workoutLogs, dayKey, beforeDate) {
+export function findPreviousSession(workoutLogs, dayKey, beforeDate, planId = "form-flow") {
   return Object.values(workoutLogs)
-    .filter((log) => log.dayKey === dayKey && log.date < beforeDate)
+    .filter((log) => (log.planId || "form-flow") === planId && log.dayKey === dayKey && log.date < beforeDate)
     .sort((a, b) => b.date.localeCompare(a.date))[0] || null;
 }
 

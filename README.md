@@ -3,6 +3,15 @@
 A private, mobile-first workout and health log built around the included evidence-based weekly program. It is a static
 site: no account, server, database, or paid service is required.
 
+## Add another weekly plan
+
+Create `plans/your-plan/plan.json` and push it to `main`. The build discovers valid plan folders automatically and adds
+them to the app's workout-plan picker. Copy the included example and follow [plans/README.md](plans/README.md); no app
+code or registry edit is required.
+
+Plan files are public programming content. They must not contain personal information. Each plan's workout history and
+exercise settings are kept separate in the visitor's browser.
+
 ## Use locally
 
 Because the app uses JavaScript modules, serve the folder with a small local web server:
@@ -27,9 +36,9 @@ The app works at both a user/organization Pages domain and a repository subpath 
 Workout, body, sleep, and preference data are stored in that browser's local storage. Use **Data → Download backup**
 regularly. Importing a valid Form / Flow JSON backup replaces the records currently stored in that browser.
 
-The app contains no analytics, advertising, accounts, external fonts, third-party scripts, or runtime network requests.
-Its Content Security Policy blocks network connections. GitHub receives the public app files, but it does not receive
-anything you enter into the app.
+The app contains no analytics, advertising, accounts, external fonts, or third-party scripts. Its Content Security Policy
+allows only same-site plan files and blocks third-party connections. GitHub receives the public app and public plan files,
+but it does not receive anything visitors enter into the app.
 
 Treat exported JSON backups as private health data. Backup filenames and the local source plan are excluded by
 `.gitignore` to help prevent accidental publication. Use **Data → Erase local data** before giving someone access to a

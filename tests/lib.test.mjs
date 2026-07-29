@@ -51,6 +51,23 @@ test("finds the most recent earlier exercise log", () => {
   assert.equal(previous.sets[0].weight, 55);
 });
 
+test("keeps previous exercise values separated by plan", () => {
+  const logs = {
+    default: {
+      date: "2026-07-08",
+      planId: "form-flow",
+      exercises: { squat: { measurement: "weight_reps", sets: [{ weight: 55, reps: 8 }] } },
+    },
+    custom: {
+      date: "2026-07-09",
+      planId: "custom-plan",
+      exercises: { squat: { measurement: "weight_reps", sets: [{ weight: 20, reps: 10 }] } },
+    },
+  };
+  assert.equal(findPreviousExerciseLog(logs, "squat", "2026-07-10", "form-flow").sets[0].weight, 55);
+  assert.equal(findPreviousExerciseLog(logs, "squat", "2026-07-10", "custom-plan").sets[0].weight, 20);
+});
+
 test("summarizes strength sessions and estimated best performance", () => {
   const logs = {
     first: {

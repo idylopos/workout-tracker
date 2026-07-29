@@ -20,14 +20,31 @@ import {
 
 const DAY_KEYS = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
 const numberFormatter = new Intl.NumberFormat(undefined, { maximumFractionDigits: 1 });
+const BUILT_IN_PLAN = {
+  id: "form-flow",
+  name: "Form / Flow weekly plan",
+  description: "Concurrent strength, running, cycling, swimming, and mobility.",
+  days: WEEK_PLAN,
+  longRuns: LONG_RUNS,
+  longRunDay: "saturday",
+};
 let state = loadState();
 let selectedDate = toIsoDate();
 let draftSession = null;
 let activeView = "today";
 let resizeFrame = null;
+let activePlan = BUILT_IN_PLAN;
+let planCatalog = [];
 
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
+const escapeHtml = (value) =>
+  String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
 
 const els = {
   trainingDate: $("#training-date"),
@@ -83,6 +100,120 @@ function formatDate(dateString, options = { weekday: "short", month: "short", da
   return new Intl.DateTimeFormat(undefined, options).format(new Date(`${dateString}T12:00:00`));
 }
 
+function normalizePlan(raw, expectedId) {
+  if (!raw || typeof raw !== "object" || raw.schemaVersion !== 1) {
+    throw new Error("This plan uses an unsupported format.");
+  }
+  const id = String(raw.id || expectedId || "");
+  if (!/^[a-z0-9][a-z0-9-]{0,63}$/.test(id) || (expectedId && id !== expectedId)) {
+    throw new Error("This plan has an invalid identifier.");
+  }
+  const days = {};
+  DAY_KEYS.forEach((dayKey) => {
+    const source = raw.days?.[dayKey];
+    if (!source) {
+      days[dayKey] = {
+        label: dayKey[0].toUpperCase() + dayKey.slice(1),
+        short: dayKey.slice(0, 3).toUpperCase(),
+        focus: "Rest",
+        kicker: "Recovery",
+        estimate: "No training",
+        tone: "rest",
+        sequenceNote: "No planned training.",
+        warmup: [],
+        exercises: [],
+      };
+      return;
+    }
+    days[dayKey] = {
+      label: String(source.label || dayKey[0].toUpperCase() + dayKey.slice(1)),
+      short: String(source.short || dayKey.slice(0, 3).toUpperCase()).slice(0, 8),
+      focus: String(source.focus || "Training"),
+      kicker: String(source.kicker || "Workout"),
+      estimate: String(source.estimate || ""),
+      tone: ["lime", "blue", "orange", "pink", "purple", "teal", "rest"].includes(source.tone)
+        ? source.tone
+        : "lime",
+      sequenceNote: String(source.sequenceNote || ""),
+      warmup: Array.isArray(source.warmup) ? source.warmup.map(String).slice(0, 30) : [],
+      exercises: Array.isArray(source.exercises)
+        ? source.exercises.slice(0, 40).map((exercise, index) => ({
+            id: String(exercise.id || `${dayKey}-${index + 1}`),
+            name: String(exercise.name || `Exercise ${index + 1}`),
+            prescription: String(exercise.prescription || ""),
+            sets: Math.max(1, Math.min(20, Number(exercise.sets) || 1)),
+            rest: Math.max(0, Math.min(900, Number(exercise.rest) || 0)),
+            measurement: Object.hasOwn(MEASUREMENT_TYPES, exercise.measurement)
+              ? exercise.measurement
+              : "reps",
+            category: String(exercise.category || "Training"),
+            section: exercise.section ? String(exercise.section) : undefined,
+            optional: Boolean(exercise.optional),
+          }))
+        : [],
+    };
+  });
+  return {
+    id,
+    name: String(raw.name || id),
+    description: String(raw.description || ""),
+    days,
+    longRuns: Array.isArray(raw.longRuns) ? raw.longRuns.map(String).slice(0, 52) : [],
+    longRunDay: DAY_KEYS.includes(raw.longRunDay) ? raw.longRunDay : "saturday",
+  };
+}
+
+async function discoverPlans() {
+  try {
+    const response = await fetch("./plans/index.json", { cache: "no-store" });
+    if (!response.ok) return;
+    const catalog = await response.json();
+    planCatalog = Array.isArray(catalog.plans) ? catalog.plans : [];
+  } catch {
+    planCatalog = [];
+  }
+}
+
+async function loadPlan(planId) {
+  if (planId === BUILT_IN_PLAN.id) return BUILT_IN_PLAN;
+  const entry = planCatalog.find((plan) => plan.id === planId);
+  if (!entry) throw new Error("That workout plan is not available.");
+  const response = await fetch(entry.path, { cache: "no-store" });
+  if (!response.ok) throw new Error("The workout plan could not be loaded.");
+  return normalizePlan(await response.json(), entry.id);
+}
+
+function renderPlanSelect() {
+  const select = $("#plan-select");
+  select.replaceChildren();
+  [{ id: BUILT_IN_PLAN.id, name: BUILT_IN_PLAN.name }, ...planCatalog].forEach((plan) => {
+    const option = document.createElement("option");
+    option.value = plan.id;
+    option.textContent = plan.name;
+    option.selected = plan.id === activePlan.id;
+    select.append(option);
+  });
+}
+
+async function changePlan(planId, announce = true, preserveProgression = false) {
+  try {
+    activePlan = await loadPlan(planId);
+    state.settings.activePlanId = activePlan.id;
+    if (!preserveProgression) state.settings.longRunWeek = 1;
+    draftSession = null;
+    persistState();
+    renderPlanSelect();
+    renderLongRunOptions();
+    renderToday();
+    renderWeek();
+    if (activeView === "progress") renderProgress();
+    if (announce) showToast(`${activePlan.name} loaded.`);
+  } catch (error) {
+    renderPlanSelect();
+    showToast(error.message || "That workout plan could not be loaded.", "error");
+  }
+}
+
 function switchView(view) {
   activeView = view;
   $$(".view").forEach((section) => section.classList.toggle("is-active", section.id === `view-${view}`));
@@ -94,16 +225,31 @@ function switchView(view) {
 
 function currentLog() {
   if (draftSession?.date === selectedDate) return draftSession;
-  return state.workoutLogs[selectedDate] || null;
+  return state.workoutLogs[workoutLogKey(selectedDate)] || null;
+}
+
+function workoutLogKey(date) {
+  return activePlan.id === "form-flow" ? date : `${activePlan.id}::${date}`;
+}
+
+function exerciseConfigKey(exerciseId) {
+  return activePlan.id === "form-flow" ? exerciseId : `${activePlan.id}::${exerciseId}`;
+}
+
+function activeWorkoutLogs() {
+  return Object.fromEntries(
+    Object.entries(state.workoutLogs).filter(([, log]) => (log.planId || "form-flow") === activePlan.id),
+  );
 }
 
 function targetLongRun() {
-  return LONG_RUNS[Math.max(0, Math.min(15, Number(state.settings.longRunWeek || 1) - 1))];
+  const runs = activePlan.longRuns || [];
+  return runs[Math.max(0, Math.min(runs.length - 1, Number(state.settings.longRunWeek || 1) - 1))];
 }
 
 function renderToday() {
   const dayKey = dateToDayKey(selectedDate);
-  const day = WEEK_PLAN[dayKey];
+  const day = activePlan.days[dayKey];
   const log = currentLog();
 
   els.trainingDate.value = selectedDate;
@@ -122,9 +268,9 @@ function renderToday() {
     button.classList.toggle("is-active", Number(button.dataset.block) === Number(state.settings.block));
   });
 
-  if (dayKey === "saturday" && Number(state.settings.block) === 1) {
+  if (activePlan.longRuns?.length && dayKey === activePlan.longRunDay && Number(state.settings.block) === 1) {
     els.longRunCallout.classList.remove("is-hidden");
-    els.longRunCallout.innerHTML = `<span>LONG-RUN WEEK ${state.settings.longRunWeek}</span><strong>${targetLongRun()}</strong><small>Walk breaks are allowed. Repeat the week if the next-morning response is worse.</small>`;
+    els.longRunCallout.innerHTML = `<span>PROGRESSION WEEK ${Number(state.settings.longRunWeek)}</span><strong>${escapeHtml(targetLongRun())}</strong><small>Use the plan’s progression guidance and repeat a week when recovery is not stable.</small>`;
   } else {
     els.longRunCallout.classList.add("is-hidden");
     els.longRunCallout.replaceChildren();
@@ -135,7 +281,7 @@ function renderToday() {
   loadResponseFields(log);
   updateSessionProgress();
 
-  const saved = state.workoutLogs[selectedDate];
+  const saved = state.workoutLogs[workoutLogKey(selectedDate)];
   if (draftSession) {
     els.saveStatus.textContent = "Previous session loaded — review, then save";
   } else if (saved) {
@@ -143,7 +289,8 @@ function renderToday() {
   } else {
     els.saveStatus.textContent = day.exercises.length ? "Not saved yet" : "Rest day";
   }
-  els.loadSession.disabled = !findPreviousSession(state.workoutLogs, dayKey, selectedDate) || !day.exercises.length;
+  els.loadSession.disabled =
+    !findPreviousSession(state.workoutLogs, dayKey, selectedDate, activePlan.id) || !day.exercises.length;
 }
 
 function renderWarmup(day, log) {
@@ -155,7 +302,7 @@ function renderWarmup(day, log) {
     label.innerHTML = `
       <input type="checkbox" data-warmup-index="${index}" ${checked[index] ? "checked" : ""} />
       <span class="custom-check" aria-hidden="true">✓</span>
-      <span>${item}</span>
+      <span>${escapeHtml(item)}</span>
     `;
     els.warmupList.append(label);
   });
@@ -194,11 +341,12 @@ function createExerciseCard(exercise, index, savedExercise) {
   $(".exercise-name", card).textContent = exercise.name;
   $(".exercise-prescription", card).textContent = exercise.prescription;
   $(".exercise-tags", card).innerHTML = `
-    <span>${exercise.section || exercise.category}</span>
+    <span>${escapeHtml(exercise.section || exercise.category)}</span>
     ${exercise.optional ? "<span class=\"tag-optional\">OPTIONAL</span>" : ""}
   `;
 
-  const measurement = savedExercise?.measurement || state.exerciseConfigs[exercise.id] || exercise.measurement;
+  const measurement =
+    savedExercise?.measurement || state.exerciseConfigs[exerciseConfigKey(exercise.id)] || exercise.measurement;
   const select = $(".measurement-select", card);
   Object.entries(MEASUREMENT_TYPES).forEach(([key, config]) => {
     const option = document.createElement("option");
@@ -208,7 +356,7 @@ function createExerciseCard(exercise, index, savedExercise) {
     select.append(option);
   });
 
-  const previous = findPreviousExerciseLog(state.workoutLogs, exercise.id, selectedDate);
+  const previous = findPreviousExerciseLog(state.workoutLogs, exercise.id, selectedDate, activePlan.id);
   const previousLine = $(".previous-line", card);
   if (previous) {
     previousLine.textContent = `Last: ${formatDate(previous.date)} · ${summarizeSetPreview(previous.measurement, previous.sets)}`;
@@ -226,16 +374,16 @@ function createExerciseCard(exercise, index, savedExercise) {
     button.setAttribute("aria-expanded", String(!collapsed));
   });
   select.addEventListener("change", () => {
-    state.exerciseConfigs[exercise.id] = select.value;
+    state.exerciseConfigs[exerciseConfigKey(exercise.id)] = select.value;
     persistState();
     renderSetRows(card, select.value, Array.from({ length: Number(card.dataset.defaultSets) }, () => ({})));
     updateSessionProgress();
   });
   $(".load-previous", card).addEventListener("click", () => {
-    const earlier = findPreviousExerciseLog(state.workoutLogs, exercise.id, selectedDate);
+    const earlier = findPreviousExerciseLog(state.workoutLogs, exercise.id, selectedDate, activePlan.id);
     if (!earlier) return;
     select.value = earlier.measurement;
-    state.exerciseConfigs[exercise.id] = earlier.measurement;
+    state.exerciseConfigs[exerciseConfigKey(exercise.id)] = earlier.measurement;
     persistState();
     renderSetRows(card, earlier.measurement, structuredClone(earlier.sets));
     showToast(`${exercise.name}: previous values loaded.`);
@@ -364,9 +512,10 @@ function saveWorkout() {
     }
   });
   const warmup = $$("[data-warmup-index]", els.warmupList).map((input) => input.checked);
-  state.workoutLogs[selectedDate] = {
+  state.workoutLogs[workoutLogKey(selectedDate)] = {
     date: selectedDate,
     dayKey,
+    planId: activePlan.id,
     warmup,
     exercises,
     response: {
@@ -412,12 +561,13 @@ function updateSessionProgress() {
 
 function loadLastSession() {
   const dayKey = dateToDayKey(selectedDate);
-  const previous = findPreviousSession(state.workoutLogs, dayKey, selectedDate);
+  const previous = findPreviousSession(state.workoutLogs, dayKey, selectedDate, activePlan.id);
   if (!previous) return;
   draftSession = {
     ...structuredClone(previous),
     date: selectedDate,
     dayKey,
+    planId: activePlan.id,
     updatedAt: null,
   };
   renderToday();
@@ -431,9 +581,9 @@ function renderWeek() {
   const grid = $("#week-grid");
   grid.replaceChildren();
   DAY_KEYS.forEach((dayKey, index) => {
-    const day = WEEK_PLAN[dayKey];
+    const day = activePlan.days[dayKey];
     const date = toIsoDate(addDays(base, index));
-    const log = state.workoutLogs[date];
+    const log = state.workoutLogs[workoutLogKey(date)];
     const completedSets = log
       ? Object.values(log.exercises || {}).flatMap((exercise) => exercise.sets || []).filter((set) => set.completed).length
       : 0;
@@ -442,11 +592,11 @@ function renderWeek() {
     card.className = "week-card";
     card.dataset.tone = day.tone;
     card.innerHTML = `
-      <span class="week-card-day">${day.short}<small>${formatDate(date, { month: "short", day: "numeric" })}</small></span>
+      <span class="week-card-day">${escapeHtml(day.short)}<small>${formatDate(date, { month: "short", day: "numeric" })}</small></span>
       <span class="week-card-copy">
-        <small>${day.kicker}</small>
-        <strong>${day.focus}</strong>
-        <span>${day.estimate}</span>
+        <small>${escapeHtml(day.kicker)}</small>
+        <strong>${escapeHtml(day.focus)}</strong>
+        <span>${escapeHtml(day.estimate)}</span>
       </span>
       <span class="week-card-status ${log ? "is-logged" : ""}">${log ? `${completedSets} sets` : dayKey === "sunday" ? "REST" : "OPEN"}</span>
     `;
@@ -463,7 +613,9 @@ function renderWeek() {
 function renderLongRunOptions() {
   const select = $("#long-run-week");
   select.replaceChildren();
-  LONG_RUNS.forEach((distance, index) => {
+  const longRuns = activePlan.longRuns || [];
+  $("#long-run-control").classList.toggle("is-hidden", !longRuns.length);
+  longRuns.forEach((distance, index) => {
     const option = document.createElement("option");
     option.value = index + 1;
     option.textContent = `Week ${index + 1} · ${distance}`;
@@ -474,22 +626,23 @@ function renderLongRunOptions() {
 
 function renderProgress() {
   const select = $("#stats-exercise");
-  if (!select.options.length) {
-    getAllExercises().forEach((exercise) => {
-      const option = document.createElement("option");
-      option.value = exercise.id;
-      option.textContent = exercise.name;
-      select.append(option);
-    });
-  }
+  const previousSelection = select.value;
+  select.replaceChildren();
+  getAllExercises(activePlan.days).forEach((exercise) => {
+    const option = document.createElement("option");
+    option.value = exercise.id;
+    option.textContent = exercise.name;
+    option.selected = exercise.id === previousSelection;
+    select.append(option);
+  });
   renderExerciseStats();
   renderBody();
   renderSleep();
 }
 
 function renderExerciseStats() {
-  const exerciseId = $("#stats-exercise").value || getAllExercises()[0]?.id;
-  const stats = summarizeExercise(state.workoutLogs, exerciseId);
+  const exerciseId = $("#stats-exercise").value || getAllExercises(activePlan.days)[0]?.id;
+  const stats = summarizeExercise(activeWorkoutLogs(), exerciseId);
   $("#stat-sessions").textContent = stats.sessions;
   $("#stat-latest").textContent = stats.latest;
   $("#stat-best").textContent = stats.best;
@@ -651,11 +804,7 @@ async function importData(file) {
     if (!approved) return;
     state = result.state;
     draftSession = null;
-    persistState();
-    renderLongRunOptions();
-    renderToday();
-    renderWeek();
-    renderProgress();
+    await changePlan(state.settings.activePlanId || "form-flow", false, true);
     showToast("Backup restored.");
   } catch (error) {
     showToast(error.message || "That backup could not be imported.", "error");
@@ -671,8 +820,10 @@ function eraseLocalData() {
   if (!approved) return;
   localStorage.removeItem(STORAGE_KEY);
   state = createDefaultState();
+  activePlan = BUILT_IN_PLAN;
   selectedDate = toIsoDate();
   draftSession = null;
+  renderPlanSelect();
   renderLongRunOptions();
   renderToday();
   renderWeek();
@@ -756,6 +907,7 @@ function timerFinished() {
 
 function bindEvents() {
   $$("[data-nav]").forEach((button) => button.addEventListener("click", () => switchView(button.dataset.nav)));
+  $("#plan-select").addEventListener("change", (event) => changePlan(event.target.value));
   els.trainingDate.addEventListener("change", () => {
     selectedDate = els.trainingDate.value || toIsoDate();
     draftSession = null;
@@ -838,12 +990,22 @@ function bindEvents() {
   });
 }
 
-function init() {
+async function init() {
   els.trainingDate.value = selectedDate;
   $("#body-date").value = selectedDate;
   $("#sleep-week").value = toIsoDate(startOfWeek(new Date()));
-  renderLongRunOptions();
   bindEvents();
+  await discoverPlans();
+  const requestedPlan = state.settings.activePlanId || "form-flow";
+  try {
+    activePlan = await loadPlan(requestedPlan);
+  } catch {
+    activePlan = BUILT_IN_PLAN;
+    state.settings.activePlanId = BUILT_IN_PLAN.id;
+    persistState();
+  }
+  renderPlanSelect();
+  renderLongRunOptions();
   renderToday();
   updateTimerUi();
 }

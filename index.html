@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'; worker-src 'none'"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'; worker-src 'none'"
     />
     <meta name="referrer" content="no-referrer" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -45,10 +45,18 @@
               <p class="eyebrow" id="today-kicker">TODAY’S WORK</p>
               <h1 id="today-heading">Ready when you are.</h1>
             </div>
-            <label class="date-control">
-              <span>Training date</span>
-              <input id="training-date" type="date" />
-            </label>
+            <div class="page-controls">
+              <label class="plan-control">
+                <span>Workout plan</span>
+                <select id="plan-select">
+                  <option value="form-flow">Form / Flow weekly plan</option>
+                </select>
+              </label>
+              <label class="date-control">
+                <span>Training date</span>
+                <input id="training-date" type="date" />
+              </label>
+            </div>
           </div>
 
           <article class="session-hero" id="session-hero">
@@ -148,7 +156,7 @@
               <span>Viewing</span>
               <strong id="week-range">—</strong>
             </div>
-            <label>
+            <label id="long-run-control">
               <span>Long-run week</span>
               <select id="long-run-week"></select>
             </label>
@@ -278,8 +286,9 @@
             <div>
               <strong>Private by design</strong>
               <p>
-                This app has no analytics, accounts, database, or runtime network requests. Records stay in this browser
-                profile. Export a backup regularly, and erase local data before handing a shared device to someone else.
+                This app has no analytics, accounts, or database. It only loads public plan files from this site; workout
+                records stay in this browser profile and are never uploaded. Export a backup regularly, and erase local
+                data before handing a shared device to someone else.
               </p>
             </div>
           </aside>

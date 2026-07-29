@@ -247,6 +247,7 @@ main {
 }
 
 .date-control,
+.plan-control,
 .week-summary label,
 .panel-head label,
 .inline-form label {
@@ -255,6 +256,7 @@ main {
 }
 
 .date-control span,
+.plan-control span,
 .week-summary label > span,
 .inline-form label > span {
   color: var(--ink-soft);
@@ -262,6 +264,21 @@ main {
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+}
+
+.page-controls {
+  display: flex;
+  align-items: end;
+  gap: 10px;
+}
+
+.plan-control {
+  display: grid;
+  gap: 6px;
+}
+
+.plan-control select {
+  min-width: 230px;
 }
 
 input,
@@ -1599,6 +1616,17 @@ textarea {
   }
 
   .date-control {
+    width: 100%;
+  }
+
+  .page-controls {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .plan-control,
+  .plan-control select {
     width: 100%;
   }
 

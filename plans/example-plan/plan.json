@@ -1,0 +1,118 @@
+{
+  "schemaVersion": 1,
+  "id": "example-plan",
+  "name": "Example three-day plan",
+  "description": "A small public example showing the folder-plan format.",
+  "days": {
+    "monday": {
+      "label": "Monday",
+      "short": "MON",
+      "focus": "Full Body A",
+      "kicker": "Strength · foundational",
+      "estimate": "45–60 min",
+      "tone": "lime",
+      "sequenceNote": "Use controlled repetitions and finish each set with good technique.",
+      "warmup": [
+        "Easy cardio · 5 min",
+        "Bodyweight squat · 8",
+        "Wall slide · 8"
+      ],
+      "exercises": [
+        {
+          "id": "goblet-squat",
+          "name": "Goblet squat",
+          "prescription": "3 × 8–12",
+          "sets": 3,
+          "rest": 120,
+          "measurement": "weight_reps",
+          "category": "Strength"
+        },
+        {
+          "id": "neutral-db-press",
+          "name": "Neutral-grip dumbbell press",
+          "prescription": "3 × 8–12",
+          "sets": 3,
+          "rest": 120,
+          "measurement": "weight_reps",
+          "category": "Strength"
+        },
+        {
+          "id": "cable-row",
+          "name": "Cable row",
+          "prescription": "3 × 10–15",
+          "sets": 3,
+          "rest": 90,
+          "measurement": "weight_reps",
+          "category": "Strength"
+        }
+      ]
+    },
+    "wednesday": {
+      "label": "Wednesday",
+      "short": "WED",
+      "focus": "Easy cardio",
+      "kicker": "Aerobic base",
+      "estimate": "30–40 min",
+      "tone": "blue",
+      "sequenceNote": "Keep the effort conversational.",
+      "warmup": [
+        "Begin very easily · 5 min"
+      ],
+      "exercises": [
+        {
+          "id": "easy-cardio",
+          "name": "Easy cardio",
+          "prescription": "30–40 min at RPE 2–4",
+          "sets": 1,
+          "rest": 0,
+          "measurement": "duration",
+          "category": "Cardio"
+        }
+      ]
+    },
+    "friday": {
+      "label": "Friday",
+      "short": "FRI",
+      "focus": "Full Body B",
+      "kicker": "Strength · repeatable",
+      "estimate": "45–60 min",
+      "tone": "orange",
+      "sequenceNote": "Progress only when all repetitions remain controlled.",
+      "warmup": [
+        "Easy cardio · 5 min",
+        "Hip hinge drill · 8",
+        "Band row · 10"
+      ],
+      "exercises": [
+        {
+          "id": "romanian-deadlift",
+          "name": "Romanian deadlift",
+          "prescription": "3 × 6–10",
+          "sets": 3,
+          "rest": 150,
+          "measurement": "weight_reps",
+          "category": "Strength"
+        },
+        {
+          "id": "landmine-press",
+          "name": "Landmine press",
+          "prescription": "3 × 8–12 / side",
+          "sets": 3,
+          "rest": 120,
+          "measurement": "weight_reps",
+          "category": "Strength"
+        },
+        {
+          "id": "lat-pulldown",
+          "name": "Neutral-grip lat pulldown",
+          "prescription": "3 × 8–12",
+          "sets": 3,
+          "rest": 120,
+          "measurement": "weight_reps",
+          "category": "Strength"
+        }
+      ]
+    }
+  }
+}
+
