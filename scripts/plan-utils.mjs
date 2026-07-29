@@ -1,6 +1,7 @@
 export const PLAN_ID_PATTERN = /^[a-z0-9][a-z0-9-]{0,63}$/;
 export const DAY_KEYS = new Set(["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]);
 export const MEASUREMENT_KEYS = new Set([
+  "completion",
   "weight_reps",
   "reps",
   "assisted_reps",

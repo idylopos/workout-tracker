@@ -5,6 +5,7 @@ import {
   createDefaultState,
   dateToDayKey,
   findPreviousExerciseLog,
+  normalizeResponseRating,
   normalizeState,
   summarizeExercise,
   validateBackup,
@@ -19,8 +20,25 @@ test("normalizes a partial persisted state", () => {
   const state = normalizeState({ settings: { block: 2 }, bodyLogs: [] });
   assert.equal(state.version, APP_VERSION);
   assert.equal(state.settings.block, 2);
+  assert.equal(state.settings.pullupStep, 1);
   assert.deepEqual(state.workoutLogs, {});
   assert.deepEqual(state.sleepLogs, []);
+});
+
+test("keeps pull-up progression within the supported roadmap", () => {
+  assert.equal(normalizeState({ settings: { pullupStep: 4 } }).settings.pullupStep, 4);
+  assert.equal(normalizeState({ settings: { pullupStep: 99 } }).settings.pullupStep, 6);
+  assert.equal(normalizeState({ settings: { pullupStep: -2 } }).settings.pullupStep, 1);
+});
+
+test("maps legacy 0–10 pain logs to the descriptive five-level scale", () => {
+  assert.equal(normalizeResponseRating(0), 0);
+  assert.equal(normalizeResponseRating(3), 1);
+  assert.equal(normalizeResponseRating(5), 2);
+  assert.equal(normalizeResponseRating(7), 3);
+  assert.equal(normalizeResponseRating(10), 4);
+  assert.equal(normalizeResponseRating(3, 2), 3);
+  assert.equal(normalizeResponseRating("", 2), "");
 });
 
 test("validates backup shape before restore", () => {
@@ -84,4 +102,23 @@ test("summarizes strength sessions and estimated best performance", () => {
   assert.equal(summary.latest, "22 kg × 8");
   assert.equal(summary.best, "22 kg × 8");
   assert.equal(summary.points.length, 2);
+});
+
+test("summarizes check-off mobility rounds", () => {
+  const summary = summarizeExercise(
+    {
+      session: {
+        date: "2026-07-08",
+        exercises: {
+          calf: {
+            measurement: "completion",
+            sets: [{ completed: true }, { completed: false }],
+          },
+        },
+      },
+    },
+    "calf",
+  );
+  assert.equal(summary.latest, "1 / 2 rounds");
+  assert.equal(summary.volume, "1");
 });

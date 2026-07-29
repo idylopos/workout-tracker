@@ -2,6 +2,11 @@ export const APP_VERSION = 1;
 export const STORAGE_KEY = "formflow.training.v1";
 
 export const MEASUREMENT_TYPES = {
+  completion: {
+    label: "Check-off only",
+    short: "Done",
+    fields: [],
+  },
   weight_reps: {
     label: "Weight × reps",
     short: "Load",
@@ -56,6 +61,114 @@ export const MEASUREMENT_TYPES = {
     ],
   },
 };
+
+export const PULL_UP_STEPS = [
+  {
+    id: 1,
+    label: "Step 1 · Assisted base",
+    title: "Assisted neutral-grip pull-up",
+    prescription: "3 × 5 · choose assistance that leaves about 2 reps in reserve",
+    sets: 3,
+    measurement: "assisted_reps",
+    target: "Complete all 3 × 5 with smooth, full-range reps.",
+    next: "After 2 successful sessions, keep the same assistance and move to Step 2.",
+  },
+  {
+    id: 2,
+    label: "Step 2 · Build assisted reps",
+    title: "Assisted neutral-grip pull-up",
+    prescription: "3 × 6–8 · keep at least 1 rep in reserve",
+    sets: 3,
+    measurement: "assisted_reps",
+    target: "Build to 3 × 8 without shortening the range or kicking.",
+    next: "After 2 successful 3 × 8 sessions, move to Step 3.",
+  },
+  {
+    id: 3,
+    label: "Step 3 · Reduce assistance",
+    title: "Lightly assisted neutral-grip pull-up",
+    prescription: "3 × 5–8 · reduce assistance by the smallest available step",
+    sets: 3,
+    measurement: "assisted_reps",
+    target: "Rebuild from 3 × 5 toward 3 × 8 each time assistance is reduced.",
+    next: "Move on after 2 successful 3 × 8 sessions at the lowest machine assistance or thinnest stable band.",
+  },
+  {
+    id: 4,
+    label: "Step 4 · Clean singles",
+    title: "Unassisted pull-up singles",
+    prescription: "5 × 1 · rest 2–3 min · no grinding or kipping",
+    sets: 5,
+    measurement: "reps",
+    target: "Complete five clean singles, each starting from control.",
+    next: "After 2 successful sessions, move to Step 5.",
+  },
+  {
+    id: 5,
+    label: "Step 5 · Repeatable doubles",
+    title: "Unassisted pull-up",
+    prescription: "4 × 2 · keep at least 1 rep in reserve",
+    sets: 4,
+    measurement: "reps",
+    target: "Complete all four doubles with the same range and tempo.",
+    next: "After 2 successful sessions, move to Step 6.",
+  },
+  {
+    id: 6,
+    label: "Step 6 · Build to five",
+    title: "Unassisted pull-up",
+    prescription: "3 sets · aim for 3–5 clean reps · stop with at least 1 rep in reserve",
+    sets: 3,
+    measurement: "reps",
+    target: "Build the first set to five continuous, clean repetitions.",
+    next: "Five clean reps completes the 0 → 5 roadmap. Stay here and add total reps gradually.",
+  },
+];
+
+export const RESPONSE_SCALE = [
+  {
+    value: 0,
+    face: "😄",
+    label: "Comfortable",
+    description: "No meaningful pain; at your normal baseline or better.",
+  },
+  {
+    value: 1,
+    face: "🙂",
+    label: "Mild",
+    description: "Noticeable but stable; movement and technique stayed normal.",
+  },
+  {
+    value: 2,
+    face: "😐",
+    label: "Adjust",
+    description: "Clearly rising or more noticeable; reduce load, range, or volume next time.",
+  },
+  {
+    value: 3,
+    face: "🙁",
+    label: "Stop",
+    description: "Sharp, limiting, or changed your movement; stop the provoking exercise.",
+  },
+  {
+    value: 4,
+    face: "😧",
+    label: "Red flag",
+    description: "Swelling, locking, giving way, night pain, or persistent worsening—seek assessment.",
+  },
+];
+
+export function normalizeResponseRating(value, scaleVersion = 1) {
+  if (value === "" || value === null || value === undefined) return "";
+  const rating = Number(value);
+  if (!Number.isFinite(rating)) return "";
+  if (Number(scaleVersion) >= 2) return Math.max(0, Math.min(4, Math.round(rating)));
+  if (rating <= 0) return 0;
+  if (rating <= 3) return 1;
+  if (rating <= 5) return 2;
+  if (rating <= 7) return 3;
+  return 4;
+}
 
 const lift = (id, name, prescription, sets, rest = 90, measurement = "weight_reps", options = {}) => ({
   id,
@@ -161,11 +274,25 @@ export const WEEK_PLAN = {
       "Moderately assisted pull-up · 1 × 2–3",
     ],
     exercises: [
-      lift("pull-up-progression", "Pull-up progression", "3 working sets · leave ≥1 rep in reserve", 3, 150, "assisted_reps"),
+      lift(
+        "pull-up-progression",
+        "Pull-up progression",
+        "Choose your current performance step below",
+        3,
+        150,
+        "assisted_reps",
+        { progression: "pullup" },
+      ),
       lift("chest-supported-row", "Chest-supported neutral-grip row", "3 × 6–10", 3, 120),
       lift("face-pull", "Face pull", "2 × 12–20", 2, 75),
       lift("hammer-curl", "Neutral-grip hammer curl", "2 × 8–15", 2, 75),
-      activity("mobility-a", "Mobility A", "Calf, hip-flexor, and strap hamstring stretch · 2 × 45 sec / side", "duration", {
+      lift("mobility-a-calf", "Mobility A · Calf stretch", "2 rounds · 45 sec / side · check each round", 2, 0, "completion", {
+        category: "Mobility",
+      }),
+      lift("mobility-a-hip-flexor", "Mobility A · Hip-flexor stretch", "2 rounds · 45 sec / side · check each round", 2, 0, "completion", {
+        category: "Mobility",
+      }),
+      lift("mobility-a-hamstring", "Mobility A · Strap hamstring stretch", "2 rounds · 45 sec / side · check each round", 2, 0, "completion", {
         category: "Mobility",
       }),
       activity("zone-2-cycle", "Optional Zone 2 cycling", "25–40 min at RPE 2–3 · only when well recovered", "duration", {
@@ -257,7 +384,15 @@ export const WEEK_PLAN = {
     exercises: [
       activity("long-run", "Long run", "Block 1: use the 16-week progression · Block 2: 8–10 km easy", "distance_time"),
       activity("easy-swim", "Technique-focused swim", "25–40 min at RPE 2–3 · no paddles, hard butterfly, or fatigued overhead work", "duration"),
-      lift("pull-up-progression", "Optional pull-up progression", "2 working sets", 2, 150, "assisted_reps", { optional: true }),
+      lift(
+        "pull-up-progression",
+        "Optional pull-up progression",
+        "Repeat your current performance step only when fresh",
+        2,
+        150,
+        "assisted_reps",
+        { optional: true, progression: "pullup" },
+      ),
       lift("one-arm-cable-row", "Optional one-arm cable row", "2 × 10–15 / side", 2, 90, "weight_reps", { optional: true }),
       lift("db-pullover", "Optional light dumbbell pullover", "2 × 10–15", 2, 90, "weight_reps", { optional: true }),
       lift("face-pull", "Optional face pull", "2 × 12–20", 2, 75, "weight_reps", { optional: true }),
@@ -305,6 +440,7 @@ export function createDefaultState() {
     settings: {
       block: 1,
       longRunWeek: 1,
+      pullupStep: 1,
       weekOffset: 0,
       activePlanId: "form-flow",
     },
@@ -318,9 +454,12 @@ export function createDefaultState() {
 export function normalizeState(value) {
   const fallback = createDefaultState();
   if (!value || typeof value !== "object") return fallback;
+  const settings = { ...fallback.settings, ...(value.settings || {}) };
+  settings.block = Number(settings.block) === 2 ? 2 : 1;
+  settings.pullupStep = Math.max(1, Math.min(PULL_UP_STEPS.length, Number(settings.pullupStep) || 1));
   return {
     version: APP_VERSION,
-    settings: { ...fallback.settings, ...(value.settings || {}) },
+    settings,
     exerciseConfigs: value.exerciseConfigs && typeof value.exerciseConfigs === "object" ? value.exerciseConfigs : {},
     workoutLogs: value.workoutLogs && typeof value.workoutLogs === "object" ? value.workoutLogs : {},
     bodyLogs: Array.isArray(value.bodyLogs) ? value.bodyLogs : [],
@@ -429,6 +568,10 @@ function numeric(value) {
 
 function bestSetMetric(measurement, sets = []) {
   if (!sets.length) return { value: 0, label: "—", volume: 0 };
+  if (measurement === "completion") {
+    const completed = sets.filter((set) => set.completed).length;
+    return { value: completed, label: `${completed} / ${sets.length} rounds`, volume: completed };
+  }
   if (measurement === "weight_reps") {
     const evaluated = sets.map((set) => {
       const weight = numeric(set.weight);

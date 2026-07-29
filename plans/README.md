@@ -60,6 +60,7 @@ Days that are omitted become rest days. Supported tones are `lime`, `blue`, `ora
 
 Supported measurements:
 
+- `completion` (check-off rounds without entering a number)
 - `weight_reps`
 - `reps`
 - `assisted_reps`
@@ -90,4 +91,3 @@ Give an AI the example file and ask:
 
 AI-generated exercise guidance should be reviewed by a qualified professional when injuries, medical conditions, or
 individualized clearance are relevant.
-

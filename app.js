@@ -2,6 +2,8 @@ import {
   APP_VERSION,
   LONG_RUNS,
   MEASUREMENT_TYPES,
+  PULL_UP_STEPS,
+  RESPONSE_SCALE,
   STORAGE_KEY,
   WEEK_PLAN,
   addDays,
@@ -11,6 +13,7 @@ import {
   findPreviousSession,
   formatDuration,
   getAllExercises,
+  normalizeResponseRating,
   normalizeState,
   startOfWeek,
   summarizeExercise,
@@ -27,6 +30,28 @@ import {
 
 const DAY_KEYS = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
 const numberFormatter = new Intl.NumberFormat(undefined, { maximumFractionDigits: 1 });
+const RUNNING_PHASES = {
+  1: {
+    number: "BLOCK 1",
+    title: "Build to a comfortable 10 km",
+    copy: "Use this phase until you can complete 10 km comfortably and your joints and usual energy recover by the following morning.",
+    points: [
+      ["Tuesday", "30 min easy · RPE 2–4"],
+      ["Thursday", "25–35 min easy · lift first"],
+      ["Saturday", "Follow the 16-week long-run progression"],
+    ],
+  },
+  2: {
+    number: "BLOCK 2",
+    title: "Improve your comfortable 10 km",
+    copy: "Start only after 10 km feels repeatable. This phase keeps the aerobic base and adds controlled speed work.",
+    points: [
+      ["Tuesday", "30–40 min easy + 4 × 20-sec strides"],
+      ["Thursday", "Start with tempo, then alternate with intervals · run first"],
+      ["Saturday", "8–10 km easy"],
+    ],
+  },
+};
 const BUILT_IN_PLAN = {
   id: "form-flow",
   name: "Form / Flow weekly plan",
@@ -72,9 +97,7 @@ const els = {
   exerciseList: $("#exercise-list"),
   loadSession: $("#load-session-button"),
   longRunCallout: $("#long-run-callout"),
-  painDuring: $("#pain-during"),
-  painLater: $("#pain-later"),
-  painNext: $("#pain-next"),
+  phaseGuide: $("#phase-guide"),
   sessionNotes: $("#session-notes"),
   saveStatus: $("#save-status"),
   toast: $("#toast"),
@@ -370,6 +393,42 @@ function targetLongRun() {
   return runs[Math.max(0, Math.min(runs.length - 1, Number(state.settings.longRunWeek || 1) - 1))];
 }
 
+function renderPhaseGuide() {
+  const builtIn = activePlan.id === BUILT_IN_PLAN.id;
+  $(".phase-selector").classList.toggle("is-hidden", !builtIn);
+  els.phaseGuide.classList.toggle("is-hidden", !builtIn);
+  if (!builtIn) return;
+  const phase = RUNNING_PHASES[Number(state.settings.block) === 2 ? 2 : 1];
+  $("#phase-guide-number").textContent = phase.number;
+  $("#phase-guide-title").textContent = phase.title;
+  $("#phase-guide-copy").textContent = phase.copy;
+  $("#phase-guide-points").innerHTML = phase.points
+    .map(([day, task]) => `<span><strong>${escapeHtml(day)}</strong>${escapeHtml(task)}</span>`)
+    .join("");
+  els.phaseGuide.dataset.block = state.settings.block;
+}
+
+function activePrescription(exercise) {
+  if (activePlan.id !== BUILT_IN_PLAN.id) return exercise.prescription;
+  const block = Number(state.settings.block) === 2 ? 2 : 1;
+  if (exercise.id === "easy-run") {
+    return block === 1
+      ? "30 min easy · RPE 2–4 · conversational pace"
+      : "30–40 min easy · then 4 × 20-sec relaxed strides with full easy recovery";
+  }
+  if (exercise.id === "run-2") {
+    return block === 1
+      ? "25–35 min easy · RPE 2–4 · lift first and separate by about 6 hours"
+      : "Start with tempo, then alternate weekly: tempo—10 min easy, 3 × 6 min at RPE 6–7 with 2 min easy; intervals—10 min easy, 6 × 2 min at RPE 8 with 2 min easy; cool down";
+  }
+  if (exercise.id === "long-run") {
+    return block === 1
+      ? `${targetLongRun()} easy · walk breaks allowed`
+      : "8–10 km easy · conversational pace · walk breaks allowed";
+  }
+  return exercise.prescription;
+}
+
 function renderToday() {
   const dayKey = dateToDayKey(selectedDate);
   const day = activePlan.days[dayKey];
@@ -388,8 +447,11 @@ function renderToday() {
   els.hero.dataset.tone = day.tone;
 
   $$("[data-block]").forEach((button) => {
-    button.classList.toggle("is-active", Number(button.dataset.block) === Number(state.settings.block));
+    const active = Number(button.dataset.block) === Number(state.settings.block);
+    button.classList.toggle("is-active", active);
+    button.setAttribute("aria-pressed", String(active));
   });
+  renderPhaseGuide();
 
   if (activePlan.longRuns?.length && dayKey === activePlan.longRunDay && Number(state.settings.block) === 1) {
     els.longRunCallout.classList.remove("is-hidden");
@@ -453,23 +515,118 @@ function renderExercises(day, log) {
   });
 }
 
+function getPullupStep(stepId) {
+  return PULL_UP_STEPS.find((step) => step.id === Number(stepId)) || PULL_UP_STEPS[0];
+}
+
+function pullupSuccessCount(stepId, beforeDate) {
+  return Object.values(activeWorkoutLogs()).filter((log) => {
+    const exercise = log.exercises?.["pull-up-progression"];
+    return (
+      log.date < beforeDate &&
+      Number(exercise?.progressionStep) === Number(stepId) &&
+      exercise?.progressionQualified === true
+    );
+  }).length;
+}
+
+function updatePullupProgressStatus(card) {
+  if (card.dataset.progression !== "pullup" || card.dataset.progressionCounts !== "true") return;
+  const stepId = Number($(".progression-select", card).value);
+  const prior = pullupSuccessCount(stepId, selectedDate);
+  const current = $(".progression-qualified", card).checked ? 1 : 0;
+  const successful = Math.min(2, prior + current);
+  const status = $(".progression-status", card);
+  if (successful >= 2) {
+    status.textContent =
+      stepId === PULL_UP_STEPS.length ? "Goal step confirmed · keep building clean reps" : "2 of 2 · ready for the next step";
+    status.dataset.ready = "true";
+  } else {
+    status.textContent = `${successful} of 2 successful sessions`;
+    status.dataset.ready = "false";
+  }
+}
+
+function applyPullupStep(card, exercise, step, resetSets = false) {
+  const isOptional = Boolean(exercise.optional);
+  const workingSets = isOptional ? Math.min(2, step.sets) : step.sets;
+  card.dataset.progressionStep = step.id;
+  card.dataset.defaultSets = workingSets;
+  $(".exercise-prescription", card).textContent = isOptional
+    ? `Optional technique practice · first ${workingSets} sets of ${step.label}`
+    : step.prescription;
+  $(".progression-title", card).textContent = `${step.label}: ${step.title}`;
+  $(".progression-target", card).innerHTML = `<strong>Today:</strong> ${escapeHtml(step.target)}`;
+  $(".progression-next", card).innerHTML = `<strong>Next:</strong> ${escapeHtml(step.next)}`;
+  if (resetSets) {
+    const measurement = $(".measurement-select", card);
+    measurement.value = step.measurement;
+    state.exerciseConfigs[exerciseConfigKey(exercise.id)] = step.measurement;
+    renderSetRows(card, step.measurement, Array.from({ length: workingSets }, () => ({})));
+  }
+  updatePullupProgressStatus(card);
+}
+
+function setupPullupGuide(card, exercise, savedExercise) {
+  const guide = $(".exercise-guide", card);
+  guide.classList.remove("is-hidden");
+  card.dataset.progression = "pullup";
+  card.dataset.progressionCounts = String(!exercise.optional);
+
+  const stepSelect = $(".progression-select", card);
+  const selectedStep = getPullupStep(savedExercise?.progressionStep ?? state.settings.pullupStep);
+  PULL_UP_STEPS.forEach((step) => {
+    const option = document.createElement("option");
+    option.value = step.id;
+    option.textContent = step.label;
+    option.selected = step.id === selectedStep.id;
+    stepSelect.append(option);
+  });
+
+  const progressionCheck = $(".progression-check", card);
+  progressionCheck.classList.toggle("is-hidden", Boolean(exercise.optional));
+  $(".progression-qualified", card).checked = savedExercise?.progressionQualified === true;
+  applyPullupStep(card, exercise, selectedStep);
+
+  stepSelect.addEventListener("change", () => {
+    const step = getPullupStep(stepSelect.value);
+    state.settings.pullupStep = step.id;
+    $(".progression-qualified", card).checked = false;
+    applyPullupStep(card, exercise, step, true);
+    persistState();
+    updateSessionProgress();
+  });
+  $(".progression-qualified", card).addEventListener("change", () => updatePullupProgressStatus(card));
+}
+
 function createExerciseCard(exercise, index, savedExercise) {
   const card = $("#exercise-template").content.firstElementChild.cloneNode(true);
+  const pullupStep =
+    exercise.progression === "pullup"
+      ? getPullupStep(savedExercise?.progressionStep ?? state.settings.pullupStep)
+      : null;
   card.dataset.exerciseId = exercise.id;
-  card.dataset.defaultSets = exercise.sets;
+  card.dataset.defaultSets = pullupStep
+    ? exercise.optional
+      ? Math.min(2, pullupStep.sets)
+      : pullupStep.sets
+    : exercise.sets;
   card.dataset.rest = exercise.rest;
   card.dataset.exerciseName = exercise.name;
 
   $(".exercise-number", card).textContent = String(index + 1).padStart(2, "0");
   $(".exercise-name", card).textContent = exercise.name;
-  $(".exercise-prescription", card).textContent = exercise.prescription;
+  $(".exercise-prescription", card).textContent = pullupStep ? pullupStep.prescription : activePrescription(exercise);
   $(".exercise-tags", card).innerHTML = `
     <span>${escapeHtml(exercise.section || exercise.category)}</span>
     ${exercise.optional ? "<span class=\"tag-optional\">OPTIONAL</span>" : ""}
   `;
 
   const measurement =
-    savedExercise?.measurement || state.exerciseConfigs[exerciseConfigKey(exercise.id)] || exercise.measurement;
+    savedExercise?.measurement ||
+    pullupStep?.measurement ||
+    state.exerciseConfigs[exerciseConfigKey(exercise.id)] ||
+    exercise.measurement;
   const select = $(".measurement-select", card);
   Object.entries(MEASUREMENT_TYPES).forEach(([key, config]) => {
     const option = document.createElement("option");
@@ -488,8 +645,11 @@ function createExerciseCard(exercise, index, savedExercise) {
     $(".load-previous", card).disabled = true;
   }
 
-  const sets = savedExercise?.sets?.length ? savedExercise.sets : Array.from({ length: exercise.sets }, () => ({}));
+  const sets = savedExercise?.sets?.length
+    ? savedExercise.sets
+    : Array.from({ length: Number(card.dataset.defaultSets) }, () => ({}));
   renderSetRows(card, measurement, sets);
+  if (exercise.progression === "pullup") setupPullupGuide(card, exercise, savedExercise);
 
   $(".exercise-toggle", card).addEventListener("click", (event) => {
     const button = event.currentTarget;
@@ -528,6 +688,7 @@ function renderSetRows(card, measurement, sets) {
 function createSetRow(measurement, index, values, restSeconds) {
   const row = document.createElement("div");
   row.className = "set-row";
+  row.classList.toggle("is-check-only", MEASUREMENT_TYPES[measurement].fields.length === 0);
   row.dataset.setIndex = index;
   row.style.setProperty("--field-count", MEASUREMENT_TYPES[measurement].fields.length);
 
@@ -535,7 +696,7 @@ function createSetRow(measurement, index, values, restSeconds) {
   done.className = "set-done";
   done.innerHTML = `
     <input type="checkbox" aria-label="Mark set ${index + 1} complete" ${values.completed ? "checked" : ""} />
-    <span>${index + 1}</span>
+    <span>${measurement === "completion" ? `Round ${index + 1}` : index + 1}</span>
   `;
   done.querySelector("input").addEventListener("change", (event) => {
     row.classList.toggle("is-done", event.target.checked);
@@ -584,7 +745,7 @@ function createSetRow(measurement, index, values, restSeconds) {
       row.remove();
       [...list.children].forEach((item, itemIndex) => {
         item.dataset.setIndex = itemIndex;
-        $(".set-done span", item).textContent = itemIndex + 1;
+        $(".set-done span", item).textContent = measurement === "completion" ? `Round ${itemIndex + 1}` : itemIndex + 1;
       });
     }
     updateSessionProgress();
@@ -595,6 +756,9 @@ function createSetRow(measurement, index, values, restSeconds) {
 
 function summarizeSetPreview(measurement, sets = []) {
   if (!sets.length) return "no sets";
+  if (measurement === "completion") {
+    return `${sets.filter((set) => set.completed).length} / ${sets.length} rounds`;
+  }
   const set = sets[0];
   if (measurement === "weight_reps") return `${set.weight || "—"} kg × ${set.reps || "—"}`;
   if (measurement === "assisted_reps") return `${set.assistance || "—"} kg assist × ${set.reps || "—"}`;
@@ -627,11 +791,17 @@ async function saveWorkout() {
   $$(".exercise-card", els.exerciseList).forEach((card) => {
     const sets = collectSetRows(card);
     if (sets.some(hasSetContent)) {
-      exercises[card.dataset.exerciseId] = {
+      const exerciseLog = {
         name: card.dataset.exerciseName,
         measurement: $(".measurement-select", card).value,
         sets,
       };
+      if (card.dataset.progression === "pullup") {
+        exerciseLog.progressionStep = Number($(".progression-select", card).value);
+        exerciseLog.progressionQualified =
+          card.dataset.progressionCounts === "true" && $(".progression-qualified", card).checked;
+      }
+      exercises[card.dataset.exerciseId] = exerciseLog;
     }
   });
   const warmup = $$("[data-warmup-index]", els.warmupList).map((input) => input.checked);
@@ -642,9 +812,10 @@ async function saveWorkout() {
     warmup,
     exercises,
     response: {
-      painDuring: valueOrBlank(els.painDuring.value),
-      painLater: valueOrBlank(els.painLater.value),
-      painNext: valueOrBlank(els.painNext.value),
+      scaleVersion: 2,
+      painDuring: selectedResponseRating("painDuring"),
+      painLater: selectedResponseRating("painLater"),
+      painNext: selectedResponseRating("painNext"),
       notes: els.sessionNotes.value.trim(),
     },
     updatedAt: new Date().toISOString(),
@@ -656,14 +827,49 @@ async function saveWorkout() {
   }
 }
 
-function valueOrBlank(value) {
-  return value === "" ? "" : Number(value);
+function selectedResponseRating(key) {
+  const selected = $(`input[name="response-${key}"]:checked`);
+  return selected ? Number(selected.value) : "";
+}
+
+function updateResponseDescription(key) {
+  const value = selectedResponseRating(key);
+  const description = $(`[data-response-description="${key}"]`);
+  const option = RESPONSE_SCALE.find((item) => item.value === value);
+  description.textContent = option?.description || "No response selected.";
+  description.dataset.rating = option?.value ?? "";
+}
+
+function renderResponseScales() {
+  ["painDuring", "painLater", "painNext"].forEach((key) => {
+    const options = $(`[data-response-options="${key}"]`);
+    options.replaceChildren();
+    RESPONSE_SCALE.forEach((item) => {
+      const label = document.createElement("label");
+      label.className = "response-option";
+      label.innerHTML = `
+        <input type="radio" name="response-${key}" value="${item.value}" />
+        <span class="response-choice" data-rating="${item.value}">
+          <span class="response-face" aria-hidden="true">${item.face}</span>
+          <strong>${escapeHtml(item.label)}</strong>
+        </span>
+      `;
+      $("input", label).addEventListener("change", () => updateResponseDescription(key));
+      options.append(label);
+    });
+  });
 }
 
 function loadResponseFields(log) {
-  els.painDuring.value = log?.response?.painDuring ?? "";
-  els.painLater.value = log?.response?.painLater ?? "";
-  els.painNext.value = log?.response?.painNext ?? "";
+  ["painDuring", "painLater", "painNext"].forEach((key) => {
+    $$(`input[name="response-${key}"]`).forEach((input) => {
+      input.checked = false;
+    });
+    const rating = normalizeResponseRating(log?.response?.[key], log?.response?.scaleVersion);
+    const input = rating === "" ? null : $(`input[name="response-${key}"][value="${rating}"]`);
+    if (input) input.checked = true;
+    updateResponseDescription(key);
+  });
   els.sessionNotes.value = log?.response?.notes ?? "";
 }
 
@@ -1121,6 +1327,7 @@ async function init() {
   els.trainingDate.value = selectedDate;
   $("#body-date").value = selectedDate;
   $("#sleep-week").value = toIsoDate(startOfWeek(new Date()));
+  renderResponseScales();
   bindEvents();
   await discoverPlans();
   const requestedPlan = state.settings.activePlanId || "form-flow";

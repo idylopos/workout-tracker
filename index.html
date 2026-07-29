@@ -77,14 +77,32 @@
           </article>
 
           <div class="today-toolbar">
-            <div class="segmented" role="group" aria-label="Training block">
-              <button type="button" data-block="1" class="is-active">Block 1</button>
-              <button type="button" data-block="2">Block 2</button>
+            <div class="segmented phase-selector" role="group" aria-label="Running phase">
+              <button type="button" data-block="1" class="is-active">
+                <small>BLOCK 1</small>
+                <span>Build to 10 km</span>
+              </button>
+              <button type="button" data-block="2">
+                <small>BLOCK 2</small>
+                <span>Improve 10 km</span>
+              </button>
             </div>
             <button class="button button-secondary" type="button" id="load-session-button">
               Load last session
             </button>
           </div>
+
+          <article class="phase-guide" id="phase-guide" aria-live="polite">
+            <div class="phase-guide-label">
+              <span id="phase-guide-number">BLOCK 1</span>
+              <strong id="phase-guide-title">Build to a comfortable 10 km</strong>
+            </div>
+            <p id="phase-guide-copy">
+              Use this phase until you can complete 10 km comfortably and recover normally by the following morning.
+            </p>
+            <div class="phase-guide-points" id="phase-guide-points"></div>
+            <small>Changing blocks changes the running prescriptions only. Your strength plan stays the same.</small>
+          </article>
 
           <div id="long-run-callout" class="callout is-hidden"></div>
 
@@ -108,25 +126,34 @@
           </div>
           <div class="exercise-list" id="exercise-list"></div>
 
-          <details class="session-notes">
-            <summary>Session response & notes</summary>
-            <div class="response-grid">
-              <label>
-                <span>Pain during · 0–10</span>
-                <input id="pain-during" type="number" min="0" max="10" step="1" inputmode="numeric" />
-              </label>
-              <label>
-                <span>Pain later today · 0–10</span>
-                <input id="pain-later" type="number" min="0" max="10" step="1" inputmode="numeric" />
-              </label>
-              <label>
-                <span>Next morning · 0–10</span>
-                <input id="pain-next" type="number" min="0" max="10" step="1" inputmode="numeric" />
-              </label>
+          <details class="session-notes" open>
+            <summary>
+              <span>
+                <span class="eyebrow">03 · REVIEW</span>
+                <strong>How did your joints respond?</strong>
+              </span>
+              <small>Choose the closest description</small>
+            </summary>
+            <div class="response-scales">
+              <fieldset class="response-question" data-response-question="painDuring">
+                <legend>During training</legend>
+                <div class="response-options" data-response-options="painDuring"></div>
+                <p class="response-description" data-response-description="painDuring">No response selected.</p>
+              </fieldset>
+              <fieldset class="response-question" data-response-question="painLater">
+                <legend>Later that day</legend>
+                <div class="response-options" data-response-options="painLater"></div>
+                <p class="response-description" data-response-description="painLater">No response selected.</p>
+              </fieldset>
+              <fieldset class="response-question" data-response-question="painNext">
+                <legend>Following morning</legend>
+                <div class="response-options" data-response-options="painNext"></div>
+                <p class="response-description" data-response-description="painNext">No response selected.</p>
+              </fieldset>
             </div>
             <label class="wide-label">
-              <span>Notes</span>
-              <textarea id="session-notes" rows="3" placeholder="RIR, symptoms, substitutions, wins…"></textarea>
+              <span>Optional note</span>
+              <textarea id="session-notes" rows="2" placeholder="Where did you feel it? What did you change?"></textarea>
             </label>
           </details>
 
@@ -370,6 +397,34 @@
             </label>
             <button class="text-button load-previous" type="button">Use last</button>
           </div>
+          <section class="exercise-guide is-hidden" aria-label="Pull-up progression guide">
+            <div class="progression-picker">
+              <label>
+                <span>Current performance step</span>
+                <select class="progression-select"></select>
+              </label>
+              <small>Advance by performance, not by calendar week.</small>
+            </div>
+            <div class="progression-instruction">
+              <strong class="progression-title"></strong>
+              <p class="progression-target"></p>
+              <p class="progression-next"></p>
+            </div>
+            <div class="progression-check">
+              <div>
+                <span>Advancement check</span>
+                <strong class="progression-status">0 of 2 successful sessions</strong>
+              </div>
+              <label>
+                <input class="progression-qualified" type="checkbox" />
+                <span>
+                  Count this session: target completed with clean technique and ≥1 RIR, with no worse joint response the
+                  following morning.
+                </span>
+              </label>
+              <small>Reopen this date the following morning, check it if all criteria are met, then save again.</small>
+            </div>
+          </section>
           <div class="previous-line"></div>
           <div class="set-list"></div>
           <button class="add-set" type="button">+ Add set</button>
