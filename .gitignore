@@ -1,0 +1,14 @@
+# Local operating-system and project metadata
+.DS_Store
+AGENTS.md
+sources/
+
+# Generated site output
+dist/
+
+# Private source material and exported health data
+evidence-based-weekly-workout-plan.md
+*backup*.json
+*.health-data.json
+exports/
+

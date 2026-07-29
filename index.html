@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'; worker-src 'none'"
+    />
+    <meta name="referrer" content="no-referrer" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#17211b" />
+    <meta
+      name="description"
+      content="A private, device-local weekly workout and health tracker built around an evidence-based training plan."
+    />
+    <title>Form / Flow — Training Log</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <button class="brand" type="button" data-nav="today" aria-label="Go to today">
+          <span class="brand-mark" aria-hidden="true">F/F</span>
+          <span>
+            <strong>FORM / FLOW</strong>
+            <small>TRAIN WITH INTENT</small>
+          </span>
+        </button>
+        <nav class="desktop-nav" aria-label="Primary navigation">
+          <button class="nav-button is-active" type="button" data-nav="today">Today</button>
+          <button class="nav-button" type="button" data-nav="week">Week</button>
+          <button class="nav-button" type="button" data-nav="progress">Progress</button>
+          <button class="nav-button" type="button" data-nav="data">Data</button>
+        </nav>
+        <div class="header-status">
+          <span class="status-dot" aria-hidden="true"></span>
+          <span>Stored on this device</span>
+        </div>
+      </header>
+
+      <main>
+        <section class="view is-active" id="view-today" aria-labelledby="today-heading">
+          <div class="page-head">
+            <div>
+              <p class="eyebrow" id="today-kicker">TODAY’S WORK</p>
+              <h1 id="today-heading">Ready when you are.</h1>
+            </div>
+            <label class="date-control">
+              <span>Training date</span>
+              <input id="training-date" type="date" />
+            </label>
+          </div>
+
+          <article class="session-hero" id="session-hero">
+            <div class="session-hero-copy">
+              <div class="session-meta">
+                <span id="session-day">MONDAY</span>
+                <span id="session-estimate">70–90 MIN</span>
+              </div>
+              <h2 id="session-focus">Legs A + bicycle HIIT</h2>
+              <p id="session-note">Keep the bicycle HIIT at least 6 hours after lifting.</p>
+            </div>
+            <div class="session-progress-wrap">
+              <div class="session-progress-ring" id="session-progress-ring">
+                <strong id="session-progress-value">0%</strong>
+                <span>logged</span>
+              </div>
+            </div>
+          </article>
+
+          <div class="today-toolbar">
+            <div class="segmented" role="group" aria-label="Training block">
+              <button type="button" data-block="1" class="is-active">Block 1</button>
+              <button type="button" data-block="2">Block 2</button>
+            </div>
+            <button class="button button-secondary" type="button" id="load-session-button">
+              Load last session
+            </button>
+          </div>
+
+          <div id="long-run-callout" class="callout is-hidden"></div>
+
+          <details class="warmup-card" open>
+            <summary>
+              <span>
+                <span class="eyebrow">01 · PREP</span>
+                <strong>Warm-up checklist</strong>
+              </span>
+              <span id="warmup-count">0 / 0</span>
+            </summary>
+            <div class="warmup-list" id="warmup-list"></div>
+          </details>
+
+          <div class="exercise-section-head">
+            <div>
+              <p class="eyebrow">02 · TRAIN</p>
+              <h2>Working sets</h2>
+            </div>
+            <p>Tap a set when it is done. Rest starts automatically.</p>
+          </div>
+          <div class="exercise-list" id="exercise-list"></div>
+
+          <details class="session-notes">
+            <summary>Session response & notes</summary>
+            <div class="response-grid">
+              <label>
+                <span>Pain during · 0–10</span>
+                <input id="pain-during" type="number" min="0" max="10" step="1" inputmode="numeric" />
+              </label>
+              <label>
+                <span>Pain later today · 0–10</span>
+                <input id="pain-later" type="number" min="0" max="10" step="1" inputmode="numeric" />
+              </label>
+              <label>
+                <span>Next morning · 0–10</span>
+                <input id="pain-next" type="number" min="0" max="10" step="1" inputmode="numeric" />
+              </label>
+            </div>
+            <label class="wide-label">
+              <span>Notes</span>
+              <textarea id="session-notes" rows="3" placeholder="RIR, symptoms, substitutions, wins…"></textarea>
+            </label>
+          </details>
+
+          <div class="save-bar">
+            <div>
+              <strong id="save-status">Not saved yet</strong>
+              <span>All records stay in this browser.</span>
+            </div>
+            <button class="button button-primary" type="button" id="save-workout">Save workout</button>
+          </div>
+        </section>
+
+        <section class="view" id="view-week" aria-labelledby="week-heading">
+          <div class="page-head">
+            <div>
+              <p class="eyebrow">THE WHOLE RHYTHM</p>
+              <h1 id="week-heading">Your training week.</h1>
+            </div>
+            <div class="week-controls">
+              <button class="icon-button" type="button" id="previous-week" aria-label="Previous week">←</button>
+              <button class="button button-secondary" type="button" id="current-week">This week</button>
+              <button class="icon-button" type="button" id="next-week" aria-label="Next week">→</button>
+            </div>
+          </div>
+          <div class="week-summary">
+            <div>
+              <span>Viewing</span>
+              <strong id="week-range">—</strong>
+            </div>
+            <label>
+              <span>Long-run week</span>
+              <select id="long-run-week"></select>
+            </label>
+          </div>
+          <div class="week-grid" id="week-grid"></div>
+          <aside class="safety-strip">
+            <strong>Joint response rule</strong>
+            <p>
+              Stable mild discomfort that returns to baseline by the next morning may be acceptable. Reduce load, range, or
+              volume if symptoms rise. Stop and seek assessment for swelling, locking, giving way, sharp or night pain, or
+              persistent deterioration.
+            </p>
+          </aside>
+        </section>
+
+        <section class="view" id="view-progress" aria-labelledby="progress-heading">
+          <div class="page-head">
+            <div>
+              <p class="eyebrow">SIGNALS, NOT NOISE</p>
+              <h1 id="progress-heading">Your progress.</h1>
+            </div>
+          </div>
+
+          <article class="panel exercise-stats-panel">
+            <div class="panel-head">
+              <div>
+                <p class="eyebrow">EXERCISE STATS</p>
+                <h2>Training trend</h2>
+              </div>
+              <label>
+                <span class="sr-only">Exercise</span>
+                <select id="stats-exercise"></select>
+              </label>
+            </div>
+            <div class="metric-grid">
+              <div class="metric-card"><span>Sessions</span><strong id="stat-sessions">0</strong></div>
+              <div class="metric-card"><span>Latest</span><strong id="stat-latest">—</strong></div>
+              <div class="metric-card"><span>Best</span><strong id="stat-best">—</strong></div>
+              <div class="metric-card"><span>Total work</span><strong id="stat-volume">—</strong></div>
+            </div>
+            <div class="chart-wrap">
+              <canvas id="exercise-chart" aria-label="Exercise trend chart"></canvas>
+              <div class="empty-chart" id="exercise-chart-empty">Log this exercise twice to see its trend.</div>
+            </div>
+          </article>
+
+          <div class="tracking-grid">
+            <article class="panel">
+              <div class="panel-head">
+                <div>
+                  <p class="eyebrow">BODY</p>
+                  <h2>Weight & waist</h2>
+                </div>
+              </div>
+              <form class="inline-form" id="body-form">
+                <label><span>Date</span><input id="body-date" type="date" required /></label>
+                <label><span>Weight</span><div class="unit-input"><input id="body-weight" type="number" min="0" step="0.1" inputmode="decimal" required /><span>kg</span></div></label>
+                <label><span>Waist</span><div class="unit-input"><input id="body-waist" type="number" min="0" step="0.1" inputmode="decimal" required /><span>cm</span></div></label>
+                <button class="button button-primary" type="submit">Add</button>
+              </form>
+              <div class="mini-chart-wrap"><canvas id="body-chart" aria-label="Body measurement chart"></canvas></div>
+              <div class="log-list" id="body-log-list"></div>
+            </article>
+
+            <article class="panel">
+              <div class="panel-head">
+                <div>
+                  <p class="eyebrow">RECOVERY</p>
+                  <h2>Weekly sleep</h2>
+                </div>
+              </div>
+              <form class="inline-form sleep-form" id="sleep-form">
+                <label><span>Week of</span><input id="sleep-week" type="date" required /></label>
+                <label><span>Average / night</span><div class="unit-input"><input id="sleep-hours" type="number" min="0" max="24" step="0.1" inputmode="decimal" required /><span>hr</span></div></label>
+                <button class="button button-primary" type="submit">Add</button>
+              </form>
+              <div class="mini-chart-wrap"><canvas id="sleep-chart" aria-label="Weekly sleep chart"></canvas></div>
+              <div class="log-list" id="sleep-log-list"></div>
+            </article>
+          </div>
+        </section>
+
+        <section class="view" id="view-data" aria-labelledby="data-heading">
+          <div class="page-head">
+            <div>
+              <p class="eyebrow">YOUR DATA, YOURS</p>
+              <h1 id="data-heading">Backup & restore.</h1>
+            </div>
+          </div>
+          <div class="data-layout">
+            <article class="data-card data-card-primary">
+              <span class="data-card-index">01</span>
+              <div>
+                <p class="eyebrow">EXPORT</p>
+                <h2>Take a complete copy.</h2>
+                <p>Downloads workouts, exercise settings, body measurements, sleep, and plan settings in one JSON file.</p>
+              </div>
+              <button class="button button-dark" type="button" id="export-data">Download backup</button>
+            </article>
+            <article class="data-card">
+              <span class="data-card-index">02</span>
+              <div>
+                <p class="eyebrow">IMPORT</p>
+                <h2>Restore from a backup.</h2>
+                <p>The file is checked before it replaces this browser’s current records.</p>
+              </div>
+              <label class="button button-secondary file-button">
+                Choose JSON file
+                <input id="import-data" type="file" accept="application/json,.json" />
+              </label>
+            </article>
+            <article class="data-card data-card-danger">
+              <span class="data-card-index">03</span>
+              <div>
+                <p class="eyebrow">PRIVACY</p>
+                <h2>Erase this device.</h2>
+                <p>
+                  Permanently removes workouts, measurements, sleep records, and preferences from this browser only.
+                  Export first if you want to keep them.
+                </p>
+              </div>
+              <button class="button button-danger" type="button" id="erase-data">Erase local data</button>
+            </article>
+          </div>
+          <aside class="privacy-note">
+            <span class="status-dot" aria-hidden="true"></span>
+            <div>
+              <strong>Private by design</strong>
+              <p>
+                This app has no analytics, accounts, database, or runtime network requests. Records stay in this browser
+                profile. Export a backup regularly, and erase local data before handing a shared device to someone else.
+              </p>
+            </div>
+          </aside>
+        </section>
+      </main>
+
+      <nav class="mobile-nav" aria-label="Primary navigation">
+        <button class="is-active" type="button" data-nav="today"><span>●</span>Today</button>
+        <button type="button" data-nav="week"><span>▦</span>Week</button>
+        <button type="button" data-nav="progress"><span>↗</span>Progress</button>
+        <button type="button" data-nav="data"><span>⇅</span>Data</button>
+      </nav>
+
+      <aside class="timer" id="rest-timer" aria-label="Rest timer">
+        <div class="timer-top">
+          <button class="timer-display" id="timer-toggle" type="button" aria-expanded="false">
+            <span>REST</span>
+            <strong id="timer-time">01:30</strong>
+          </button>
+          <button class="timer-play" id="timer-play" type="button" aria-label="Start rest timer">▶</button>
+        </div>
+        <div class="timer-drawer" id="timer-drawer">
+          <div class="timer-presets" role="group" aria-label="Rest timer presets">
+            <button type="button" data-timer="60">1:00</button>
+            <button type="button" data-timer="90" class="is-active">1:30</button>
+            <button type="button" data-timer="120">2:00</button>
+            <button type="button" data-timer="180">3:00</button>
+          </div>
+          <button class="timer-reset" id="timer-reset" type="button">Reset</button>
+        </div>
+      </aside>
+
+      <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    </div>
+
+    <template id="exercise-template">
+      <article class="exercise-card">
+        <div class="exercise-card-head">
+          <button class="exercise-toggle" type="button" aria-expanded="true">
+            <span class="exercise-number"></span>
+            <span class="exercise-title-wrap">
+              <span class="exercise-tags"></span>
+              <strong class="exercise-name"></strong>
+              <small class="exercise-prescription"></small>
+            </span>
+            <span class="chevron" aria-hidden="true">⌄</span>
+          </button>
+        </div>
+        <div class="exercise-body">
+          <div class="exercise-toolbar">
+            <label>
+              <span>Measure</span>
+              <select class="measurement-select"></select>
+            </label>
+            <button class="text-button load-previous" type="button">Use last</button>
+          </div>
+          <div class="previous-line"></div>
+          <div class="set-list"></div>
+          <button class="add-set" type="button">+ Add set</button>
+        </div>
+      </article>
+    </template>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
