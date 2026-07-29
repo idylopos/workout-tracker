@@ -33,14 +33,22 @@ The app works at both a user/organization Pages domain and a repository subpath 
 
 ## Data and backups
 
-Workout, body, sleep, and preference data are stored in that browser's local storage. Use **Data → Download backup**
-regularly. Importing a valid Form / Flow JSON backup replaces the records currently stored in that browser.
+Workout, body, sleep, and preference data are encrypted with AES-GCM before being stored in that browser. The encryption
+key is derived from a user-created passphrase and is kept only in memory for the active browser session. Existing
+unencrypted Form / Flow records are migrated into the encrypted vault after the user creates a passphrase.
+
+The passphrase is never stored or uploaded and cannot be recovered. If it is forgotten, the only in-app recovery is to
+erase the encrypted vault and start over. Use **Data → Lock app** when leaving a shared device.
+
+Use **Data → Download backup** regularly. Importing a valid Form / Flow JSON backup replaces the records currently stored
+in that browser.
 
 The app contains no analytics, advertising, accounts, external fonts, or third-party scripts. Its Content Security Policy
 allows only same-site plan files and blocks third-party connections. GitHub receives the public app and public plan files,
 but it does not receive anything visitors enter into the app.
 
-Treat exported JSON backups as private health data. Backup filenames and the local source plan are excluded by
+Exported JSON backups are intentionally portable and are not passphrase-encrypted, so treat them as private health data.
+Backup filenames and the local source plan are excluded by
 `.gitignore` to help prevent accidental publication. Use **Data → Erase local data** before giving someone access to a
 shared browser profile or device.
 

@@ -17,6 +17,13 @@ import {
   toIsoDate,
   validateBackup,
 } from "./lib.js";
+import {
+  PBKDF2_ITERATIONS,
+  VAULT_STORAGE_KEY,
+  createVault,
+  encryptState,
+  unlockVault,
+} from "./crypto-vault.js";
 
 const DAY_KEYS = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
 const numberFormatter = new Intl.NumberFormat(undefined, { maximumFractionDigits: 1 });
@@ -28,13 +35,17 @@ const BUILT_IN_PLAN = {
   longRuns: LONG_RUNS,
   longRunDay: "saturday",
 };
-let state = loadState();
+let state = createDefaultState();
 let selectedDate = toIsoDate();
 let draftSession = null;
 let activeView = "today";
 let resizeFrame = null;
 let activePlan = BUILT_IN_PLAN;
 let planCatalog = [];
+let vaultKey = null;
+let vaultSalt = null;
+let vaultIterations = PBKDF2_ITERATIONS;
+let saveQueue = Promise.resolve();
 
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
@@ -69,23 +80,22 @@ const els = {
   toast: $("#toast"),
 };
 
-function loadState() {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    return stored ? normalizeState(JSON.parse(stored)) : createDefaultState();
-  } catch {
-    return createDefaultState();
-  }
-}
-
 function persistState() {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    return true;
-  } catch {
-    showToast("Could not save in this browser. Export a backup and check storage settings.", "error");
-    return false;
-  }
+  if (!vaultKey || !vaultSalt) return Promise.resolve(false);
+  const snapshot = structuredClone(state);
+  saveQueue = saveQueue
+    .catch(() => undefined)
+    .then(async () => {
+      const vault = await encryptState(snapshot, vaultKey, vaultSalt, vaultIterations);
+      localStorage.setItem(VAULT_STORAGE_KEY, JSON.stringify(vault));
+      localStorage.removeItem(STORAGE_KEY);
+      return true;
+    })
+    .catch(() => {
+      showToast("Could not save the encrypted vault. Export a backup and check browser storage.", "error");
+      return false;
+    });
+  return saveQueue;
 }
 
 function showToast(message, tone = "success") {
@@ -94,6 +104,119 @@ function showToast(message, tone = "success") {
   els.toast.classList.add("is-visible");
   clearTimeout(showToast.timeout);
   showToast.timeout = setTimeout(() => els.toast.classList.remove("is-visible"), 3200);
+}
+
+function legacyState() {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    return stored ? normalizeState(JSON.parse(stored)) : createDefaultState();
+  } catch {
+    return createDefaultState();
+  }
+}
+
+function openVaultDialog(mode, storedVault = null, initialState = null) {
+  const dialog = $("#privacy-dialog");
+  const form = $("#privacy-form");
+  const title = $("#privacy-dialog-title");
+  const copy = $("#privacy-dialog-copy");
+  const passphrase = $("#privacy-passphrase");
+  const confirmWrap = $("#privacy-confirm-wrap");
+  const confirmPassphrase = $("#privacy-confirm");
+  const error = $("#privacy-error");
+  const submit = $("#privacy-submit");
+  const reset = $("#privacy-reset");
+  const creating = mode === "create";
+
+  title.textContent = creating ? "Create your privacy passphrase" : "Unlock your records";
+  copy.textContent = creating
+    ? "Your records will be encrypted before browser storage. Use at least 10 characters and keep this passphrase somewhere safe—it cannot be recovered."
+    : "Enter your passphrase. It stays in memory for this browser session and is never stored or uploaded.";
+  submit.textContent = creating ? "Create encrypted vault" : "Unlock";
+  confirmWrap.classList.toggle("is-hidden", !creating);
+  confirmPassphrase.required = creating;
+  reset.classList.toggle("is-hidden", creating);
+  passphrase.autocomplete = creating ? "new-password" : "current-password";
+  error.textContent = "";
+  form.reset();
+  dialog.oncancel = (event) => event.preventDefault();
+
+  return new Promise((resolve) => {
+    form.onsubmit = async (event) => {
+      event.preventDefault();
+      const secret = passphrase.value;
+      if (creating && secret.length < 10) {
+        error.textContent = "Use at least 10 characters.";
+        return;
+      }
+      if (creating && secret !== confirmPassphrase.value) {
+        error.textContent = "The passphrases do not match.";
+        return;
+      }
+      submit.disabled = true;
+      error.textContent = creating ? "Creating encrypted vault…" : "Unlocking…";
+      try {
+        const result = creating
+          ? await createVault(initialState, secret)
+          : await unlockVault(storedVault, secret);
+        passphrase.value = "";
+        confirmPassphrase.value = "";
+        dialog.close();
+        resolve({ kind: "success", result });
+      } catch {
+        error.textContent = creating
+          ? "The encrypted vault could not be created in this browser."
+          : "Incorrect passphrase or damaged encrypted data.";
+      } finally {
+        submit.disabled = false;
+      }
+    };
+    reset.onclick = () => {
+      const approved = window.confirm(
+        "Erase the encrypted vault on this device? Without the passphrase, these records cannot be recovered.",
+      );
+      if (!approved) return;
+      dialog.close();
+      resolve({ kind: "erase" });
+    };
+    dialog.showModal();
+    requestAnimationFrame(() => passphrase.focus());
+  });
+}
+
+async function initializeVault() {
+  while (true) {
+    const stored = localStorage.getItem(VAULT_STORAGE_KEY);
+    if (stored) {
+      let parsed;
+      try {
+        parsed = JSON.parse(stored);
+      } catch {
+        parsed = null;
+      }
+      const access = await openVaultDialog("unlock", parsed);
+      if (access.kind === "erase") {
+        localStorage.removeItem(VAULT_STORAGE_KEY);
+        localStorage.removeItem(STORAGE_KEY);
+        continue;
+      }
+      state = normalizeState(access.result.state);
+      vaultKey = access.result.key;
+      vaultSalt = access.result.salt;
+      vaultIterations = access.result.iterations;
+      return;
+    }
+
+    const initialState = legacyState();
+    const access = await openVaultDialog("create", null, initialState);
+    state = normalizeState(access.result.state);
+    vaultKey = access.result.key;
+    vaultSalt = access.result.salt;
+    vaultIterations = access.result.iterations;
+    localStorage.setItem(VAULT_STORAGE_KEY, JSON.stringify(access.result.vault));
+    localStorage.removeItem(STORAGE_KEY);
+    return;
+  }
 }
 
 function formatDate(dateString, options = { weekday: "short", month: "short", day: "numeric" }) {
@@ -201,7 +324,7 @@ async function changePlan(planId, announce = true, preserveProgression = false) 
     state.settings.activePlanId = activePlan.id;
     if (!preserveProgression) state.settings.longRunWeek = 1;
     draftSession = null;
-    persistState();
+    await persistState();
     renderPlanSelect();
     renderLongRunOptions();
     renderToday();
@@ -498,7 +621,7 @@ function hasSetContent(set) {
   return set.completed || Object.entries(set).some(([key, value]) => key !== "completed" && value !== "");
 }
 
-function saveWorkout() {
+async function saveWorkout() {
   const dayKey = dateToDayKey(selectedDate);
   const exercises = {};
   $$(".exercise-card", els.exerciseList).forEach((card) => {
@@ -527,7 +650,7 @@ function saveWorkout() {
     updatedAt: new Date().toISOString(),
   };
   draftSession = null;
-  if (persistState()) {
+  if (await persistState()) {
     showToast("Workout saved on this device.");
     renderToday();
   }
@@ -818,17 +941,19 @@ function eraseLocalData() {
     "Permanently erase every workout, body measurement, sleep record, and preference stored by this app in this browser?",
   );
   if (!approved) return;
+  localStorage.removeItem(VAULT_STORAGE_KEY);
   localStorage.removeItem(STORAGE_KEY);
+  vaultKey = null;
+  vaultSalt = null;
+  window.location.reload();
+}
+
+async function lockApp() {
+  await saveQueue;
+  vaultKey = null;
+  vaultSalt = null;
   state = createDefaultState();
-  activePlan = BUILT_IN_PLAN;
-  selectedDate = toIsoDate();
-  draftSession = null;
-  renderPlanSelect();
-  renderLongRunOptions();
-  renderToday();
-  renderWeek();
-  renderProgress();
-  showToast("All Form / Flow data was erased from this browser.");
+  window.location.reload();
 }
 
 const timer = {
@@ -944,35 +1069,36 @@ function bindEvents() {
   });
 
   $("#stats-exercise").addEventListener("change", renderExerciseStats);
-  $("#body-form").addEventListener("submit", (event) => {
+  $("#body-form").addEventListener("submit", async (event) => {
     event.preventDefault();
     upsertByDate(state.bodyLogs, {
       date: $("#body-date").value,
       weight: Number($("#body-weight").value),
       waist: Number($("#body-waist").value),
     });
-    persistState();
+    const saved = await persistState();
     renderBody();
     event.target.reset();
     $("#body-date").value = toIsoDate();
-    showToast("Body measurements saved.");
+    if (saved) showToast("Body measurements saved.");
   });
-  $("#sleep-form").addEventListener("submit", (event) => {
+  $("#sleep-form").addEventListener("submit", async (event) => {
     event.preventDefault();
     upsertByDate(state.sleepLogs, {
       week: $("#sleep-week").value,
       hours: Number($("#sleep-hours").value),
     }, "week");
-    persistState();
+    const saved = await persistState();
     renderSleep();
     event.target.reset();
     $("#sleep-week").value = toIsoDate(startOfWeek(new Date()));
-    showToast("Weekly sleep saved.");
+    if (saved) showToast("Weekly sleep saved.");
   });
 
   $("#export-data").addEventListener("click", exportData);
   $("#import-data").addEventListener("change", (event) => importData(event.target.files[0]));
   $("#erase-data").addEventListener("click", eraseLocalData);
+  $("#lock-app").addEventListener("click", lockApp);
 
   $("#timer-toggle").addEventListener("click", () => {
     const expanded = $("#rest-timer").classList.toggle("is-expanded");
@@ -991,6 +1117,7 @@ function bindEvents() {
 }
 
 async function init() {
+  await initializeVault();
   els.trainingDate.value = selectedDate;
   $("#body-date").value = selectedDate;
   $("#sleep-week").value = toIsoDate(startOfWeek(new Date()));

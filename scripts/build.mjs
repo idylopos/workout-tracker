@@ -9,6 +9,7 @@ const files = [
   "styles.css",
   "app.js",
   "lib.js",
+  "crypto-vault.js",
   ".nojekyll",
 ];
 

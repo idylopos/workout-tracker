@@ -278,7 +278,10 @@
                   Export first if you want to keep them.
                 </p>
               </div>
-              <button class="button button-danger" type="button" id="erase-data">Erase local data</button>
+              <div class="data-card-actions">
+                <button class="button button-secondary" type="button" id="lock-app">Lock app</button>
+                <button class="button button-danger" type="button" id="erase-data">Erase local data</button>
+              </div>
             </article>
           </div>
           <aside class="privacy-note">
@@ -286,9 +289,9 @@
             <div>
               <strong>Private by design</strong>
               <p>
-                This app has no analytics, accounts, or database. It only loads public plan files from this site; workout
-                records stay in this browser profile and are never uploaded. Export a backup regularly, and erase local
-                data before handing a shared device to someone else.
+                This app has no analytics, accounts, or database. It only loads public plan files from this site. Workout
+                records are encrypted with your passphrase before browser storage and are never uploaded. Export a backup
+                regularly, and lock or erase the app before handing a shared device to someone else.
               </p>
             </div>
           </aside>
@@ -323,6 +326,28 @@
 
       <div class="toast" id="toast" role="status" aria-live="polite"></div>
     </div>
+
+    <dialog class="privacy-dialog" id="privacy-dialog" aria-labelledby="privacy-dialog-title">
+      <form class="privacy-form" id="privacy-form">
+        <span class="privacy-lock" aria-hidden="true">FF</span>
+        <p class="eyebrow">LOCAL ENCRYPTED VAULT</p>
+        <h2 id="privacy-dialog-title">Unlock your records</h2>
+        <p id="privacy-dialog-copy">
+          Enter your passphrase. It stays on this device for this browser session and is never stored or uploaded.
+        </p>
+        <label>
+          <span>Passphrase</span>
+          <input id="privacy-passphrase" type="password" autocomplete="current-password" required />
+        </label>
+        <label id="privacy-confirm-wrap" class="is-hidden">
+          <span>Confirm passphrase</span>
+          <input id="privacy-confirm" type="password" autocomplete="new-password" />
+        </label>
+        <p class="privacy-error" id="privacy-error" role="alert"></p>
+        <button class="button button-primary" id="privacy-submit" type="submit">Unlock</button>
+        <button class="text-button privacy-reset" id="privacy-reset" type="button">Erase encrypted data and start over</button>
+      </form>
+    </dialog>
 
     <template id="exercise-template">
       <article class="exercise-card">

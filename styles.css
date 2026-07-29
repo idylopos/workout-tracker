@@ -1351,6 +1351,12 @@ textarea {
   color: #fff;
 }
 
+.data-card-actions {
+  display: flex;
+  gap: 8px;
+  margin: 0;
+}
+
 .data-card-index {
   position: absolute;
   right: 24px;
@@ -1549,6 +1555,84 @@ textarea {
 
 .toast[data-tone="error"] {
   background: #9d2e21;
+}
+
+.privacy-dialog {
+  width: min(480px, calc(100% - 28px));
+  padding: 0;
+  overflow: visible;
+  border: 1px solid var(--ink);
+  border-radius: 22px;
+  background: var(--card);
+  color: var(--ink);
+  box-shadow: 0 30px 100px rgba(10, 18, 13, 0.35);
+}
+
+.privacy-dialog::backdrop {
+  background: rgba(10, 18, 13, 0.82);
+  backdrop-filter: blur(8px);
+}
+
+.privacy-form {
+  display: grid;
+  gap: 15px;
+  padding: 30px;
+}
+
+.privacy-form h2 {
+  margin-bottom: -7px;
+  font-size: 32px;
+  line-height: 1.05;
+}
+
+.privacy-form > p:not(.eyebrow, .privacy-error) {
+  margin-bottom: 2px;
+  color: var(--ink-soft);
+  font-size: 13px;
+}
+
+.privacy-form label {
+  display: grid;
+  gap: 6px;
+}
+
+.privacy-form label > span {
+  color: var(--ink-soft);
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.privacy-form input {
+  width: 100%;
+}
+
+.privacy-lock {
+  display: grid;
+  width: 52px;
+  height: 52px;
+  place-items: center;
+  border-radius: 15px;
+  background: var(--ink);
+  color: var(--lime);
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: -0.06em;
+}
+
+.privacy-error {
+  min-height: 20px;
+  margin: -3px 0;
+  color: #9d2e21;
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.privacy-reset {
+  justify-self: center;
+  border-bottom: 0;
+  color: #8a4137;
 }
 
 @media (max-width: 900px) {
@@ -1840,6 +1924,19 @@ textarea {
 
   .data-card-danger {
     min-height: 280px;
+  }
+
+  .data-card-actions {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .data-card-actions .button {
+    width: 100%;
+  }
+
+  .privacy-form {
+    padding: 24px 20px;
   }
 
   .data-card-index {
