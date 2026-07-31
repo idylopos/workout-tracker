@@ -1,15 +1,18 @@
 import { cp, mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { validatePlan } from "./plan-utils.mjs";
+import { writeWorkoutPlanMarkdown } from "./sync-plan-markdown.mjs";
 
 const root = resolve(import.meta.dirname, "..");
 const destination = resolve(root, "dist");
+await writeWorkoutPlanMarkdown(root);
 const files = [
   "index.html",
   "styles.css",
   "app.js",
   "lib.js",
   "crypto-vault.js",
+  "WORKOUT_PLAN.md",
   ".nojekyll",
 ];
 

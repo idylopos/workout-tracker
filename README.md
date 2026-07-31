@@ -44,6 +44,10 @@ For repeated working sets, enter the first set and choose **Fill empty sets from
 Every built-in exercise includes a collapsible **Quick form guide** covering setup, execution, the main thing to watch,
 and a substitute when appropriate. Folder-based plans can provide the same guidance in `plan.json`.
 
+The current built-in plan is also available as [WORKOUT_PLAN.md](WORKOUT_PLAN.md). It is generated from `lib.js` during
+`npm run build`; after changing the built-in plan, run `npm run sync-plan` and commit the updated Markdown together with
+the code change.
+
 ## Publish on GitHub Pages
 
 1. Create a GitHub repository and add these files.

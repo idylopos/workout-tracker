@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { validatePlan } from "../scripts/plan-utils.mjs";
+import { renderWorkoutPlanMarkdown } from "../scripts/sync-plan-markdown.mjs";
 
 test("the example folder plan passes build validation", async () => {
   const plan = JSON.parse(await readFile(new URL("../plans/example-plan/plan.json", import.meta.url), "utf8"));
@@ -54,4 +55,15 @@ test("custom exercise guidance requires setup, action, and watch text", () => {
     },
   };
   assert.match(validatePlan(plan, "guided-plan").join(" "), /guidance\.watch/);
+});
+
+test("the readable workout plan is rendered from the built-in plan", async () => {
+  const generated = renderWorkoutPlanMarkdown();
+  const checkedIn = await readFile(new URL("../WORKOUT_PLAN.md", import.meta.url), "utf8");
+  assert.equal(checkedIn, generated);
+  assert.match(generated, /### Block 1 — Build to a comfortable 10 km/);
+  assert.match(generated, /### Block 2 — Improve comfortable 10 km speed/);
+  assert.match(generated, /### Friday — Push B \+ Mobility B/);
+  assert.match(generated, /This is not the adductor machine/);
+  assert.match(generated, /Pull-up progression — choose by performance/);
 });
