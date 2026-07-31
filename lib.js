@@ -621,7 +621,7 @@ export const WEEK_PLAN = {
       lift("mobility-b-shoulder", "Mobility B · Cross-body shoulder stretch", "2 rounds · 45 sec / side", 2, 0, "completion", {
         category: "Mobility",
       }),
-      lift("mobility-b-adductor", "Mobility B · Bench-supported adductor stretch", "2 rounds · 45 sec / side", 2, 0, "completion", {
+      lift("mobility-b-adductor", "Mobility B · Adductor Rock Back", "2 rounds · 45 sec / side", 2, 0, "completion", {
         category: "Mobility",
       }),
     ],
