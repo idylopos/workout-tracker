@@ -30,3 +30,28 @@ test("a plan ID must match its folder", () => {
   assert.match(validatePlan(plan, "folder-name").join(" "), /must exactly match/);
 });
 
+test("custom exercise guidance requires setup, action, and watch text", () => {
+  const plan = {
+    schemaVersion: 1,
+    id: "guided-plan",
+    name: "Guided plan",
+    days: {
+      monday: {
+        exercises: [
+          {
+            id: "squat",
+            name: "Squat",
+            measurement: "reps",
+            sets: 3,
+            rest: 60,
+            guidance: {
+              setup: "Stand tall.",
+              action: "Squat under control.",
+            },
+          },
+        ],
+      },
+    },
+  };
+  assert.match(validatePlan(plan, "guided-plan").join(" "), /guidance\.watch/);
+});

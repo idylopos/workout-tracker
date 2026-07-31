@@ -161,6 +161,232 @@ export const RESPONSE_SCALE = [
   },
 ];
 
+const guidance = (setup, action, watch, option = "") => ({ setup, action, watch, option });
+
+export const EXERCISE_GUIDANCE = {
+  "squat-jump": guidance(
+    "Stand about hip-width apart with a stable foot tripod.",
+    "Dip only slightly, jump vertically, and land softly in the same stance. Reset before every rep.",
+    "Keep the landing quiet and knees tracking over the feet. Stop if knee symptoms rise.",
+  ),
+  "box-squat": guidance(
+    "Set the box at a depth you can control. Brace, keep the whole foot planted, and sit back toward it.",
+    "Touch down under control without relaxing, then drive the floor away to stand.",
+    "Do not drop onto the box or let the knees collapse inward. Shorten the range if symptoms increase.",
+  ),
+  "bulgarian-split-squat": guidance(
+    "Place the rear foot on a low bench and keep enough distance for the front heel to stay down.",
+    "Lower mostly through the front leg, then push through the whole front foot to rise.",
+    "Use support for balance. Keep the front knee tracking with the toes and use a comfortable depth.",
+  ),
+  "assisted-nordic": guidance(
+    "Kneel on padding with the ankles firmly anchored; use a band or hands for assistance.",
+    "Keep hips extended and lower the body as one line as slowly as possible, then assist the return.",
+    "Start with a short range. Stop for hamstring cramping, sharp pain, or loss of hip position.",
+  ),
+  "hip-abduction": guidance(
+    "Set the machine or cable so the pelvis stays level and the working leg begins under control.",
+    "Move the thigh outward without leaning, pause briefly, and return slowly.",
+    "Use a range that comes from the hip rather than twisting the pelvis or turning the toes far outward.",
+  ),
+  "standing-calf-raise": guidance(
+    "Stand tall with the ball of the foot secure and use light hand support.",
+    "Rise onto the toes, pause at the top, then lower under control through a comfortable stretch.",
+    "Keep the ankle tracking straight; do not bounce or roll onto the outer edge of the foot.",
+  ),
+  "seated-calf-raise": guidance(
+    "Sit with knees bent about 90° and the balls of the feet secure on the platform.",
+    "Lift the heels, pause, and lower slowly through a comfortable range.",
+    "Avoid bouncing or letting the feet roll inward or outward.",
+  ),
+  "tibialis-raise": guidance(
+    "Lean against a wall with heels on the floor and feet slightly forward.",
+    "Lift the forefeet and toes toward the shins, pause, then lower slowly.",
+    "Keep the heels planted and shorten the stance if the front of the shin cramps.",
+  ),
+  "copenhagen-plank": guidance(
+    "Lie side-on with the top knee supported on a bench and the lower knee bent beneath you.",
+    "Lift the hips into a straight shoulder-to-knee line and breathe normally.",
+    "Stop if you feel groin pain rather than muscular effort. Use more bench support to make it easier.",
+  ),
+  "bicycle-hiit": guidance(
+    "Adjust the saddle so the knee remains slightly bent at the bottom of the pedal stroke.",
+    "Warm up fully, ride each hard minute at RPE 8–9, and make every recovery genuinely easy.",
+    "Hard does not mean all-out. Keep cadence controlled and stop for chest pain, dizziness, or unusual breathlessness.",
+  ),
+  "half-kneeling-landmine-press": guidance(
+    "Kneel with the leg opposite the pressing arm forward. Hold the bar end near the shoulder and brace gently.",
+    "Press up and forward along the bar path while allowing the shoulder blade to rotate, then lower slowly.",
+    "Do not lean back, shrug, or force a pinching range. Keep about two reps in reserve.",
+  ),
+  "neutral-db-bench": guidance(
+    "Lie with feet planted and hold the dumbbells with palms facing each other.",
+    "Lower with elbows roughly 30–45° from the torso, then press without bouncing.",
+    "Stop the descent before shoulder discomfort and keep the shoulder blades comfortably supported.",
+  ),
+  "cable-lateral-raise": guidance(
+    "Stand tall with the cable low and the arm slightly in front of the body.",
+    "Lead with the elbow and raise only through a comfortable range, then lower for about two seconds.",
+    "Use light weight; do not shrug, swing, or push through shoulder discomfort.",
+  ),
+  "rope-pressdown": guidance(
+    "Stand tall with elbows close to the ribs and shoulders relaxed.",
+    "Extend the elbows, separate the rope slightly at the bottom, and return without moving the upper arms.",
+    "Avoid leaning your body onto the cable or letting the shoulders roll forward.",
+  ),
+  "cable-external-rotation": guidance(
+    "Set a light cable at elbow height and keep the elbow gently against the side, bent 90°.",
+    "Rotate the forearm outward while the upper arm stays still, then return slowly.",
+    "Use a small, painless range. Do not twist the torso or chase heavier loads.",
+  ),
+  "easy-run": guidance(
+    "Begin with 5–10 minutes very easy and use a relaxed, natural stride.",
+    "Keep the effort conversational at RPE 2–4; walk breaks are allowed.",
+    "Reduce duration or pace if knee symptoms rise during the run or are worse the following morning.",
+  ),
+  "pelvic-floor": guidance(
+    "Breathe normally and imagine gently lifting around the urethra and anus without moving the pelvis.",
+    "Use a submaximal contraction, then fully release for at least as long as each hold.",
+    "Do not hold your breath, bear down, or keep the muscles clenched between reps.",
+  ),
+  "pull-up-progression": guidance(
+    "Use a neutral grip, begin with controlled shoulder blades, and select the assistance shown in your current step.",
+    "Pull the chest toward the handles without kicking, then lower to the step’s full controlled range.",
+    "Stop before grinding or shoulder pain. Advance only after the performance checks shown below.",
+  ),
+  "chest-supported-row": guidance(
+    "Set the bench so the chest stays supported and use a neutral grip.",
+    "Pull the elbows back toward the hips, pause, and lower until the shoulder blades move naturally forward.",
+    "Do not lift the chest off the pad, shrug, or jerk the weight.",
+  ),
+  "face-pull": guidance(
+    "Set the rope around upper-chest to face height and step back into light tension.",
+    "Pull toward the nose or forehead with elbows comfortably out, then return slowly.",
+    "Keep the ribs down and shoulders away from the ears; use a painless path.",
+  ),
+  "hammer-curl": guidance(
+    "Stand tall with palms facing each other and elbows near the ribs.",
+    "Curl without moving the upper arms, then lower under control.",
+    "Avoid swinging, leaning back, or letting the shoulders roll forward.",
+  ),
+  "kneeling-cable-crunch": guidance(
+    "Kneel facing the cable with the rope beside the head and hips mostly still.",
+    "Exhale and curl the ribs toward the pelvis, then return under control.",
+    "Do not pull with the arms, sit the hips backward, or hold your breath.",
+  ),
+  "mobility-a-calf": guidance(
+    "Face a wall with the stretching leg behind you, heel down, and toes forward.",
+    "Move the body forward until the calf stretch is gentle and steady.",
+    "Do not force pain or let the rear foot collapse inward.",
+  ),
+  "mobility-a-hip-flexor": guidance(
+    "Half-kneel on padding and lightly tuck the pelvis as if bringing the belt buckle upward.",
+    "Shift forward slightly until the front of the rear hip feels a gentle stretch.",
+    "Avoid arching the lower back or pushing into the front of the hip.",
+  ),
+  "mobility-a-hamstring": guidance(
+    "Lie on your back with a strap around one foot and the opposite leg relaxed.",
+    "Raise the strapped leg with a soft knee until the back of the thigh feels a gentle stretch.",
+    "Keep the pelvis down and avoid pulling into tingling, numbness, or sharp pain.",
+  ),
+  "zone-2-cycle": guidance(
+    "Use a comfortable saddle height and begin with several easy minutes.",
+    "Ride steadily at RPE 2–3, where full sentences remain easy.",
+    "This is optional recovery volume; skip it when sleep, legs, running, or joints are not normal.",
+  ),
+  "kettlebell-swing": guidance(
+    "Place the bell slightly ahead, hinge to grip it, and hike it back between the thighs.",
+    "Snap the hips to float the bell, then let it return into the next hinge.",
+    "It is a hip hinge, not a squat or arm raise. Stop if the back rounds or the bell pulls the shoulders.",
+  ),
+  "trap-bar-deadlift": guidance(
+    "Stand centered in the bar, brace, and take the handles with the whole foot planted.",
+    "Push the floor away and stand tall, then hinge and bend the knees to return the bar under control.",
+    "Keep the load close and spine steady; do not jerk from the floor or lean back at lockout.",
+  ),
+  "barbell-hip-thrust": guidance(
+    "Place the upper back on a bench, pad the bar, and set feet so the shins are near vertical at the top.",
+    "Drive through the whole foot, finish by squeezing the glutes, and lower under control.",
+    "Do not overarch the lower back or throw the head backward.",
+  ),
+  "controlled-step-down": guidance(
+    "Stand on a low step with the working foot fully supported and use a rail if needed.",
+    "Lower the free heel toward the floor for about three seconds, lightly touch, then rise.",
+    "Keep the pelvis level and knee tracking over the foot. Reduce step height if symptoms increase.",
+  ),
+  "run-2": guidance(
+    "Complete the prescribed easy warm-up before any faster work.",
+    "Follow the current block’s effort and recovery exactly; keep fast reps controlled rather than maximal.",
+    "End the quality portion if form deteriorates or knee symptoms rise, and monitor the following morning.",
+  ),
+  "neutral-incline-db-press": guidance(
+    "Use a low incline, plant the feet, and hold the dumbbells with palms facing each other.",
+    "Lower with elbows in a comfortable 30–45° path, then press smoothly.",
+    "Use the lowest comfortable incline and stop the descent before pinching or clicking becomes uncomfortable.",
+  ),
+  "one-arm-landmine-press": guidance(
+    "Stand in a split stance with the bar near the working shoulder and ribs stacked over the pelvis.",
+    "Press up and forward while allowing the shoulder blade to move, then lower slowly.",
+    "Do not twist, lean back, shrug, or force an uncomfortable endpoint.",
+  ),
+  "cable-scaption": guidance(
+    "Use a very light low cable. Keep the thumb up and the arm about 20–30° forward of the side of the body.",
+    "Raise only to the height that remains fully comfortable, then lower for about two seconds.",
+    "First reduce the load and stop before discomfort. If the shoulder still feels uncomfortable, do not force the exercise.",
+    "Use a supported machine lateral raise for 2–3 × 12–20 in a comfortable path. If that also feels uncomfortable, omit Friday’s raise and keep the landmine presses.",
+  ),
+  "cross-body-triceps": guidance(
+    "Set the cable above shoulder height and hold it with the opposite hand across the body.",
+    "Keep the upper arm quiet while straightening the elbow down and across, then return slowly.",
+    "Use a shoulder position that feels natural; do not pull the shoulder forward.",
+  ),
+  "reverse-crunch": guidance(
+    "Lie on your back with hips and knees bent and arms supported beside you.",
+    "Exhale, gently roll the pelvis toward the ribs, and lift the tailbone slightly before lowering slowly.",
+    "Do not swing the legs, throw the hips overhead, or hold your breath.",
+  ),
+  "mobility-b-chest": guidance(
+    "Place the forearm on a doorway with the elbow below shoulder height.",
+    "Step or turn away gently until the chest feels a mild stretch.",
+    "Do not force the shoulder forward or continue if the front of the shoulder pinches.",
+  ),
+  "mobility-b-shoulder": guidance(
+    "Bring one arm across the chest and support it above the elbow with the other arm.",
+    "Draw it gently closer while keeping the shoulder down and relaxed.",
+    "The stretch should be behind the shoulder, not a pinch at the front or top.",
+  ),
+  "mobility-b-adductor": guidance(
+    "This is not the adductor machine. Put both hands on a bench, keep one knee under the hip, and extend the other leg to the side with its foot flat.",
+    "Keep the spine neutral and slowly send the hips backward until the inner thigh feels a gentle stretch.",
+    "Use the bench for support and stop before groin, hip, or knee pain.",
+  ),
+  "long-run": guidance(
+    "Start 5–10 minutes very easily and choose a flat, familiar route when possible.",
+    "Stay conversational and use planned or unplanned walk breaks to keep the effort easy.",
+    "Repeat rather than advance the progression if joint symptoms or usual energy are not back to baseline the next morning.",
+  ),
+  "easy-swim": guidance(
+    "Begin with relaxed technique lengths and choose strokes that feel comfortable at the shoulder.",
+    "Keep the effort at RPE 2–3 with generous rest as needed.",
+    "Avoid paddles, hard butterfly, or fatigued overhead work; stop any stroke that provokes shoulder discomfort.",
+  ),
+  "one-arm-cable-row": guidance(
+    "Stand or sit square to the cable with the arm reaching forward under control.",
+    "Pull the elbow toward the hip without rotating the torso, then return slowly.",
+    "Keep the shoulder away from the ear and use a comfortable reach.",
+  ),
+  "db-pullover": guidance(
+    "Lie supported on a bench, hold one light dumbbell over the chest, and keep a small elbow bend.",
+    "Lower only until the shoulders remain comfortable, then bring the weight back over the chest.",
+    "Keep the ribs down and do not chase a deep overhead stretch or painful clicking.",
+  ),
+  "cable-curl": guidance(
+    "Stand tall with elbows near the ribs and wrists neutral.",
+    "Curl without moving the upper arms, then lower slowly.",
+    "Avoid swinging, leaning back, or allowing the shoulders to roll forward.",
+  ),
+};
+
 export function normalizeResponseRating(value, scaleVersion = 1) {
   if (value === "" || value === null || value === undefined) return "";
   const rating = Number(value);
@@ -372,7 +598,13 @@ export const WEEK_PLAN = {
     exercises: [
       lift("neutral-incline-db-press", "Neutral-grip incline dumbbell press", "3 × 8–12", 3, 150),
       lift("one-arm-landmine-press", "One-arm landmine press", "2 × 10–12 / side", 2, 120),
-      lift("cable-scaption", "Cable scaption raise · thumbs up", "3 × 12–20 · painless range", 3, 75),
+      lift(
+        "cable-scaption",
+        "Friday lateral-delt raise",
+        "3 × 12–20 · scaption only if comfortable; otherwise use the guide’s substitute",
+        3,
+        75,
+      ),
       lift("cross-body-triceps", "Cross-body cable triceps extension", "2 × 10–15", 2, 75),
       lift("cable-external-rotation", "Cable external rotation", "2 × 12–20", 2, 60),
       lift(
@@ -383,7 +615,13 @@ export const WEEK_PLAN = {
         75,
         "reps",
       ),
-      activity("mobility-b", "Mobility B", "Doorway chest, cross-body shoulder, and supported adductor · 2 × 45 sec / side", "duration", {
+      lift("mobility-b-chest", "Mobility B · Doorway chest stretch", "2 rounds · 45 sec / side", 2, 0, "completion", {
+        category: "Mobility",
+      }),
+      lift("mobility-b-shoulder", "Mobility B · Cross-body shoulder stretch", "2 rounds · 45 sec / side", 2, 0, "completion", {
+        category: "Mobility",
+      }),
+      lift("mobility-b-adductor", "Mobility B · Bench-supported adductor stretch", "2 rounds · 45 sec / side", 2, 0, "completion", {
         category: "Mobility",
       }),
     ],

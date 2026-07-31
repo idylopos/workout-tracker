@@ -47,7 +47,13 @@ each visitor's browser and are not part of a plan.
           "rest": 120,
           "measurement": "weight_reps",
           "category": "Strength",
-          "optional": false
+          "optional": false,
+          "guidance": {
+            "setup": "Brief starting-position instruction.",
+            "action": "Brief description of the movement.",
+            "watch": "The main technique or comfort warning.",
+            "option": "Optional easier or more comfortable substitute."
+          }
         }
       ]
     }
@@ -69,6 +75,9 @@ Supported measurements:
 - `distance`
 
 An exercise ID may be reused on multiple days when those logs should contribute to the same exercise statistics.
+
+`guidance` is optional. When provided, `setup`, `action`, and `watch` are required non-empty strings of at most 500
+characters; `option` is optional. The app shows this text inside the exercise card’s collapsible **Quick form guide**.
 
 ## Optional progression
 

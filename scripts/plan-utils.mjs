@@ -61,6 +61,29 @@ export function validatePlan(plan, folderName) {
       if (!Number.isFinite(exercise.rest) || exercise.rest < 0 || exercise.rest > 900) {
         errors.push(`${path}.rest must be a number from 0 to 900 seconds.`);
       }
+      if (exercise.guidance !== undefined) {
+        if (!exercise.guidance || typeof exercise.guidance !== "object" || Array.isArray(exercise.guidance)) {
+          errors.push(`${path}.guidance must be an object when provided.`);
+        } else {
+          ["setup", "action", "watch"].forEach((key) => {
+            if (
+              typeof exercise.guidance[key] !== "string" ||
+              !exercise.guidance[key].trim() ||
+              exercise.guidance[key].length > 500
+            ) {
+              errors.push(`${path}.guidance.${key} must be a non-empty string of at most 500 characters.`);
+            }
+          });
+          if (
+            exercise.guidance.option !== undefined &&
+            (typeof exercise.guidance.option !== "string" ||
+              !exercise.guidance.option.trim() ||
+              exercise.guidance.option.length > 500)
+          ) {
+            errors.push(`${path}.guidance.option must be a non-empty string of at most 500 characters when provided.`);
+          }
+        }
+      }
     });
   });
   if (plan.longRuns !== undefined && !Array.isArray(plan.longRuns)) {

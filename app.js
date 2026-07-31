@@ -1,5 +1,6 @@
 import {
   APP_VERSION,
+  EXERCISE_GUIDANCE,
   EXTRA_ACTIVITY_MEASUREMENTS,
   EXTRA_ACTIVITY_TYPES,
   LONG_RUNS,
@@ -262,6 +263,15 @@ function formatDate(dateString, options = { weekday: "short", month: "short", da
   return new Intl.DateTimeFormat(undefined, options).format(new Date(`${dateString}T12:00:00`));
 }
 
+function normalizeExerciseGuidance(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return undefined;
+  const normalized = {};
+  ["setup", "action", "watch", "option"].forEach((key) => {
+    if (typeof value[key] === "string" && value[key].trim()) normalized[key] = value[key].trim().slice(0, 500);
+  });
+  return normalized.setup && normalized.action && normalized.watch ? normalized : undefined;
+}
+
 function normalizePlan(raw, expectedId) {
   if (!raw || typeof raw !== "object" || raw.schemaVersion !== 1) {
     throw new Error("This plan uses an unsupported format.");
@@ -311,6 +321,7 @@ function normalizePlan(raw, expectedId) {
             category: String(exercise.category || "Training"),
             section: exercise.section ? String(exercise.section) : undefined,
             optional: Boolean(exercise.optional),
+            guidance: normalizeExerciseGuidance(exercise.guidance),
           }))
         : [],
     };
@@ -817,6 +828,23 @@ function setupPullupGuide(card, exercise, savedExercise) {
   $(".progression-qualified", card).addEventListener("change", () => updatePullupProgressStatus(card));
 }
 
+function setupExerciseGuidance(card, exercise) {
+  const guide =
+    exercise.guidance ||
+    (activePlan.id === BUILT_IN_PLAN.id ? EXERCISE_GUIDANCE[exercise.id] : undefined);
+  if (!guide) return;
+  const details = $(".form-guide", card);
+  details.classList.remove("is-hidden");
+  ["setup", "action", "watch"].forEach((key) => {
+    $(`[data-guidance="${key}"]`, details).textContent = guide[key];
+  });
+  const option = $(".form-guide-option", details);
+  if (guide.option) {
+    option.classList.remove("is-hidden");
+    $('[data-guidance="option"]', option).textContent = guide.option;
+  }
+}
+
 function createExerciseCard(exercise, index, savedExercise) {
   const card = $("#exercise-template").content.firstElementChild.cloneNode(true);
   const pullupStep =
@@ -839,6 +867,7 @@ function createExerciseCard(exercise, index, savedExercise) {
     <span>${escapeHtml(exercise.section || exercise.category)}</span>
     ${exercise.optional ? "<span class=\"tag-optional\">OPTIONAL</span>" : ""}
   `;
+  setupExerciseGuidance(card, exercise);
 
   const measurement =
     savedExercise?.measurement ||

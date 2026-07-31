@@ -2,10 +2,12 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   APP_VERSION,
+  EXERCISE_GUIDANCE,
   WEEK_PLAN,
   createDefaultState,
   dateToDayKey,
   findPreviousExerciseLog,
+  getAllExercises,
   normalizeResponseRating,
   normalizeState,
   summarizeCardioRange,
@@ -91,6 +93,17 @@ test("rebalances direct abdominal and deltoid work without stacking Friday press
   assert.equal(friday.find((exercise) => exercise.id === "cable-scaption").sets, 3);
   assert.equal(friday.find((exercise) => exercise.id === "reverse-crunch").sets, 2);
   assert.equal(friday.some((exercise) => exercise.id === "push-up-plus"), false);
+  assert.equal(friday.some((exercise) => exercise.id === "mobility-b"), false);
+  assert.equal(friday.filter((exercise) => exercise.id.startsWith("mobility-b-")).length, 3);
+});
+
+test("provides a quick form guide for every built-in exercise", () => {
+  const missing = getAllExercises(WEEK_PLAN)
+    .map((exercise) => exercise.id)
+    .filter((exerciseId) => !EXERCISE_GUIDANCE[exerciseId]);
+  assert.deepEqual(missing, []);
+  assert.match(EXERCISE_GUIDANCE["mobility-b-adductor"].setup, /not the adductor machine/i);
+  assert.match(EXERCISE_GUIDANCE["cable-scaption"].option, /machine lateral raise/i);
 });
 
 test("finds the most recent earlier exercise log", () => {

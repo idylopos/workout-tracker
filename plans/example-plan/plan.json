@@ -25,7 +25,13 @@
           "sets": 3,
           "rest": 120,
           "measurement": "weight_reps",
-          "category": "Strength"
+          "category": "Strength",
+          "guidance": {
+            "setup": "Hold one dumbbell at the chest and stand with the whole foot planted.",
+            "action": "Sit between the hips, then push the floor away to stand.",
+            "watch": "Keep the knees tracking over the feet and use a comfortable depth.",
+            "option": "Use a box behind you when learning the movement."
+          }
         },
         {
           "id": "neutral-db-press",
@@ -115,4 +121,3 @@
     }
   }
 }
-

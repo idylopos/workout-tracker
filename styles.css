@@ -833,6 +833,90 @@ textarea {
   border-top: 1px solid var(--line);
 }
 
+.form-guide {
+  margin-top: 14px;
+  overflow: hidden;
+  border: 1px solid #d9d2c5;
+  border-radius: 13px;
+  background: #faf7f0;
+}
+
+.form-guide summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 13px 15px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.form-guide summary::-webkit-details-marker {
+  display: none;
+}
+
+.form-guide summary strong,
+.form-guide summary small {
+  display: block;
+}
+
+.form-guide summary strong {
+  font-size: 13px;
+}
+
+.form-guide summary small {
+  margin-top: 1px;
+  color: var(--ink-soft);
+  font-size: 10px;
+}
+
+.form-guide-toggle {
+  display: grid;
+  width: 26px;
+  height: 26px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--ink);
+  color: #fff;
+  font-size: 17px;
+  transition: transform 160ms ease;
+}
+
+.form-guide[open] .form-guide-toggle {
+  transform: rotate(45deg);
+}
+
+.form-guide-content {
+  display: grid;
+  gap: 8px;
+  padding: 0 15px 14px;
+}
+
+.form-guide-content p {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  gap: 10px;
+  margin: 0;
+  padding-top: 8px;
+  border-top: 1px solid #e5dfd3;
+  color: var(--ink-soft);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.form-guide-content p > strong {
+  color: var(--ink);
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.form-guide-content .form-guide-option {
+  color: #27578c;
+}
+
 .exercise-guide {
   display: grid;
   gap: 14px;
