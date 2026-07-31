@@ -317,7 +317,7 @@
               <div>
                 <p class="eyebrow">EXPORT</p>
                 <h2>Take a complete copy.</h2>
-                <p>Downloads workouts, reusable activities, exercise settings, body measurements, sleep, and plan settings in one JSON file.</p>
+                <p>Downloads workouts, current workout drafts, reusable activities, body measurements, sleep, and settings in one JSON file.</p>
               </div>
               <button class="button button-dark" type="button" id="export-data">Download backup</button>
             </article>
@@ -339,7 +339,7 @@
                 <p class="eyebrow">PRIVACY</p>
                 <h2>Erase this device.</h2>
                 <p>
-                  Permanently removes workouts, measurements, sleep records, and preferences from this browser only.
+                  Permanently removes workouts, drafts, measurements, sleep records, and preferences from this browser only.
                   Export first if you want to keep them.
                 </p>
               </div>
@@ -355,7 +355,7 @@
               <strong>Private by design</strong>
               <p>
                 This app has no analytics, accounts, or database. It only loads public plan files from this site. Workout
-                records are encrypted with your passphrase before browser storage and are never uploaded. Export a backup
+                records and drafts are encrypted with your passphrase before browser storage and are never uploaded. Export a backup
                 regularly, and lock or erase the app before handing a shared device to someone else.
               </p>
             </div>
@@ -520,7 +520,10 @@
           </section>
           <div class="previous-line"></div>
           <div class="set-list"></div>
-          <button class="add-set" type="button">+ Add set</button>
+          <div class="set-actions">
+            <button class="copy-first-set" type="button">Fill empty sets from set 1</button>
+            <button class="add-set" type="button">+ Add set</button>
+          </div>
         </div>
       </article>
     </template>

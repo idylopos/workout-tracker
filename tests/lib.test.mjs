@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   APP_VERSION,
+  WEEK_PLAN,
   createDefaultState,
   dateToDayKey,
   findPreviousExerciseLog,
@@ -23,6 +24,7 @@ test("normalizes a partial persisted state", () => {
   assert.equal(state.settings.block, 2);
   assert.equal(state.settings.pullupStep, 1);
   assert.deepEqual(state.workoutLogs, {});
+  assert.deepEqual(state.workoutDrafts, {});
   assert.deepEqual(state.sleepLogs, []);
 });
 
@@ -56,6 +58,39 @@ test("validates backup shape before restore", () => {
   const malformedActivity = createDefaultState();
   malformedActivity.savedActivities = [{ id: "bad", name: "", type: "flying", measurement: "duration" }];
   assert.equal(validateBackup(malformedActivity).valid, false);
+
+  const malformedDraft = createDefaultState();
+  malformedDraft.workoutDrafts.today = { date: "not-a-date", exercises: {} };
+  assert.equal(validateBackup(malformedDraft).valid, false);
+
+  const legacyWithoutDrafts = createDefaultState();
+  delete legacyWithoutDrafts.workoutDrafts;
+  assert.equal(validateBackup(legacyWithoutDrafts).valid, true);
+});
+
+test("keeps encrypted workout drafts during state normalization", () => {
+  const draft = {
+    date: "2026-07-31",
+    dayKey: "friday",
+    planId: "form-flow",
+    exercises: {
+      press: { measurement: "weight_reps", sets: [{ completed: false, weight: 20, reps: 8 }] },
+    },
+  };
+  const state = normalizeState({ workoutDrafts: { "2026-07-31": draft } });
+  assert.deepEqual(state.workoutDrafts["2026-07-31"], draft);
+});
+
+test("rebalances direct abdominal and deltoid work without stacking Friday presses", () => {
+  const tuesday = WEEK_PLAN.tuesday.exercises;
+  const wednesday = WEEK_PLAN.wednesday.exercises;
+  const friday = WEEK_PLAN.friday.exercises;
+  assert.equal(tuesday.find((exercise) => exercise.id === "cable-lateral-raise").sets, 3);
+  assert.equal(wednesday.find((exercise) => exercise.id === "face-pull").sets, 3);
+  assert.equal(wednesday.find((exercise) => exercise.id === "kneeling-cable-crunch").sets, 2);
+  assert.equal(friday.find((exercise) => exercise.id === "cable-scaption").sets, 3);
+  assert.equal(friday.find((exercise) => exercise.id === "reverse-crunch").sets, 2);
+  assert.equal(friday.some((exercise) => exercise.id === "push-up-plus"), false);
 });
 
 test("finds the most recent earlier exercise log", () => {

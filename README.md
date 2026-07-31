@@ -32,6 +32,15 @@ Select **Save this setup as a reusable activity** to add the configuration to th
 and completed extra-cardio records are stored inside the encrypted browser vault and included in JSON backups. The Week
 view shows the selected week’s combined planned and extra cardio, while Progress shows an eight-week duration trend.
 
+## During a workout
+
+Changes on the Today screen are automatically saved as an encrypted draft. If the browser reloads or discards the tab,
+unlock the vault again and the draft will be restored. **Save workout** confirms the draft as a completed workout log.
+The app intentionally does not remember the passphrase or decryption key.
+
+For repeated working sets, enter the first set and choose **Fill empty sets from set 1**. The app copies load and reps
+(or the equivalent primary measurements) into blank fields while leaving RIR/RPE and any values already entered alone.
+
 ## Publish on GitHub Pages
 
 1. Create a GitHub repository and add these files.
@@ -43,9 +52,10 @@ The app works at both a user/organization Pages domain and a repository subpath 
 
 ## Data and backups
 
-Workout, body, sleep, and preference data are encrypted with AES-GCM before being stored in that browser. The encryption
-key is derived from a user-created passphrase and is kept only in memory for the active browser session. Existing
-unencrypted Form / Flow records are migrated into the encrypted vault after the user creates a passphrase.
+Workout logs, in-progress workout drafts, body measurements, sleep records, reusable activities, and preferences are
+encrypted with AES-GCM before being stored in that browser. The encryption key is derived from a user-created passphrase
+and is kept only in memory for the active browser session. Existing unencrypted Form / Flow records are migrated into the
+encrypted vault after the user creates a passphrase.
 
 The passphrase is never stored or uploaded and cannot be recovered. If it is forgotten, the only in-app recovery is to
 erase the encrypted vault and start over. Use **Data → Lock app** when leaving a shared device.

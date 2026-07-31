@@ -1086,16 +1086,32 @@ textarea {
   font-size: 22px;
 }
 
-.add-set {
-  width: 100%;
-  min-height: 40px;
+.set-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(120px, 0.42fr);
+  gap: 8px;
   margin-top: 8px;
+}
+
+.copy-first-set,
+.add-set {
+  min-height: 40px;
   border: 1px dashed #aaa59b;
   border-radius: 10px;
   background: transparent;
   color: var(--ink-soft);
   font-size: 12px;
   font-weight: 800;
+}
+
+.copy-first-set {
+  border-style: solid;
+  background: #f2efe7;
+  color: var(--ink);
+}
+
+.copy-first-set:disabled {
+  display: none;
 }
 
 .extra-activity-section {
@@ -1921,6 +1937,10 @@ textarea {
   box-shadow: var(--shadow);
 }
 
+body[data-active-view="today"] .timer {
+  bottom: 104px;
+}
+
 .timer-top {
   display: grid;
   grid-template-columns: 1fr 52px;
@@ -2699,6 +2719,10 @@ textarea {
     right: 12px;
     bottom: calc(74px + var(--safe-bottom));
     width: 166px;
+  }
+
+  body[data-active-view="today"] .timer {
+    bottom: calc(158px + var(--safe-bottom));
   }
 
   .timer-top {

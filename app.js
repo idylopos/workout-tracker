@@ -82,6 +82,9 @@ let vaultKey = null;
 let vaultSalt = null;
 let vaultIterations = PBKDF2_ITERATIONS;
 let saveQueue = Promise.resolve();
+let workoutDirty = false;
+let draftSaveTimer = null;
+let draftRevision = 0;
 
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
@@ -375,6 +378,7 @@ async function changePlan(planId, announce = true, preserveProgression = false) 
 
 function switchView(view) {
   activeView = view;
+  document.body.dataset.activeView = view;
   $$(".view").forEach((section) => section.classList.toggle("is-active", section.id === `view-${view}`));
   $$("[data-nav]").forEach((button) => button.classList.toggle("is-active", button.dataset.nav === view));
   window.scrollTo({ top: 0, behavior: "smooth" });
@@ -384,6 +388,8 @@ function switchView(view) {
 
 function currentLog() {
   if (draftSession?.date === selectedDate) return draftSession;
+  const draft = state.workoutDrafts[workoutLogKey(selectedDate)];
+  if (draft) return draft;
   return state.workoutLogs[workoutLogKey(selectedDate)] || null;
 }
 
@@ -479,6 +485,9 @@ function activePrescription(exercise) {
 }
 
 function renderToday() {
+  clearTimeout(draftSaveTimer);
+  draftSaveTimer = null;
+  workoutDirty = false;
   const dayKey = dateToDayKey(selectedDate);
   const day = activePlan.days[dayKey];
   const log = currentLog();
@@ -517,8 +526,11 @@ function renderToday() {
   updateSessionProgress();
 
   const saved = state.workoutLogs[workoutLogKey(selectedDate)];
+  const savedDraft = state.workoutDrafts[workoutLogKey(selectedDate)];
   if (draftSession) {
     els.saveStatus.textContent = "Previous session loaded — review, then save";
+  } else if (savedDraft) {
+    els.saveStatus.textContent = "Encrypted draft restored — review, then save";
   } else if (saved) {
     els.saveStatus.textContent = `Saved ${formatDate(saved.updatedAt?.slice(0, 10) || selectedDate)}`;
   } else {
@@ -711,7 +723,13 @@ async function addExtraActivity(event) {
 }
 
 function markWorkoutDirty() {
-  els.saveStatus.textContent = "Unsaved changes — tap Save workout";
+  workoutDirty = true;
+  draftRevision += 1;
+  els.saveStatus.textContent = "Saving encrypted draft…";
+  clearTimeout(draftSaveTimer);
+  draftSaveTimer = setTimeout(() => {
+    saveWorkoutDraftNow();
+  }, 250);
 }
 
 function getPullupStep(stepId) {
@@ -874,9 +892,11 @@ function createExerciseCard(exercise, index, savedExercise) {
     showToast(`${exercise.name}: previous values loaded.`);
     updateSessionProgress();
   });
+  $(".copy-first-set", card).addEventListener("click", () => copyFirstSetIntoEmpty(card, select.value));
   $(".add-set", card).addEventListener("click", () => {
     const setList = $(".set-list", card);
     setList.append(createSetRow(select.value, setList.children.length, {}, Number(card.dataset.rest)));
+    updateCopyFirstSetButton(card, select.value);
     markWorkoutDirty();
   });
   return card;
@@ -888,6 +908,47 @@ function renderSetRows(card, measurement, sets, options = {}) {
   sets.forEach((set, index) =>
     setList.append(createSetRow(measurement, index, set, Number(card.dataset.rest), options)),
   );
+  updateCopyFirstSetButton(card, measurement);
+}
+
+function repeatableFields(measurement) {
+  return MEASUREMENT_TYPES[measurement].fields.filter((field) => !["rir", "rpe"].includes(field.key));
+}
+
+function updateCopyFirstSetButton(card, measurement) {
+  const button = $(".copy-first-set", card);
+  if (!button) return;
+  button.disabled = repeatableFields(measurement).length === 0 || $$(".set-row", card).length < 2;
+}
+
+function copyFirstSetIntoEmpty(card, measurement) {
+  const rows = $$(".set-row", card);
+  const fields = repeatableFields(measurement);
+  if (rows.length < 2 || !fields.length) return;
+  const source = rows[0];
+  const sourceValues = Object.fromEntries(
+    fields.map((field) => [field.key, $(`[data-field="${field.key}"]`, source)?.value ?? ""]),
+  );
+  if (!Object.values(sourceValues).some((value) => value !== "")) {
+    showToast("Enter set 1 first, then fill the remaining sets.", "error");
+    return;
+  }
+  let copied = 0;
+  rows.slice(1).forEach((row) => {
+    fields.forEach((field) => {
+      const input = $(`[data-field="${field.key}"]`, row);
+      if (input && input.value === "" && sourceValues[field.key] !== "") {
+        input.value = sourceValues[field.key];
+        copied += 1;
+      }
+    });
+  });
+  if (!copied) {
+    showToast("The remaining sets already have values.");
+    return;
+  }
+  markWorkoutDirty();
+  showToast("Set 1 values filled into empty sets.");
 }
 
 function createSetRow(measurement, index, values, restSeconds, options = {}) {
@@ -957,6 +1018,8 @@ function createSetRow(measurement, index, values, restSeconds, options = {}) {
         $(".set-done span", item).textContent = measurement === "completion" ? `Round ${itemIndex + 1}` : itemIndex + 1;
       });
     }
+    const card = list.closest(".exercise-card");
+    if (card) updateCopyFirstSetButton(card, measurement);
     markWorkoutDirty();
     updateSessionProgress();
   });
@@ -995,7 +1058,7 @@ function hasSetContent(set) {
   return set.completed || Object.entries(set).some(([key, value]) => key !== "completed" && value !== "");
 }
 
-async function saveWorkout() {
+function collectWorkoutRecord() {
   const dayKey = dateToDayKey(selectedDate);
   const exercises = {};
   $$(".exercise-card", els.exerciseList).forEach((card) => {
@@ -1016,7 +1079,7 @@ async function saveWorkout() {
   });
   const warmup = $$("[data-warmup-index]", els.warmupList).map((input) => input.checked);
   const extraActivities = collectExtraActivities();
-  state.workoutLogs[workoutLogKey(selectedDate)] = {
+  return {
     date: selectedDate,
     dayKey,
     planId: activePlan.id,
@@ -1032,6 +1095,38 @@ async function saveWorkout() {
     },
     updatedAt: new Date().toISOString(),
   };
+}
+
+async function saveWorkoutDraftNow() {
+  clearTimeout(draftSaveTimer);
+  draftSaveTimer = null;
+  if (!workoutDirty || !vaultKey) return saveQueue;
+
+  const revision = draftRevision;
+  const key = workoutLogKey(selectedDate);
+  state.workoutDrafts[key] = {
+    ...collectWorkoutRecord(),
+    draftedAt: new Date().toISOString(),
+  };
+  draftSession = null;
+  const saved = await persistState();
+  if (saved && revision === draftRevision) {
+    workoutDirty = false;
+    els.saveStatus.textContent = "Encrypted draft saved automatically";
+  } else if (!saved && revision === draftRevision) {
+    els.saveStatus.textContent = "Draft could not be saved — keep this page open";
+  }
+  return saved;
+}
+
+async function saveWorkout() {
+  clearTimeout(draftSaveTimer);
+  draftSaveTimer = null;
+  draftRevision += 1;
+  workoutDirty = false;
+  const key = workoutLogKey(selectedDate);
+  state.workoutLogs[key] = collectWorkoutRecord();
+  delete state.workoutDrafts[key];
   draftSession = null;
   if (await persistState()) {
     showToast("Workout saved on this device.");
@@ -1115,6 +1210,7 @@ function loadLastSession() {
     updatedAt: null,
   };
   renderToday();
+  markWorkoutDirty();
   showToast(`Loaded ${formatDate(previous.date)}. Review before saving.`);
 }
 
@@ -1152,7 +1248,8 @@ function renderWeek() {
       </span>
       <span class="week-card-status ${log ? "is-logged" : ""}">${log ? `${completedSets} sets` : dayKey === "sunday" ? "REST" : "OPEN"}</span>
     `;
-    card.addEventListener("click", () => {
+    card.addEventListener("click", async () => {
+      await saveWorkoutDraftNow();
       selectedDate = date;
       draftSession = null;
       renderToday();
@@ -1351,7 +1448,8 @@ function drawLineChart(canvas, datasets, options = {}) {
   });
 }
 
-function exportData() {
+async function exportData() {
+  await saveWorkoutDraftNow();
   const payload = {
     ...state,
     version: APP_VERSION,
@@ -1404,6 +1502,7 @@ function eraseLocalData() {
 }
 
 async function lockApp() {
+  await saveWorkoutDraftNow();
   await saveQueue;
   vaultKey = null;
   vaultSalt = null;
@@ -1487,15 +1586,21 @@ function timerFinished() {
 
 function bindEvents() {
   $$("[data-nav]").forEach((button) => button.addEventListener("click", () => switchView(button.dataset.nav)));
-  $("#plan-select").addEventListener("change", (event) => changePlan(event.target.value));
-  els.trainingDate.addEventListener("change", () => {
-    selectedDate = els.trainingDate.value || toIsoDate();
+  $("#plan-select").addEventListener("change", async (event) => {
+    await saveWorkoutDraftNow();
+    await changePlan(event.target.value);
+  });
+  els.trainingDate.addEventListener("change", async () => {
+    const nextDate = els.trainingDate.value || toIsoDate();
+    await saveWorkoutDraftNow();
+    selectedDate = nextDate;
     draftSession = null;
     renderToday();
   });
-  $$("[data-block]").forEach((button) => button.addEventListener("click", () => {
+  $$("[data-block]").forEach((button) => button.addEventListener("click", async () => {
+    await saveWorkoutDraftNow();
     state.settings.block = Number(button.dataset.block);
-    persistState();
+    await persistState();
     renderToday();
   }));
   els.warmupList.addEventListener("change", updateWarmupCount);
@@ -1552,9 +1657,10 @@ function bindEvents() {
     persistState();
     renderWeek();
   });
-  $("#long-run-week").addEventListener("change", (event) => {
+  $("#long-run-week").addEventListener("change", async (event) => {
+    await saveWorkoutDraftNow();
     state.settings.longRunWeek = Number(event.target.value);
-    persistState();
+    await persistState();
     renderToday();
   });
 
@@ -1604,10 +1710,17 @@ function bindEvents() {
       if (activeView === "progress") renderProgress();
     });
   });
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden") saveWorkoutDraftNow();
+  });
+  window.addEventListener("pagehide", () => {
+    saveWorkoutDraftNow();
+  });
 }
 
 async function init() {
   await initializeVault();
+  document.body.dataset.activeView = activeView;
   els.trainingDate.value = selectedDate;
   $("#body-date").value = selectedDate;
   $("#sleep-week").value = toIsoDate(startOfWeek(new Date()));

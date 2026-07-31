@@ -249,9 +249,15 @@ export const WEEK_PLAN = {
       "Dumbbell press · 1 lighter set × 5",
     ],
     exercises: [
-      lift("half-kneeling-landmine-press", "Half-kneeling 1-arm landmine press", "3 × 6–10 / side", 3, 120),
+      lift(
+        "half-kneeling-landmine-press",
+        "Half-kneeling 1-arm landmine press",
+        "3 × 6–8 / side · keep 2 RIR · use a comfortable path",
+        3,
+        120,
+      ),
       lift("neutral-db-bench", "Neutral-grip dumbbell bench press", "3 × 6–10", 3, 150),
-      lift("cable-lateral-raise", "Cable lateral raise", "2 × 12–20", 2, 75),
+      lift("cable-lateral-raise", "Cable lateral raise", "3 × 12–20 · stop before shrugging", 3, 75),
       lift("rope-pressdown", "Rope triceps press-down", "2 × 10–15", 2, 75),
       lift("cable-external-rotation", "Cable external rotation", "2 × 12–20", 2, 60),
       activity("easy-run", "Easy run", "Block 1: 30 min, RPE 2–4 · Block 2: 30–40 min + 4 × 20-sec strides", "distance_time"),
@@ -265,7 +271,7 @@ export const WEEK_PLAN = {
     short: "WED",
     focus: "Pull A + Mobility A",
     kicker: "Pull-up skill · recovery",
-    estimate: "55–75 min",
+    estimate: "60–80 min",
     tone: "orange",
     sequenceNote: "Optional cycling only when sleep, legs, running, and joints feel normal.",
     warmup: [
@@ -287,8 +293,15 @@ export const WEEK_PLAN = {
         { progression: "pullup" },
       ),
       lift("chest-supported-row", "Chest-supported neutral-grip row", "3 × 6–10", 3, 120),
-      lift("face-pull", "Face pull", "2 × 12–20", 2, 75),
+      lift("face-pull", "Face pull", "3 × 12–20 · controlled rear-delt focus", 3, 75),
       lift("hammer-curl", "Neutral-grip hammer curl", "2 × 8–15", 2, 75),
+      lift(
+        "kneeling-cable-crunch",
+        "Kneeling cable crunch",
+        "2 × 10–15 · exhale as you curl · no breath-holding",
+        2,
+        75,
+      ),
       lift("mobility-a-calf", "Mobility A · Calf stretch", "2 rounds · 45 sec / side · check each round", 2, 0, "completion", {
         category: "Mobility",
       }),
@@ -345,7 +358,7 @@ export const WEEK_PLAN = {
     short: "FRI",
     focus: "Push B + Mobility B",
     kicker: "Upper hypertrophy · mobility",
-    estimate: "55–75 min",
+    estimate: "60–80 min",
     tone: "purple",
     sequenceNote: "Use comfortable shoulder paths; do not force clicking or pinching.",
     warmup: [
@@ -359,10 +372,17 @@ export const WEEK_PLAN = {
     exercises: [
       lift("neutral-incline-db-press", "Neutral-grip incline dumbbell press", "3 × 8–12", 3, 150),
       lift("one-arm-landmine-press", "One-arm landmine press", "2 × 10–12 / side", 2, 120),
-      lift("push-up-plus", "Push-up plus", "2 × 8–15", 2, 90, "reps"),
-      lift("cable-scaption", "Cable scaption raise · thumbs up", "2 × 12–20", 2, 75),
+      lift("cable-scaption", "Cable scaption raise · thumbs up", "3 × 12–20 · painless range", 3, 75),
       lift("cross-body-triceps", "Cross-body cable triceps extension", "2 × 10–15", 2, 75),
       lift("cable-external-rotation", "Cable external rotation", "2 × 12–20", 2, 60),
+      lift(
+        "reverse-crunch",
+        "Reverse crunch",
+        "2 × 10–20 · posterior pelvic tilt · no swinging",
+        2,
+        75,
+        "reps",
+      ),
       activity("mobility-b", "Mobility B", "Doorway chest, cross-body shoulder, and supported adductor · 2 × 45 sec / side", "duration", {
         category: "Mobility",
       }),
@@ -449,6 +469,7 @@ export function createDefaultState() {
     },
     exerciseConfigs: {},
     workoutLogs: {},
+    workoutDrafts: {},
     savedActivities: [],
     bodyLogs: [],
     sleepLogs: [],
@@ -493,6 +514,10 @@ export function normalizeState(value) {
     settings,
     exerciseConfigs: value.exerciseConfigs && typeof value.exerciseConfigs === "object" ? value.exerciseConfigs : {},
     workoutLogs: value.workoutLogs && typeof value.workoutLogs === "object" ? value.workoutLogs : {},
+    workoutDrafts:
+      value.workoutDrafts && typeof value.workoutDrafts === "object" && !Array.isArray(value.workoutDrafts)
+        ? value.workoutDrafts
+        : {},
     savedActivities: Array.isArray(value.savedActivities)
       ? value.savedActivities.filter((activity) => isValidExtraActivity(activity))
       : [],
@@ -508,6 +533,12 @@ export function validateBackup(value) {
   }
   if (!value.workoutLogs || typeof value.workoutLogs !== "object" || Array.isArray(value.workoutLogs)) {
     return { valid: false, reason: "Workout logs are missing or malformed." };
+  }
+  if (
+    value.workoutDrafts !== undefined &&
+    (!value.workoutDrafts || typeof value.workoutDrafts !== "object" || Array.isArray(value.workoutDrafts))
+  ) {
+    return { valid: false, reason: "Workout drafts are malformed." };
   }
   if (!Array.isArray(value.bodyLogs) || !Array.isArray(value.sleepLogs)) {
     return { valid: false, reason: "Body or sleep logs are malformed." };
@@ -531,7 +562,7 @@ export function validateBackup(value) {
   if (!bodyValid || !sleepValid) {
     return { valid: false, reason: "A body or sleep record contains an invalid date or value." };
   }
-  const workoutsValid = Object.values(value.workoutLogs).every((log) => {
+  const validWorkoutRecord = (log) => {
     if (!log || typeof log !== "object" || !validDate(log.date)) return false;
     if (log.planId !== undefined && (typeof log.planId !== "string" || !/^[a-z0-9][a-z0-9-]{0,63}$/.test(log.planId))) {
       return false;
@@ -549,7 +580,10 @@ export function validateBackup(value) {
       (Array.isArray(log.extraActivities) &&
         log.extraActivities.every((activity) => isValidExtraActivity(activity, true)));
     return exercisesValid && extraActivitiesValid;
-  });
+  };
+  const workoutsValid =
+    Object.values(value.workoutLogs).every(validWorkoutRecord) &&
+    Object.values(value.workoutDrafts || {}).every(validWorkoutRecord);
   if (!workoutsValid) {
     return { valid: false, reason: "A workout record contains an invalid date, measurement type, or set list." };
   }
