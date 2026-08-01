@@ -3,6 +3,7 @@ import {
   EXERCISE_GUIDANCE,
   EXTRA_ACTIVITY_MEASUREMENTS,
   EXTRA_ACTIVITY_TYPES,
+  LONG_RUN_PHASES,
   LONG_RUNS,
   MEASUREMENT_TYPES,
   PULL_UP_STEPS,
@@ -12,6 +13,7 @@ import {
   addDays,
   createDefaultState,
   dateToDayKey,
+  evaluateLongRunProgress,
   findPreviousExerciseLog,
   findPreviousSession,
   formatDuration,
@@ -50,7 +52,7 @@ const RUNNING_PHASES = {
     points: [
       ["Tuesday", "30 min easy · RPE 2–4"],
       ["Thursday", "25–35 min easy · lift first"],
-      ["Saturday", "Follow the 16-week long-run progression"],
+      ["Saturday", "Follow the 16-stage long-run progression"],
     ],
   },
   2: {
@@ -86,6 +88,8 @@ let saveQueue = Promise.resolve();
 let workoutDirty = false;
 let draftSaveTimer = null;
 let draftRevision = 0;
+let longRunPreviewStage = null;
+let longRunViewedPhase = null;
 
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
@@ -373,6 +377,8 @@ async function changePlan(planId, announce = true, preserveProgression = false) 
     activePlan = await loadPlan(planId);
     state.settings.activePlanId = activePlan.id;
     if (!preserveProgression) state.settings.longRunWeek = 1;
+    longRunPreviewStage = null;
+    longRunViewedPhase = null;
     draftSession = null;
     await persistState();
     renderPlanSelect();
@@ -454,9 +460,70 @@ function formatCardioDistance(distance) {
   return `${numberFormatter.format(Number(distance || 0))} km`;
 }
 
-function targetLongRun() {
+function currentLongRunStage() {
+  const total = activePlan.longRuns?.length || 1;
+  return Math.max(1, Math.min(total, Number(state.settings.longRunWeek) || 1));
+}
+
+function targetLongRun(stage = currentLongRunStage()) {
   const runs = activePlan.longRuns || [];
-  return runs[Math.max(0, Math.min(runs.length - 1, Number(state.settings.longRunWeek || 1) - 1))];
+  return runs[Math.max(0, Math.min(runs.length - 1, Number(stage || 1) - 1))];
+}
+
+function longRunPhases() {
+  const count = activePlan.longRuns?.length || 0;
+  if (count === LONG_RUNS.length && activePlan.id === BUILT_IN_PLAN.id) return LONG_RUN_PHASES;
+  const size = Math.max(1, Math.ceil(count / 4));
+  return Array.from({ length: Math.ceil(count / size) }, (_, index) => ({
+    id: index + 1,
+    name: `Phase ${index + 1}`,
+    start: index * size + 1,
+    end: Math.min(count, (index + 1) * size),
+  }));
+}
+
+function longRunPhaseForStage(stage) {
+  const phases = longRunPhases();
+  return phases.find((phase) => Number(stage) >= phase.start && Number(stage) <= phase.end) || phases[0];
+}
+
+function longRunExerciseId() {
+  const day = activePlan.days[activePlan.longRunDay];
+  return day?.exercises.find((exercise) => exercise.id === "long-run")?.id || "long-run";
+}
+
+function longRunLogForStage(stage) {
+  const exerciseId = longRunExerciseId();
+  return Object.values(activeWorkoutLogs())
+    .filter((log) => Number(log.exercises?.[exerciseId]?.progressionStage) === Number(stage))
+    .sort((a, b) => b.date.localeCompare(a.date))[0] || null;
+}
+
+function longRunEvaluation(stage) {
+  const log = longRunLogForStage(stage);
+  return {
+    ...evaluateLongRunProgress(log, targetLongRun(stage), longRunExerciseId()),
+    date: log?.date || "",
+  };
+}
+
+function longRunStatusCopy(evaluation) {
+  if (evaluation.date) return `${evaluation.label} · ${formatDate(evaluation.date)}`;
+  return evaluation.label;
+}
+
+async function setLongRunStage(stage, announce = true) {
+  const total = activePlan.longRuns?.length || 0;
+  if (!total) return;
+  await saveWorkoutDraftNow();
+  state.settings.longRunWeek = Math.max(1, Math.min(total, Number(stage) || 1));
+  longRunPreviewStage = state.settings.longRunWeek;
+  longRunViewedPhase = longRunPhaseForStage(state.settings.longRunWeek)?.id || 1;
+  await persistState();
+  renderLongRunOptions();
+  renderToday();
+  if (activeView === "week") renderWeek();
+  if (announce) showToast(`Long-run Stage ${state.settings.longRunWeek} is now current.`);
 }
 
 function renderPhaseGuide() {
@@ -523,8 +590,25 @@ function renderToday() {
   renderPhaseGuide();
 
   if (activePlan.longRuns?.length && dayKey === activePlan.longRunDay && Number(state.settings.block) === 1) {
+    const savedStage = Number(log?.exercises?.[longRunExerciseId()]?.progressionStage);
+    const displayStage = savedStage || currentLongRunStage();
+    const phase = longRunPhaseForStage(displayStage);
+    const evaluation = longRunEvaluation(displayStage);
     els.longRunCallout.classList.remove("is-hidden");
-    els.longRunCallout.innerHTML = `<span>PROGRESSION WEEK ${Number(state.settings.longRunWeek)}</span><strong>${escapeHtml(targetLongRun())}</strong><small>Use the plan’s progression guidance and repeat a week when recovery is not stable.</small>`;
+    els.longRunCallout.innerHTML = `
+      <div class="long-run-callout-copy">
+        <span>${escapeHtml(phase?.name || "Long run")} · STAGE ${displayStage} OF ${activePlan.longRuns.length}</span>
+        <strong>${escapeHtml(targetLongRun(displayStage))}</strong>
+        <small>${escapeHtml(longRunStatusCopy(evaluation))}. Progress by recovery, not by the calendar.</small>
+      </div>
+      <button class="button button-dark" type="button" id="open-long-run-roadmap">Open roadmap</button>
+    `;
+    $("#open-long-run-roadmap").addEventListener("click", async () => {
+      await saveWorkoutDraftNow();
+      longRunPreviewStage = currentLongRunStage();
+      longRunViewedPhase = longRunPhaseForStage(longRunPreviewStage)?.id || 1;
+      switchView("week");
+    });
   } else {
     els.longRunCallout.classList.add("is-hidden");
     els.longRunCallout.replaceChildren();
@@ -758,14 +842,86 @@ function pullupSuccessCount(stepId, beforeDate) {
   }).length;
 }
 
+function pullupQualification(savedExercise) {
+  const legacy = savedExercise?.progressionQualified === true;
+  return {
+    performance: savedExercise?.progressionPerformanceQualified ?? legacy,
+    recovery: savedExercise?.progressionRecoveryQualified ?? legacy,
+  };
+}
+
+function pullupSuccessfulSessions(card) {
+  const stepId = Number($(".progression-select", card).value);
+  const prior = pullupSuccessCount(stepId, selectedDate);
+  const countsCurrent = card.dataset.progressionCounts === "true";
+  const performance = $(".progression-performance-qualified", card).checked;
+  const recovery = $(".progression-recovery-qualified", card).checked;
+  return Math.min(2, prior + (countsCurrent && performance && recovery ? 1 : 0));
+}
+
+function pullupRoadmapStatus(stepId, currentStepId, currentReady) {
+  if (stepId < currentStepId) return { key: "completed", label: "Completed" };
+  if (stepId === currentStepId) {
+    return currentReady ? { key: "ready", label: "Ready to advance" } : { key: "current", label: "Current step" };
+  }
+  if (stepId === currentStepId + 1 && currentReady) return { key: "eligible", label: "Ready to select" };
+  return { key: "upcoming", label: "Not yet verified" };
+}
+
+function renderPullupRoadmap(card, previewStepId) {
+  const currentStepId = Number($(".progression-select", card).value);
+  const successful = pullupSuccessfulSessions(card);
+  const currentReady = successful >= 2;
+  const preview = getPullupStep(previewStepId || currentStepId);
+  const range = $(".progression-range", card);
+  range.value = preview.id;
+  range.setAttribute("aria-valuetext", `${preview.label}: ${preview.title}`);
+  range.style.setProperty("--range-progress", `${((preview.id - 1) / (PULL_UP_STEPS.length - 1)) * 100}%`);
+  $(".progression-current-label", card).textContent = `Step ${currentStepId} of ${PULL_UP_STEPS.length}`;
+
+  const rail = $(".progression-rail", card);
+  rail.replaceChildren();
+  PULL_UP_STEPS.forEach((step) => {
+    const status = pullupRoadmapStatus(step.id, currentStepId, currentReady);
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "progression-node";
+    button.dataset.status = status.key;
+    button.classList.toggle("is-preview", step.id === preview.id);
+    button.setAttribute("aria-label", `${step.label}. ${status.label}`);
+    if (step.id === currentStepId) button.setAttribute("aria-current", "step");
+    button.innerHTML = `
+      <span class="progression-node-dot">${status.key === "completed" ? "✓" : step.id}</span>
+      <span>${escapeHtml(step.short)}</span>
+    `;
+    button.addEventListener("click", () => renderPullupRoadmap(card, step.id));
+    rail.append(button);
+  });
+
+  const previewStatus = pullupRoadmapStatus(preview.id, currentStepId, currentReady);
+  $(".progression-title", card).textContent = `${preview.label}: ${preview.title}`;
+  $(".progression-preview-status", card).textContent = previewStatus.label;
+  $(".progression-preview-status", card).dataset.status = previewStatus.key;
+  $(".progression-prescription", card).innerHTML = `<strong>Prescription:</strong> ${escapeHtml(preview.prescription)}`;
+  $(".progression-target", card).innerHTML = `<strong>Criteria:</strong> ${escapeHtml(preview.target)}`;
+  $(".progression-next", card).innerHTML = `<strong>Next:</strong> ${escapeHtml(preview.next)}`;
+  const apply = $(".progression-apply", card);
+  apply.classList.toggle("is-hidden", preview.id === currentStepId);
+  apply.textContent =
+    preview.id < currentStepId ? `Step back to Step ${preview.id}` : `Use Step ${preview.id}`;
+}
+
 function updatePullupProgressStatus(card) {
   if (card.dataset.progression !== "pullup" || card.dataset.progressionCounts !== "true") return;
   const stepId = Number($(".progression-select", card).value);
-  const prior = pullupSuccessCount(stepId, selectedDate);
-  const current = $(".progression-qualified", card).checked ? 1 : 0;
-  const successful = Math.min(2, prior + current);
+  const performance = $(".progression-performance-qualified", card).checked;
+  const recovery = $(".progression-recovery-qualified", card).checked;
+  const successful = pullupSuccessfulSessions(card);
   const status = $(".progression-status", card);
-  if (successful >= 2) {
+  if (performance && !recovery) {
+    status.textContent = "Performance logged · morning check pending";
+    status.dataset.ready = "false";
+  } else if (successful >= 2) {
     status.textContent =
       stepId === PULL_UP_STEPS.length ? "Goal step confirmed · keep building clean reps" : "2 of 2 · ready for the next step";
     status.dataset.ready = "true";
@@ -773,6 +929,7 @@ function updatePullupProgressStatus(card) {
     status.textContent = `${successful} of 2 successful sessions`;
     status.dataset.ready = "false";
   }
+  renderPullupRoadmap(card, Number($(".progression-range", card).value));
 }
 
 function applyPullupStep(card, exercise, step, resetSets = false) {
@@ -783,16 +940,12 @@ function applyPullupStep(card, exercise, step, resetSets = false) {
   $(".exercise-prescription", card).textContent = isOptional
     ? `Optional technique practice · first ${workingSets} sets of ${step.label}`
     : step.prescription;
-  $(".progression-title", card).textContent = `${step.label}: ${step.title}`;
-  $(".progression-target", card).innerHTML = `<strong>Today:</strong> ${escapeHtml(step.target)}`;
-  $(".progression-next", card).innerHTML = `<strong>Next:</strong> ${escapeHtml(step.next)}`;
   if (resetSets) {
     const measurement = $(".measurement-select", card);
     measurement.value = step.measurement;
     state.exerciseConfigs[exerciseConfigKey(exercise.id)] = step.measurement;
     renderSetRows(card, step.measurement, Array.from({ length: workingSets }, () => ({})));
   }
-  updatePullupProgressStatus(card);
 }
 
 function setupPullupGuide(card, exercise, savedExercise) {
@@ -803,29 +956,50 @@ function setupPullupGuide(card, exercise, savedExercise) {
 
   const stepSelect = $(".progression-select", card);
   const selectedStep = getPullupStep(savedExercise?.progressionStep ?? state.settings.pullupStep);
-  PULL_UP_STEPS.forEach((step) => {
-    const option = document.createElement("option");
-    option.value = step.id;
-    option.textContent = step.label;
-    option.selected = step.id === selectedStep.id;
-    stepSelect.append(option);
-  });
+  stepSelect.value = selectedStep.id;
 
   const progressionCheck = $(".progression-check", card);
   progressionCheck.classList.toggle("is-hidden", Boolean(exercise.optional));
-  $(".progression-qualified", card).checked = savedExercise?.progressionQualified === true;
+  const qualification = pullupQualification(savedExercise);
+  const performance = $(".progression-performance-qualified", card);
+  const recovery = $(".progression-recovery-qualified", card);
+  performance.checked = qualification.performance;
+  recovery.checked = qualification.recovery;
+  recovery.disabled = selectedDate >= toIsoDate() && !qualification.recovery;
+  $(".progression-check-help", card).textContent = recovery.disabled
+    ? "The following-morning check becomes available tomorrow. Save today’s performance now."
+    : "Confirm the following-morning response, then save this date again.";
   applyPullupStep(card, exercise, selectedStep);
+  renderPullupRoadmap(card, selectedStep.id);
+  updatePullupProgressStatus(card);
 
-  stepSelect.addEventListener("change", () => {
-    const step = getPullupStep(stepSelect.value);
+  $(".progression-range", card).addEventListener("input", (event) => {
+    renderPullupRoadmap(card, Number(event.target.value));
+  });
+  $(".progression-apply", card).addEventListener("click", () => {
+    const step = getPullupStep($(".progression-range", card).value);
+    const hasEnteredSets = collectSetRows(card).some(hasSetContent);
+    if (
+      hasEnteredSets &&
+      !window.confirm(`Changing to ${step.label} will clear the sets entered on this workout. Continue?`)
+    ) {
+      renderPullupRoadmap(card, Number(stepSelect.value));
+      return;
+    }
     state.settings.pullupStep = step.id;
-    $(".progression-qualified", card).checked = false;
+    stepSelect.value = step.id;
+    performance.checked = false;
+    recovery.checked = false;
+    recovery.disabled = selectedDate >= toIsoDate();
     applyPullupStep(card, exercise, step, true);
+    renderPullupRoadmap(card, step.id);
+    updatePullupProgressStatus(card);
     persistState();
     markWorkoutDirty();
     updateSessionProgress();
   });
-  $(".progression-qualified", card).addEventListener("change", () => updatePullupProgressStatus(card));
+  performance.addEventListener("change", () => updatePullupProgressStatus(card));
+  recovery.addEventListener("change", () => updatePullupProgressStatus(card));
 }
 
 function setupExerciseGuidance(card, exercise) {
@@ -851,6 +1025,19 @@ function createExerciseCard(exercise, index, savedExercise) {
     exercise.progression === "pullup"
       ? getPullupStep(savedExercise?.progressionStep ?? state.settings.pullupStep)
       : null;
+  const isLongRunProgression =
+    exercise.id === longRunExerciseId() &&
+    activePlan.longRuns?.length &&
+    (activePlan.id !== BUILT_IN_PLAN.id || Number(state.settings.block) === 1);
+  const longRunStage = isLongRunProgression
+    ? Math.max(
+        1,
+        Math.min(
+          activePlan.longRuns.length,
+          Number(savedExercise?.progressionStage ?? state.settings.longRunWeek) || 1,
+        ),
+      )
+    : null;
   card.dataset.exerciseId = exercise.id;
   card.dataset.defaultSets = pullupStep
     ? exercise.optional
@@ -859,10 +1046,15 @@ function createExerciseCard(exercise, index, savedExercise) {
     : exercise.sets;
   card.dataset.rest = exercise.rest;
   card.dataset.exerciseName = exercise.name;
+  if (longRunStage) card.dataset.longRunStage = longRunStage;
 
   $(".exercise-number", card).textContent = String(index + 1).padStart(2, "0");
   $(".exercise-name", card).textContent = exercise.name;
-  $(".exercise-prescription", card).textContent = pullupStep ? pullupStep.prescription : activePrescription(exercise);
+  $(".exercise-prescription", card).textContent = pullupStep
+    ? pullupStep.prescription
+    : longRunStage
+      ? `${targetLongRun(longRunStage)} easy · walk breaks allowed`
+      : activePrescription(exercise);
   $(".exercise-tags", card).innerHTML = `
     <span>${escapeHtml(exercise.section || exercise.category)}</span>
     ${exercise.optional ? "<span class=\"tag-optional\">OPTIONAL</span>" : ""}
@@ -1100,9 +1292,14 @@ function collectWorkoutRecord() {
       };
       if (card.dataset.progression === "pullup") {
         exerciseLog.progressionStep = Number($(".progression-select", card).value);
+        exerciseLog.progressionPerformanceQualified =
+          card.dataset.progressionCounts === "true" && $(".progression-performance-qualified", card).checked;
+        exerciseLog.progressionRecoveryQualified =
+          card.dataset.progressionCounts === "true" && $(".progression-recovery-qualified", card).checked;
         exerciseLog.progressionQualified =
-          card.dataset.progressionCounts === "true" && $(".progression-qualified", card).checked;
+          exerciseLog.progressionPerformanceQualified && exerciseLog.progressionRecoveryQualified;
       }
+      if (card.dataset.longRunStage) exerciseLog.progressionStage = Number(card.dataset.longRunStage);
       exercises[card.dataset.exerciseId] = exerciseLog;
     }
   });
@@ -1252,6 +1449,8 @@ function renderWeek() {
   $("#week-cardio-distance").textContent = formatCardioDistance(cardio.distance);
   $("#week-cardio-sessions").textContent = cardio.sessions;
   $("#week-cardio-extra").textContent = cardio.extraSessions;
+  renderLongRunOptions();
+  renderLongRunRoadmap();
   const grid = $("#week-grid");
   grid.replaceChildren();
   DAY_KEYS.forEach((dayKey, index) => {
@@ -1292,13 +1491,164 @@ function renderLongRunOptions() {
   const select = $("#long-run-week");
   select.replaceChildren();
   const longRuns = activePlan.longRuns || [];
-  $("#long-run-control").classList.toggle("is-hidden", !longRuns.length);
+  const available =
+    longRuns.length && (activePlan.id !== BUILT_IN_PLAN.id || Number(state.settings.block) === 1);
+  $("#long-run-control").classList.toggle("is-hidden", !available);
+  const selectedStage = Math.max(
+    1,
+    Math.min(longRuns.length || 1, Number(longRunPreviewStage ?? state.settings.longRunWeek) || 1),
+  );
   longRuns.forEach((distance, index) => {
     const option = document.createElement("option");
     option.value = index + 1;
-    option.textContent = `Week ${index + 1} · ${distance}`;
-    option.selected = Number(state.settings.longRunWeek) === index + 1;
+    option.textContent = `Stage ${index + 1} · ${distance}`;
+    option.selected = selectedStage === index + 1;
     select.append(option);
+  });
+}
+
+function renderLongRunRoadmap() {
+  const container = $("#long-run-roadmap-content");
+  const runs = activePlan.longRuns || [];
+  const available =
+    runs.length && (activePlan.id !== BUILT_IN_PLAN.id || Number(state.settings.block) === 1);
+  if (!available) {
+    container.replaceChildren();
+    return;
+  }
+
+  const current = Math.max(1, Math.min(runs.length, Number(state.settings.longRunWeek) || 1));
+  const preview = Math.max(1, Math.min(runs.length, Number(longRunPreviewStage ?? current) || current));
+  longRunPreviewStage = preview;
+  const phases = longRunPhases();
+  const previewPhase = longRunPhaseForStage(preview);
+  const viewedPhase =
+    phases.find((phase) => phase.id === Number(longRunViewedPhase)) || previewPhase || phases[0];
+  longRunViewedPhase = viewedPhase.id;
+  $("#long-run-stage-count").textContent = `Stage ${current} of ${runs.length}`;
+  $("#long-run-week").value = String(preview);
+
+  const phaseRail = phases
+    .map((phase) => {
+      const currentPhase = current >= phase.start && current <= phase.end;
+      const phasePast = phase.end < current;
+      return `
+        <button
+          type="button"
+          class="long-run-phase ${phase.id === viewedPhase.id ? "is-viewing" : ""}"
+          data-long-run-phase="${phase.id}"
+          data-status="${currentPhase ? "current" : phasePast ? "past" : "upcoming"}"
+          ${currentPhase ? 'aria-current="step"' : ""}
+        >
+          <span class="long-run-phase-dot">${phasePast ? "✓" : phase.id}</span>
+          <strong>${escapeHtml(phase.name)}</strong>
+          <small>${phase.start}–${phase.end}</small>
+        </button>
+      `;
+    })
+    .join("");
+
+  const milestones = [];
+  for (let stage = viewedPhase.start; stage <= viewedPhase.end; stage += 1) {
+    const evaluation = longRunEvaluation(stage);
+    const target = targetLongRun(stage);
+    const recoveryStage = /cutback|recovery/i.test(target);
+    milestones.push(`
+      <button
+        type="button"
+        class="long-run-milestone ${stage === preview ? "is-preview" : ""}"
+        data-long-run-stage="${stage}"
+        data-status="${stage === current ? "current" : evaluation.status}"
+        ${stage === current ? 'aria-current="step"' : ""}
+      >
+        <span>Stage ${stage}</span>
+        <strong>${escapeHtml(target)}</strong>
+        <small>${recoveryStage ? "RECOVERY" : escapeHtml(evaluation.label)}</small>
+      </button>
+    `);
+  }
+
+  const evaluation = longRunEvaluation(preview);
+  const currentEvaluation = longRunEvaluation(current);
+  const target = targetLongRun(preview);
+  const actual =
+    evaluation.distance > 0
+      ? `${numberFormatter.format(evaluation.distance)} km${Number.isFinite(evaluation.rpe) ? ` · RPE ${evaluation.rpe}` : ""}`
+      : "No attempt recorded";
+  const action =
+    preview !== current
+      ? `<button class="button button-dark" type="button" data-long-run-action="use">Use Stage ${preview}</button>`
+      : `
+        <button class="button button-secondary" type="button" data-long-run-action="repeat">Repeat Stage ${current}</button>
+        <button
+          class="button button-dark"
+          type="button"
+          data-long-run-action="advance"
+          ${currentEvaluation.status !== "ready" || current >= runs.length ? "disabled" : ""}
+        >${current >= runs.length ? "Roadmap complete" : `Advance to Stage ${current + 1}`}</button>
+      `;
+
+  container.innerHTML = `
+    <div class="long-run-phase-rail" aria-label="Long-run phases">${phaseRail}</div>
+    <div class="long-run-phase-label">
+      <span>Viewing ${escapeHtml(viewedPhase.name)}</span>
+      <small>Stages ${viewedPhase.start}–${viewedPhase.end}</small>
+    </div>
+    <div class="long-run-milestones">${milestones.join("")}</div>
+    <article class="long-run-stage-detail" data-status="${evaluation.status}">
+      <div class="long-run-stage-detail-head">
+        <div>
+          <span>Stage ${preview}${preview === current ? " · CURRENT" : " · PREVIEW"}</span>
+          <h3>${escapeHtml(target)} easy</h3>
+        </div>
+        <strong>${escapeHtml(longRunStatusCopy(evaluation))}</strong>
+      </div>
+      <p>${escapeHtml(evaluation.reason)}</p>
+      <div class="long-run-stage-facts">
+        <span><small>Latest result</small><strong>${escapeHtml(actual)}</strong></span>
+        <span><small>Advance when</small><strong>Target at RPE ≤4 + stable morning response</strong></span>
+      </div>
+      <div class="long-run-stage-actions">${action}</div>
+      <small class="long-run-stage-note">
+        Record “Following morning” in Session response. The app recommends; you retain the final decision.
+      </small>
+    </article>
+  `;
+
+  $$("[data-long-run-phase]", container).forEach((button) => {
+    button.addEventListener("click", () => {
+      longRunViewedPhase = Number(button.dataset.longRunPhase);
+      const phase = phases.find((item) => item.id === longRunViewedPhase);
+      if (phase && (preview < phase.start || preview > phase.end)) longRunPreviewStage = phase.start;
+      renderLongRunOptions();
+      renderLongRunRoadmap();
+    });
+  });
+  $$("[data-long-run-stage]", container).forEach((button) => {
+    button.addEventListener("click", () => {
+      longRunPreviewStage = Number(button.dataset.longRunStage);
+      renderLongRunOptions();
+      renderLongRunRoadmap();
+    });
+  });
+  $("[data-long-run-action=\"use\"]", container)?.addEventListener("click", async () => {
+    const advancingWithoutReadiness = preview > current && currentEvaluation.status !== "ready";
+    if (
+      advancingWithoutReadiness &&
+      !window.confirm("The current stage’s advancement criteria are not confirmed. Use the previewed stage anyway?")
+    ) {
+      return;
+    }
+    await setLongRunStage(preview);
+  });
+  $("[data-long-run-action=\"repeat\"]", container)?.addEventListener("click", () => {
+    longRunPreviewStage = current;
+    showToast(`Stage ${current} remains current. Repeat it when ready.`);
+    renderLongRunOptions();
+    renderLongRunRoadmap();
+  });
+  $("[data-long-run-action=\"advance\"]", container)?.addEventListener("click", async () => {
+    await setLongRunStage(current + 1);
   });
 }
 
@@ -1641,7 +1991,7 @@ function bindEvents() {
   $("#view-today").addEventListener("change", (event) => {
     if (
       event.target.matches(
-        ".set-row input, [data-warmup-index], .response-option input, .progression-qualified",
+        ".set-row input, [data-warmup-index], .response-option input, .progression-performance-qualified, .progression-recovery-qualified",
       )
     ) {
       markWorkoutDirty();
@@ -1686,11 +2036,10 @@ function bindEvents() {
     persistState();
     renderWeek();
   });
-  $("#long-run-week").addEventListener("change", async (event) => {
-    await saveWorkoutDraftNow();
-    state.settings.longRunWeek = Number(event.target.value);
-    await persistState();
-    renderToday();
+  $("#long-run-week").addEventListener("change", (event) => {
+    longRunPreviewStage = Number(event.target.value);
+    longRunViewedPhase = longRunPhaseForStage(longRunPreviewStage)?.id || 1;
+    renderLongRunRoadmap();
   });
 
   $("#stats-exercise").addEventListener("change", renderExerciseStats);

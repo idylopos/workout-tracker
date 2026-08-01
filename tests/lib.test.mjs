@@ -3,11 +3,14 @@ import assert from "node:assert/strict";
 import {
   APP_VERSION,
   EXERCISE_GUIDANCE,
+  LONG_RUN_PHASES,
   WEEK_PLAN,
   createDefaultState,
   dateToDayKey,
+  evaluateLongRunProgress,
   findPreviousExerciseLog,
   getAllExercises,
+  longRunTargetDistance,
   normalizeResponseRating,
   normalizeState,
   summarizeCardioRange,
@@ -34,6 +37,64 @@ test("keeps pull-up progression within the supported roadmap", () => {
   assert.equal(normalizeState({ settings: { pullupStep: 4 } }).settings.pullupStep, 4);
   assert.equal(normalizeState({ settings: { pullupStep: 99 } }).settings.pullupStep, 6);
   assert.equal(normalizeState({ settings: { pullupStep: -2 } }).settings.pullupStep, 1);
+});
+
+test("keeps long-run progression within the supported settings range", () => {
+  assert.equal(normalizeState({ settings: { longRunWeek: 7 } }).settings.longRunWeek, 7);
+  assert.equal(normalizeState({ settings: { longRunWeek: 99 } }).settings.longRunWeek, 52);
+  assert.equal(normalizeState({ settings: { longRunWeek: -2 } }).settings.longRunWeek, 1);
+  assert.deepEqual(LONG_RUN_PHASES.map((phase) => [phase.start, phase.end]), [
+    [1, 4],
+    [5, 8],
+    [9, 12],
+    [13, 16],
+  ]);
+});
+
+test("evaluates long-run readiness from target, RPE, and next-morning response", () => {
+  assert.equal(longRunTargetDistance("6–7 km recovery"), 6);
+  const ready = evaluateLongRunProgress(
+    {
+      exercises: {
+        "long-run": {
+          measurement: "distance_time",
+          progressionStage: 5,
+          sets: [{ completed: true, distance: 5.6, minutes: 42, rpe: 4 }],
+        },
+      },
+      response: { scaleVersion: 2, painNext: 1 },
+    },
+    "5.6 km",
+  );
+  assert.equal(ready.status, "ready");
+
+  const pending = evaluateLongRunProgress(
+    {
+      exercises: {
+        "long-run": {
+          measurement: "distance_time",
+          sets: [{ completed: true, distance: 5.6, minutes: 42, rpe: 3 }],
+        },
+      },
+      response: { scaleVersion: 2, painNext: "" },
+    },
+    "5.6 km",
+  );
+  assert.equal(pending.status, "pending");
+
+  const repeat = evaluateLongRunProgress(
+    {
+      exercises: {
+        "long-run": {
+          measurement: "distance_time",
+          sets: [{ completed: true, distance: 5.6, minutes: 42, rpe: 6 }],
+        },
+      },
+      response: { scaleVersion: 2, painNext: 0 },
+    },
+    "5.6 km",
+  );
+  assert.equal(repeat.status, "repeat");
 });
 
 test("maps legacy 0–10 pain logs to the descriptive five-level scale", () => {
@@ -68,6 +129,30 @@ test("validates backup shape before restore", () => {
   const legacyWithoutDrafts = createDefaultState();
   delete legacyWithoutDrafts.workoutDrafts;
   assert.equal(validateBackup(legacyWithoutDrafts).valid, true);
+
+  const progressionBackup = createDefaultState();
+  progressionBackup.workoutLogs["2026-08-01"] = {
+    date: "2026-08-01",
+    dayKey: "saturday",
+    planId: "form-flow",
+    exercises: {
+      "long-run": {
+        measurement: "distance_time",
+        progressionStage: 5,
+        sets: [{ completed: true, distance: 5.6, minutes: 42, seconds: 0, rpe: 3 }],
+      },
+      "pull-up-progression": {
+        measurement: "assisted_reps",
+        progressionStep: 2,
+        progressionPerformanceQualified: true,
+        progressionRecoveryQualified: true,
+        progressionQualified: true,
+        sets: [{ completed: true, assistance: 20, reps: 8, rir: 1 }],
+      },
+    },
+    response: { scaleVersion: 2, painNext: 0 },
+  };
+  assert.equal(validateBackup(progressionBackup).valid, true);
 });
 
 test("keeps encrypted workout drafts during state normalization", () => {

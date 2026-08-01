@@ -377,7 +377,7 @@ work; Saturday stays at 8–10 km easy.
 - Pull B if fresh · light cable row 1 × 8
 
 #### Exercises and activities
-1. **Long run** — Block 1: use the 16-week progression below · Block 2: 8–10 km easy; walk breaks allowed
+1. **Long run** — Block 1: use the 16-stage progression below · Block 2: 8–10 km easy; walk breaks allowed
    - Log as: Distance + time.
    - **Setup:** Start 5–10 minutes very easily and choose a flat, familiar route when possible.
    - **Do:** Stay conversational and use planned or unplanned walk breaks to keep the effort easy.
@@ -438,30 +438,37 @@ Complete rest. Ordinary relaxed movement is fine.
 
 ## Saturday long-run progression — Block 1
 
-- Week 1: 4.5 km easy
-- Week 2: 4.8 km easy
-- Week 3: 5.2 km easy
-- Week 4: 4.5 km cutback easy
-- Week 5: 5.6 km easy
-- Week 6: 6.0 km easy
-- Week 7: 6.5 km easy
-- Week 8: 5.2 km cutback easy
-- Week 9: 7.0 km easy
-- Week 10: 7.6 km easy
-- Week 11: 8.2 km easy
-- Week 12: 6.5 km cutback easy
-- Week 13: 8.8 km easy
-- Week 14: 9.4 km easy
-- Week 15: 10.0 km easy
-- Week 16: 6–7 km recovery easy
+These are performance-and-recovery stages, not fixed calendar weeks. The app groups them as
+Foundation (1–4), Build (5–8), Extend (9–12), 10 km (13–16).
 
-Repeat a week when the next-morning response is not stable. Walk breaks are allowed.
+- Stage 1: 4.5 km easy
+- Stage 2: 4.8 km easy
+- Stage 3: 5.2 km easy
+- Stage 4: 4.5 km cutback easy
+- Stage 5: 5.6 km easy
+- Stage 6: 6.0 km easy
+- Stage 7: 6.5 km easy
+- Stage 8: 5.2 km cutback easy
+- Stage 9: 7.0 km easy
+- Stage 10: 7.6 km easy
+- Stage 11: 8.2 km easy
+- Stage 12: 6.5 km cutback easy
+- Stage 13: 8.8 km easy
+- Stage 14: 9.4 km easy
+- Stage 15: 10.0 km easy
+- Stage 16: 6–7 km recovery easy
+
+Repeat a stage when the distance is not yet easy or the next-morning response is not stable. Walk breaks are allowed.
+The tracker records the stage used with that workout and enables the next-stage action after the target is completed at
+RPE 4 or below with a Comfortable or Mild following-morning response. This is a recommendation; the user retains the
+final decision and can repeat or step back.
 
 ## Pull-up progression — choose by performance
 
-Choose the step that matches your current ability; it is not a calendar-week requirement. Mark the advancement check
-only after two successful sessions meeting the step target, with clean technique, at least one rep in reserve, and no
-worse joint response the following morning.
+Choose the step that matches your current ability; it is not a calendar-week requirement. In the app, drag or tap the
+roadmap to preview a step, then confirm separately before changing the current step. Each qualified session requires
+both the performance check—target met with clean technique and at least one rep in reserve—and the following-morning
+recovery check. Advance after two qualified sessions; stepping back does not delete past logs.
 
 - **Step 1 · Assisted base** — Assisted neutral-grip pull-up: 3 × 5 · choose assistance that leaves about 2 reps in reserve. Target: Complete all 3 × 5 with smooth, full-range reps. Next: After 2 successful sessions, keep the same assistance and move to Step 2.
 - **Step 2 · Build assisted reps** — Assisted neutral-grip pull-up: 3 × 6–8 · keep at least 1 rep in reserve. Target: Build to 3 × 8 without shortening the range or kicking. Next: After 2 successful 3 × 8 sessions, move to Step 3.

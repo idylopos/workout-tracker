@@ -195,11 +195,24 @@
               <span>Viewing</span>
               <strong id="week-range">—</strong>
             </div>
-            <label id="long-run-control">
-              <span>Long-run week</span>
-              <select id="long-run-week"></select>
-            </label>
           </div>
+          <section class="long-run-roadmap is-hidden" id="long-run-control" aria-labelledby="long-run-roadmap-title">
+            <header class="long-run-roadmap-head">
+              <div>
+                <p class="eyebrow">10 KM ROADMAP</p>
+                <h2 id="long-run-roadmap-title">Long-run progression</h2>
+                <p>Progress by recovery, not by the calendar. Repeating or stepping back is part of the plan.</p>
+              </div>
+              <div class="long-run-roadmap-meta">
+                <strong id="long-run-stage-count">Stage 1 of 16</strong>
+                <label>
+                  <span>Jump to stage</span>
+                  <select id="long-run-week"></select>
+                </label>
+              </div>
+            </header>
+            <div id="long-run-roadmap-content"></div>
+          </section>
           <div class="cardio-week-summary" aria-label="Weekly cardio totals">
             <div><span>Cardio time</span><strong id="week-cardio-time">0 min</strong></div>
             <div><span>Distance</span><strong id="week-cardio-distance">0 km</strong></div>
@@ -506,17 +519,33 @@
             </div>
           </details>
           <section class="exercise-guide is-hidden" aria-label="Pull-up progression guide">
-            <div class="progression-picker">
-              <label>
-                <span>Current performance step</span>
-                <select class="progression-select"></select>
-              </label>
-              <small>Advance by performance, not by calendar week.</small>
+            <div class="progression-roadmap-head">
+              <div>
+                <span>Pull-up roadmap</span>
+                <strong class="progression-current-label">Step 1 of 6</strong>
+              </div>
+              <small>Drag or tap to inspect a step. A separate confirmation changes your current step.</small>
+            </div>
+            <input class="progression-select" type="hidden" value="1" />
+            <div class="progression-rail-wrap">
+              <input
+                class="progression-range"
+                type="range"
+                min="1"
+                max="6"
+                step="1"
+                value="1"
+                aria-label="Preview pull-up progression step"
+              />
+              <div class="progression-rail" aria-label="Pull-up progression steps"></div>
             </div>
             <div class="progression-instruction">
               <strong class="progression-title"></strong>
+              <span class="progression-preview-status"></span>
+              <p class="progression-prescription"></p>
               <p class="progression-target"></p>
               <p class="progression-next"></p>
+              <button class="button button-secondary progression-apply is-hidden" type="button"></button>
             </div>
             <div class="progression-check">
               <div>
@@ -524,13 +553,18 @@
                 <strong class="progression-status">0 of 2 successful sessions</strong>
               </div>
               <label>
-                <input class="progression-qualified" type="checkbox" />
+                <input class="progression-performance-qualified" type="checkbox" />
                 <span>
-                  Count this session: target completed with clean technique and ≥1 RIR, with no worse joint response the
-                  following morning.
+                  Performance completed: stage target met with clean technique, full intended range, and at least 1 RIR.
                 </span>
               </label>
-              <small>Reopen this date the following morning, check it if all criteria are met, then save again.</small>
+              <label>
+                <input class="progression-recovery-qualified" type="checkbox" />
+                <span>Following-morning response: joints and usual function are at baseline or no worse.</span>
+              </label>
+              <small class="progression-check-help">
+                Save the performance today. Reopen this date the following morning, confirm recovery, and save again.
+              </small>
             </div>
           </section>
           <div class="previous-line"></div>

@@ -3,6 +3,7 @@ import { resolve } from "node:path";
 import { writeFile } from "node:fs/promises";
 import {
   EXERCISE_GUIDANCE,
+  LONG_RUN_PHASES,
   LONG_RUNS,
   MEASUREMENT_TYPES,
   PULL_UP_STEPS,
@@ -23,7 +24,7 @@ function prescription(exercise) {
     return "Block 1: 25–35 min easy · Block 2: alternate tempo and intervals; run first and separate sessions by about 6 hours";
   }
   if (exercise.id === "long-run") {
-    return "Block 1: use the 16-week progression below · Block 2: 8–10 km easy; walk breaks allowed";
+    return "Block 1: use the 16-stage progression below · Block 2: 8–10 km easy; walk breaks allowed";
   }
   return exercise.prescription;
 }
@@ -113,15 +114,22 @@ ${days}
 
 ## Saturday long-run progression — Block 1
 
-${LONG_RUNS.map((distance, index) => `- Week ${index + 1}: ${distance} easy`).join("\n")}
+These are performance-and-recovery stages, not fixed calendar weeks. The app groups them as
+${LONG_RUN_PHASES.map((phase) => `${phase.name} (${phase.start}–${phase.end})`).join(", ")}.
 
-Repeat a week when the next-morning response is not stable. Walk breaks are allowed.
+${LONG_RUNS.map((distance, index) => `- Stage ${index + 1}: ${distance} easy`).join("\n")}
+
+Repeat a stage when the distance is not yet easy or the next-morning response is not stable. Walk breaks are allowed.
+The tracker records the stage used with that workout and enables the next-stage action after the target is completed at
+RPE 4 or below with a Comfortable or Mild following-morning response. This is a recommendation; the user retains the
+final decision and can repeat or step back.
 
 ## Pull-up progression — choose by performance
 
-Choose the step that matches your current ability; it is not a calendar-week requirement. Mark the advancement check
-only after two successful sessions meeting the step target, with clean technique, at least one rep in reserve, and no
-worse joint response the following morning.
+Choose the step that matches your current ability; it is not a calendar-week requirement. In the app, drag or tap the
+roadmap to preview a step, then confirm separately before changing the current step. Each qualified session requires
+both the performance check—target met with clean technique and at least one rep in reserve—and the following-morning
+recovery check. Advance after two qualified sessions; stepping back does not delete past logs.
 
 ${pullUpMarkdown()}
 

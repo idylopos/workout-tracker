@@ -68,6 +68,7 @@ export const MEASUREMENT_TYPES = {
 export const PULL_UP_STEPS = [
   {
     id: 1,
+    short: "Base",
     label: "Step 1 · Assisted base",
     title: "Assisted neutral-grip pull-up",
     prescription: "3 × 5 · choose assistance that leaves about 2 reps in reserve",
@@ -78,6 +79,7 @@ export const PULL_UP_STEPS = [
   },
   {
     id: 2,
+    short: "Build reps",
     label: "Step 2 · Build assisted reps",
     title: "Assisted neutral-grip pull-up",
     prescription: "3 × 6–8 · keep at least 1 rep in reserve",
@@ -88,6 +90,7 @@ export const PULL_UP_STEPS = [
   },
   {
     id: 3,
+    short: "Less help",
     label: "Step 3 · Reduce assistance",
     title: "Lightly assisted neutral-grip pull-up",
     prescription: "3 × 5–8 · reduce assistance by the smallest available step",
@@ -98,6 +101,7 @@ export const PULL_UP_STEPS = [
   },
   {
     id: 4,
+    short: "Singles",
     label: "Step 4 · Clean singles",
     title: "Unassisted pull-up singles",
     prescription: "5 × 1 · rest 2–3 min · no grinding or kipping",
@@ -108,6 +112,7 @@ export const PULL_UP_STEPS = [
   },
   {
     id: 5,
+    short: "Doubles",
     label: "Step 5 · Repeatable doubles",
     title: "Unassisted pull-up",
     prescription: "4 × 2 · keep at least 1 rep in reserve",
@@ -118,6 +123,7 @@ export const PULL_UP_STEPS = [
   },
   {
     id: 6,
+    short: "5 reps",
     label: "Step 6 · Build to five",
     title: "Unassisted pull-up",
     prescription: "3 sets · aim for 3–5 clean reps · stop with at least 1 rep in reserve",
@@ -397,6 +403,94 @@ export function normalizeResponseRating(value, scaleVersion = 1) {
   if (rating <= 5) return 2;
   if (rating <= 7) return 3;
   return 4;
+}
+
+export function longRunTargetDistance(target) {
+  const match = String(target || "").match(/\d+(?:\.\d+)?/);
+  return match ? Number(match[0]) : 0;
+}
+
+export function evaluateLongRunProgress(log, target, exerciseId = "long-run") {
+  const exercise = log?.exercises?.[exerciseId];
+  const sets = Array.isArray(exercise?.sets) ? exercise.sets : [];
+  const entered = sets.filter((set) => Number(set?.distance) > 0);
+  if (!entered.length) {
+    return {
+      status: "not-started",
+      label: "Not logged yet",
+      reason: "Complete this stage’s long run before advancing.",
+      distance: 0,
+      rpe: null,
+    };
+  }
+
+  const bestSet = entered.reduce((best, set) => (Number(set.distance) > Number(best.distance) ? set : best));
+  const distance = Number(bestSet.distance);
+  const targetDistance = longRunTargetDistance(target);
+  const rpe = bestSet.rpe === "" || bestSet.rpe === undefined ? null : Number(bestSet.rpe);
+  if (!bestSet.completed) {
+    return {
+      status: "pending",
+      label: "Run entered",
+      reason: "Mark the long-run set complete to finish this attempt.",
+      distance,
+      rpe,
+    };
+  }
+  if (targetDistance && distance + 0.05 < targetDistance) {
+    return {
+      status: "repeat",
+      label: "Repeat recommended",
+      reason: `Logged ${distance} km; this stage targets ${target}.`,
+      distance,
+      rpe,
+    };
+  }
+  if (!Number.isFinite(rpe)) {
+    return {
+      status: "pending",
+      label: "RPE needed",
+      reason: "Add the run’s RPE before deciding whether to advance.",
+      distance,
+      rpe: null,
+    };
+  }
+  if (rpe > 4) {
+    return {
+      status: "repeat",
+      label: "Repeat recommended",
+      reason: `The run was RPE ${rpe}; repeat until the prescribed distance feels easy and conversational.`,
+      distance,
+      rpe,
+    };
+  }
+
+  const nextMorning = normalizeResponseRating(log?.response?.painNext, log?.response?.scaleVersion);
+  if (nextMorning === "") {
+    return {
+      status: "pending",
+      label: "Morning check pending",
+      reason: "Reopen this workout the following morning and record your response.",
+      distance,
+      rpe,
+    };
+  }
+  if (Number(nextMorning) > 1) {
+    return {
+      status: "repeat",
+      label: "Repeat recommended",
+      reason: "The following-morning response was above Mild; repeat, reduce, or step back.",
+      distance,
+      rpe,
+    };
+  }
+  return {
+    status: "ready",
+    label: "Ready to advance",
+    reason: "Target completed at easy effort with a stable following-morning response.",
+    distance,
+    rpe,
+  };
 }
 
 const lift = (id, name, prescription, sets, rest = 90, measurement = "weight_reps", options = {}) => ({
@@ -695,6 +789,13 @@ export const LONG_RUNS = [
   "6–7 km recovery",
 ];
 
+export const LONG_RUN_PHASES = [
+  { id: 1, name: "Foundation", start: 1, end: 4 },
+  { id: 2, name: "Build", start: 5, end: 8 },
+  { id: 3, name: "Extend", start: 9, end: 12 },
+  { id: 4, name: "10 km", start: 13, end: 16 },
+];
+
 export function createDefaultState() {
   return {
     version: APP_VERSION,
@@ -746,6 +847,7 @@ export function normalizeState(value) {
   if (!value || typeof value !== "object") return fallback;
   const settings = { ...fallback.settings, ...(value.settings || {}) };
   settings.block = Number(settings.block) === 2 ? 2 : 1;
+  settings.longRunWeek = Math.max(1, Math.min(52, Number(settings.longRunWeek) || 1));
   settings.pullupStep = Math.max(1, Math.min(PULL_UP_STEPS.length, Number(settings.pullupStep) || 1));
   return {
     version: APP_VERSION,

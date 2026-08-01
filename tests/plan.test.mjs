@@ -66,4 +66,6 @@ test("the readable workout plan is rendered from the built-in plan", async () =>
   assert.match(generated, /### Friday — Push B \+ Mobility B/);
   assert.match(generated, /This is not the adductor machine/);
   assert.match(generated, /Pull-up progression — choose by performance/);
+  assert.match(generated, /Stage 16: 6–7 km recovery easy/);
+  assert.match(generated, /both the performance check/);
 });
