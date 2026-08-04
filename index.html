@@ -34,7 +34,7 @@
         </nav>
         <div class="header-status">
           <span class="status-dot" aria-hidden="true"></span>
-          <span>Stored on this device</span>
+          <span id="vault-session-status">Stored on this device</span>
         </div>
       </header>
 
@@ -368,8 +368,9 @@
               <strong>Private by design</strong>
               <p>
                 This app has no analytics, accounts, or database. It only loads public plan files from this site. Workout
-                records and drafts are encrypted with your passphrase before browser storage and are never uploaded. Export a backup
-                regularly, and lock or erase the app before handing a shared device to someone else.
+                records and drafts are encrypted with your passphrase before browser storage and are never uploaded. The
+                optional two-hour unlock stores a non-exportable key, never the passphrase. Export a backup regularly,
+                and lock or erase the app before handing a shared device to someone else.
               </p>
             </div>
           </aside>
@@ -475,6 +476,13 @@
         <label id="privacy-confirm-wrap" class="is-hidden">
           <span>Confirm passphrase</span>
           <input id="privacy-confirm" type="password" autocomplete="new-password" />
+        </label>
+        <label class="remember-unlock">
+          <input id="privacy-remember" type="checkbox" checked />
+          <span>
+            <strong>Keep unlocked for two hours</strong>
+            <small>Stores a non-exportable key in this browser, never your passphrase. Turn this off on a shared device.</small>
+          </span>
         </label>
         <p class="privacy-error" id="privacy-error" role="alert"></p>
         <button class="button button-primary" id="privacy-submit" type="submit">Unlock</button>

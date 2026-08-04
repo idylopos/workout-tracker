@@ -2749,6 +2749,42 @@ body[data-active-view="today"] .timer {
   width: 100%;
 }
 
+.privacy-form .remember-unlock {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: #f8f5ed;
+  cursor: pointer;
+}
+
+.privacy-form .remember-unlock > input {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  accent-color: var(--blue);
+}
+
+.privacy-form .remember-unlock > span {
+  display: grid;
+  gap: 2px;
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.remember-unlock small {
+  color: var(--ink-soft);
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
 .privacy-lock {
   display: grid;
   width: 52px;

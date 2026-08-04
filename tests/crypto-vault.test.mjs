@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { createVault, unlockVault } from "../crypto-vault.js";
+import { createVault, unlockVault, unlockVaultWithKey } from "../crypto-vault.js";
 
 test("encrypts state without leaving plaintext in the vault", async () => {
   const state = {
@@ -22,6 +22,10 @@ test("encrypts state without leaving plaintext in the vault", async () => {
 
   const unlocked = await unlockVault(created.vault, "a-long-test-passphrase");
   assert.deepEqual(unlocked.state, state);
+  assert.equal(unlocked.key.extractable, false);
+
+  const resumed = await unlockVaultWithKey(created.vault, unlocked.key);
+  assert.deepEqual(resumed.state, state);
 });
 
 test("rejects an incorrect passphrase", async () => {

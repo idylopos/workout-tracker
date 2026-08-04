@@ -72,7 +72,7 @@ export async function createVault(state, passphrase) {
   return { state, key, salt, iterations: PBKDF2_ITERATIONS, vault };
 }
 
-export async function unlockVault(vault, passphrase) {
+function readVault(vault) {
   if (
     !vault ||
     vault.version !== 1 ||
@@ -89,7 +89,11 @@ export async function unlockVault(vault, passphrase) {
   const salt = base64ToBytes(vault.kdf.salt);
   const iv = base64ToBytes(vault.cipher.iv);
   const ciphertext = base64ToBytes(vault.cipher.data);
-  const key = await deriveKey(passphrase, salt, iterations);
+  return { salt, iv, ciphertext, iterations };
+}
+
+export async function unlockVaultWithKey(vault, key) {
+  const { salt, iv, ciphertext, iterations } = readVault(vault);
   const plaintext = await globalThis.crypto.subtle.decrypt(
     { name: "AES-GCM", iv, additionalData, tagLength: 128 },
     key,
@@ -104,3 +108,8 @@ export async function unlockVault(vault, passphrase) {
   };
 }
 
+export async function unlockVault(vault, passphrase) {
+  const { salt, iterations } = readVault(vault);
+  const key = await deriveKey(passphrase, salt, iterations);
+  return unlockVaultWithKey(vault, key);
+}

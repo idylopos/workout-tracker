@@ -5,6 +5,9 @@
 This document is the readable version of the built-in plan used by the public Workout Tracker. The app remains the
 place to log sets, cardio, body measurements, sleep, pain response, and encrypted drafts.
 
+The tracker can remember a non-exportable browser unlock key for a fixed two-hour window. It never stores the
+passphrase, and **Lock app** clears the remembered key immediately.
+
 ## Weekly rules
 
 - **Sunday:** complete rest.

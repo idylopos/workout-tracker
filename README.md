@@ -35,8 +35,9 @@ view shows the selected week’s combined planned and extra cardio, while Progre
 ## During a workout
 
 Changes on the Today screen are automatically saved as an encrypted draft. If the browser reloads or discards the tab,
-unlock the vault again and the draft will be restored. **Save workout** confirms the draft as a completed workout log.
-The app intentionally does not remember the passphrase or decryption key.
+the draft will be restored. With **Keep unlocked for two hours** selected, the browser retains a non-exportable
+decryption key until the fixed expiry time, so a reload does not require the passphrase again. The passphrase itself is
+never stored. **Save workout** confirms the draft as a completed workout log.
 
 For repeated working sets, enter the first set and choose **Fill empty sets from set 1**. The app copies load and reps
 (or the equivalent primary measurements) into blank fields while leaving RIR/RPE and any values already entered alone.
@@ -65,11 +66,13 @@ The app works at both a user/organization Pages domain and a repository subpath 
 
 Workout logs, in-progress workout drafts, body measurements, sleep records, reusable activities, and preferences are
 encrypted with AES-GCM before being stored in that browser. The encryption key is derived from a user-created passphrase
-and is kept only in memory for the active browser session. Existing unencrypted Form / Flow records are migrated into the
-encrypted vault after the user creates a passphrase.
+and is normally kept in memory. When the two-hour option is selected, a non-exportable Web Crypto key is retained in
+that browser with a fixed expiry; it is not the passphrase and cannot be exported as raw key material. Existing
+unencrypted Form / Flow records are migrated into the encrypted vault after the user creates a passphrase.
 
 The passphrase is never stored or uploaded and cannot be recovered. If it is forgotten, the only in-app recovery is to
-erase the encrypted vault and start over. Use **Data → Lock app** when leaving a shared device.
+erase the encrypted vault and start over. **Data → Lock app** immediately clears the remembered unlock key; use it before
+leaving a shared device.
 
 Use **Data → Download backup** regularly. Importing a valid Form / Flow JSON backup replaces the records currently stored
 in that browser.
