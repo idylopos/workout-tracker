@@ -69,4 +69,5 @@ test("the readable workout plan is rendered from the built-in plan", async () =>
   assert.match(generated, /Stage 16: 6–7 km recovery easy/);
   assert.match(generated, /both the performance check/);
   assert.match(generated, /non-exportable browser unlock key/);
+  assert.match(generated, /Use Last.*keeps today's planned set count/);
 });

@@ -41,6 +41,9 @@ never stored. **Save workout** confirms the draft as a completed workout log.
 
 For repeated working sets, enter the first set and choose **Fill empty sets from set 1**. The app copies load and reps
 (or the equivalent primary measurements) into blank fields while leaving RIR/RPE and any values already entered alone.
+**Use Last** keeps the number of sets currently planned for today, copies reusable values from the previous workout,
+and leaves every completion box and RIR/RPE field clear. If today has more sets, the final previous set supplies the
+extra row’s starting values.
 
 Every built-in exercise includes a collapsible **Quick form guide** covering setup, execution, the main thing to watch,
 and a substitute when appropriate. Folder-based plans can provide the same guidance in `plan.json`.

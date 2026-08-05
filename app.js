@@ -20,6 +20,7 @@ import {
   getAllExercises,
   normalizeResponseRating,
   normalizeState,
+  preparePreviousSets,
   startOfWeek,
   summarizeCardioRange,
   summarizeExercise,
@@ -1184,12 +1185,13 @@ function createExerciseCard(exercise, index, savedExercise) {
   $(".load-previous", card).addEventListener("click", () => {
     const earlier = findPreviousExerciseLog(state.workoutLogs, exercise.id, selectedDate, activePlan.id);
     if (!earlier) return;
+    const todaySetCount = $(".set-list", card).children.length || Number(card.dataset.defaultSets);
     select.value = earlier.measurement;
     state.exerciseConfigs[exerciseConfigKey(exercise.id)] = earlier.measurement;
     persistState();
-    renderSetRows(card, earlier.measurement, structuredClone(earlier.sets));
+    renderSetRows(card, earlier.measurement, preparePreviousSets(earlier.sets, todaySetCount, earlier.measurement));
     markWorkoutDirty();
-    showToast(`${exercise.name}: previous values loaded.`);
+    showToast(`${exercise.name}: previous values loaded into ${todaySetCount} unchecked sets.`);
     updateSessionProgress();
   });
   $(".copy-first-set", card).addEventListener("click", () => copyFirstSetIntoEmpty(card, select.value));
@@ -1980,10 +1982,19 @@ const timer = {
   running: false,
   interval: null,
   endsAt: null,
+  finishedTimeout: null,
 };
+
+function clearTimerFinishedState() {
+  clearTimeout(timer.finishedTimeout);
+  timer.finishedTimeout = null;
+  $("#rest-timer").classList.remove("is-finished");
+  $("#timer-label").textContent = "REST";
+}
 
 function setTimer(seconds, start = false) {
   clearInterval(timer.interval);
+  clearTimerFinishedState();
   timer.total = seconds;
   timer.remaining = seconds;
   timer.running = false;
@@ -1993,6 +2004,7 @@ function setTimer(seconds, start = false) {
 }
 
 function startTimer() {
+  clearTimerFinishedState();
   if (timer.running) {
     timer.remaining = Math.max(0, Math.ceil((timer.endsAt - Date.now()) / 1000));
     timer.running = false;
@@ -2030,7 +2042,8 @@ function formatTimer(seconds) {
 function timerFinished() {
   updateTimerUi();
   $("#rest-timer").classList.add("is-finished");
-  setTimeout(() => $("#rest-timer").classList.remove("is-finished"), 1500);
+  $("#timer-label").textContent = "REST DONE";
+  timer.finishedTimeout = setTimeout(clearTimerFinishedState, 5000);
   try {
     const audio = new AudioContext();
     const oscillator = audio.createOscillator();

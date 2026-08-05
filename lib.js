@@ -65,6 +65,25 @@ export const MEASUREMENT_TYPES = {
   },
 };
 
+export function preparePreviousSets(previousSets, targetCount, measurement) {
+  const sources = Array.isArray(previousSets) ? previousSets : [];
+  const count = Math.max(1, Number.parseInt(targetCount, 10) || 1);
+  const reusableFields = (MEASUREMENT_TYPES[measurement]?.fields || [])
+    .map((field) => field.key)
+    .filter((key) => key !== "rir" && key !== "rpe");
+
+  return Array.from({ length: count }, (_, index) => {
+    const source = sources.length ? sources[Math.min(index, sources.length - 1)] : {};
+    const nextSet = { completed: false };
+    reusableFields.forEach((key) => {
+      if (source[key] !== undefined && source[key] !== null && source[key] !== "") {
+        nextSet[key] = source[key];
+      }
+    });
+    return nextSet;
+  });
+}
+
 export const PULL_UP_STEPS = [
   {
     id: 1,

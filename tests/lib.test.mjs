@@ -13,10 +13,37 @@ import {
   longRunTargetDistance,
   normalizeResponseRating,
   normalizeState,
+  preparePreviousSets,
   summarizeCardioRange,
   summarizeExercise,
   validateBackup,
 } from "../lib.js";
+
+test("Use Last preserves today's set count and clears completion and effort", () => {
+  const copied = preparePreviousSets(
+    [
+      { weight: 45, reps: 10, rir: 2, completed: true },
+      { weight: 50, reps: 8, rir: 1, completed: true },
+    ],
+    3,
+    "weight_reps",
+  );
+
+  assert.deepEqual(copied, [
+    { weight: 45, reps: 10, completed: false },
+    { weight: 50, reps: 8, completed: false },
+    { weight: 50, reps: 8, completed: false },
+  ]);
+});
+
+test("Use Last trims extra historical sets without marking today's sets done", () => {
+  const copied = preparePreviousSets(
+    [{ completed: true }, { completed: true }, { completed: true }],
+    2,
+    "completion",
+  );
+  assert.deepEqual(copied, [{ completed: false }, { completed: false }]);
+});
 
 test("maps local dates to the correct training day", () => {
   assert.equal(dateToDayKey("2026-07-27"), "monday");

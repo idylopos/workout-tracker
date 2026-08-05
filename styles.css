@@ -780,7 +780,8 @@ textarea {
   height: 44px;
   place-items: center;
   border-radius: 12px;
-  background: var(--ink);
+  border: 1px solid #164f9e;
+  background: var(--blue);
   color: #fff;
   font-size: 12px;
   font-weight: 900;
@@ -1271,8 +1272,10 @@ textarea {
 }
 
 .set-row.is-done .set-done {
-  background: var(--ink);
-  color: var(--lime);
+  border-color: #087968;
+  background: #0b947e;
+  color: #fff;
+  box-shadow: 0 0 0 3px rgba(11, 148, 126, 0.14);
 }
 
 .set-row.is-done .set-done span::before {
@@ -1618,9 +1621,9 @@ textarea {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 18px;
-  margin-top: 22px;
-  padding: 13px 14px 13px 20px;
+  gap: 12px;
+  margin-top: 16px;
+  padding: 8px 9px 8px 14px;
   border: 1px solid var(--ink);
   border-radius: 16px;
   background: var(--card);
@@ -1633,12 +1636,14 @@ textarea {
 }
 
 .save-bar strong {
-  font-size: 13px;
+  font-size: 12px;
+  line-height: 1.2;
 }
 
 .save-bar span {
   color: var(--ink-soft);
-  font-size: 10px;
+  font-size: 9px;
+  line-height: 1.2;
 }
 
 .rest-card {
@@ -2549,13 +2554,31 @@ body[data-active-view="today"] .timer {
 }
 
 .timer.is-finished {
-  animation: timer-finish 400ms ease 2;
+  border: 3px solid #fff;
+  background: var(--lime);
+  color: var(--ink);
+  box-shadow:
+    0 0 0 7px rgba(182, 222, 51, 0.45),
+    0 18px 55px rgba(23, 33, 27, 0.38);
+  animation: timer-finish 650ms ease-in-out 3;
+}
+
+.timer.is-finished .timer-display span {
+  color: var(--ink);
+  font-size: 11px;
+}
+
+.timer.is-finished .timer-play {
+  border-left-color: rgba(23, 33, 27, 0.2);
+  background: #fff;
 }
 
 @keyframes timer-finish {
   50% {
-    transform: scale(1.06);
-    background: var(--blue);
+    transform: scale(1.1);
+    box-shadow:
+      0 0 0 12px rgba(182, 222, 51, 0.25),
+      0 22px 60px rgba(23, 33, 27, 0.45);
   }
 }
 
