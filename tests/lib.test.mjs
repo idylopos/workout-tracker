@@ -209,11 +209,22 @@ test("rebalances direct abdominal and deltoid work without stacking Friday press
   assert.equal(friday.filter((exercise) => exercise.id.startsWith("mobility-b-")).length, 3);
 });
 
+test("keeps multidirectional preparation and Mobility A low-volume", () => {
+  const mondayWarmup = WEEK_PLAN.monday.warmup;
+  const wednesday = WEEK_PLAN.wednesday.exercises;
+  const mobilityA = wednesday.filter((exercise) => exercise.id.startsWith("mobility-a-"));
+  assert.match(mondayWarmup.join(" "), /3D lunge/);
+  assert.equal(mobilityA.length, 5);
+  assert.ok(mobilityA.every((exercise) => exercise.sets === 1 && exercise.measurement === "completion"));
+  assert.equal(wednesday.at(-1).id, "mobility-a-seated-good-morning");
+});
+
 test("provides a quick form guide for every built-in exercise", () => {
   const missing = getAllExercises(WEEK_PLAN)
     .map((exercise) => exercise.id)
     .filter((exerciseId) => !EXERCISE_GUIDANCE[exerciseId]);
   assert.deepEqual(missing, []);
+  assert.match(EXERCISE_GUIDANCE["mobility-a-bridge-march"].watch, /stability drill, not a stretch/i);
   assert.match(EXERCISE_GUIDANCE["mobility-b-adductor"].setup, /not the adductor machine/i);
   assert.match(EXERCISE_GUIDANCE["cable-scaption"].option, /machine lateral raise/i);
 });

@@ -53,6 +53,9 @@ Pull-up sessions include a six-step performance roadmap with separate same-day t
 recovery checks. The Week view groups the 16 long-run stages into four phases, retains each workout’s assigned stage,
 and offers explicit repeat, step-back, and criteria-gated advance actions.
 
+The built-in plan uses a brief Monday 3D-lunge warm-up and a separately logged, low-fatigue Wednesday Mobility A
+sequence. Each mobility movement is logged on its own rather than as one combined set.
+
 The current built-in plan is also available as [WORKOUT_PLAN.md](WORKOUT_PLAN.md). It is generated from `lib.js` during
 `npm run build`; after changing the built-in plan, run `npm run sync-plan` and commit the updated Markdown together with
 the code change.

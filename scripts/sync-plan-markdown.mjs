@@ -92,6 +92,23 @@ During logging, **Use Last** keeps today's planned set count, copies reusable va
 all completion, effort, and pull-up qualification fields. When today has more sets than the prior workout, the last
 prior set provides starting values for the additional rows. Importing values never marks today's exercise complete.
 
+## Mobility placement and limits
+
+Monday's 3D lunges are a brief dynamic rehearsal before the squat and jump sequence, not extra working sets. Wednesday
+Mobility A is performed last (after optional cycling) as one easy round of movement practice. The five-exercise sequence
+itself has not been shown to be uniquely superior: cat–cow, frog rock-backs, lateral lunges, and seated good mornings
+practice comfortable motion, while bridge leg lifts primarily train trunk–pelvic stability.
+
+Dynamic stretching can improve acute range of motion and may support subsequent dynamic performance, but lasting
+flexibility requires repeated training over time. Resistance training through a comfortable range can also improve
+range of motion. Post-exercise stretching should not be treated as a recovery method because trials do not show
+meaningful improvements in soreness, strength recovery, or performance.
+
+Evidence: [acute stretching review](https://pubmed.ncbi.nlm.nih.gov/26642915/),
+[chronic stretching meta-analysis](https://pubmed.ncbi.nlm.nih.gov/37301370/),
+[resistance training and range-of-motion meta-analysis](https://pmc.ncbi.nlm.nih.gov/articles/PMC9935664/), and
+[post-exercise stretching meta-analysis](https://pubmed.ncbi.nlm.nih.gov/34025459/).
+
 ## Weekly rules
 
 - **Sunday:** complete rest.

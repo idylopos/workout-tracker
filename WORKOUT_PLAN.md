@@ -12,6 +12,23 @@ During logging, **Use Last** keeps today's planned set count, copies reusable va
 all completion, effort, and pull-up qualification fields. When today has more sets than the prior workout, the last
 prior set provides starting values for the additional rows. Importing values never marks today's exercise complete.
 
+## Mobility placement and limits
+
+Monday's 3D lunges are a brief dynamic rehearsal before the squat and jump sequence, not extra working sets. Wednesday
+Mobility A is performed last (after optional cycling) as one easy round of movement practice. The five-exercise sequence
+itself has not been shown to be uniquely superior: cat–cow, frog rock-backs, lateral lunges, and seated good mornings
+practice comfortable motion, while bridge leg lifts primarily train trunk–pelvic stability.
+
+Dynamic stretching can improve acute range of motion and may support subsequent dynamic performance, but lasting
+flexibility requires repeated training over time. Resistance training through a comfortable range can also improve
+range of motion. Post-exercise stretching should not be treated as a recovery method because trials do not show
+meaningful improvements in soreness, strength recovery, or performance.
+
+Evidence: [acute stretching review](https://pubmed.ncbi.nlm.nih.gov/26642915/),
+[chronic stretching meta-analysis](https://pubmed.ncbi.nlm.nih.gov/37301370/),
+[resistance training and range-of-motion meta-analysis](https://pmc.ncbi.nlm.nih.gov/articles/PMC9935664/), and
+[post-exercise stretching meta-analysis](https://pubmed.ncbi.nlm.nih.gov/34025459/).
+
 ## Weekly rules
 
 - **Sunday:** complete rest.
@@ -46,6 +63,7 @@ work; Saturday stays at 8–10 km easy.
 - Easy bicycle · 3–5 min at RPE 2–3
 - Ankle rocks · 8/side
 - Bodyweight hip hinge · 8
+- 3D lunge · 1 round/side: forward × 2, lateral × 2, reverse-diagonal × 2 · bodyweight and shallow comfortable range
 - Bodyweight box squat · 8
 - Low step-down · 5/side
 - Glute bridge with breathing · 2 × 8
@@ -166,7 +184,7 @@ work; Saturday stays at 8–10 km easy.
 ### Wednesday — Pull A + Mobility A
 **Theme:** Pull-up skill · recovery  
 **Estimated time:** 60–80 min  
-**Sequence note:** Optional cycling only when sleep, legs, running, and joints feel normal.
+**Sequence note:** Optional cycling only when well recovered. Complete Mobility A last and keep it easy—not a second leg workout.
 
 #### Warm-up
 - Easy bicycle · 3 min
@@ -207,29 +225,41 @@ work; Saturday stays at 8–10 km easy.
    - **Do:** Exhale and curl the ribs toward the pelvis, then return under control.
    - **Watch:** Do not pull with the arms, sit the hips backward, or hold your breath.
 
-6. **Mobility A · Calf stretch** — 2 rounds · 45 sec / side · check each round
-   - Log as: Check-off only.
-   - **Setup:** Face a wall with the stretching leg behind you, heel down, and toes forward.
-   - **Do:** Move the body forward until the calf stretch is gentle and steady.
-   - **Watch:** Do not force pain or let the rear foot collapse inward.
-
-7. **Mobility A · Hip-flexor stretch** — 2 rounds · 45 sec / side · check each round
-   - Log as: Check-off only.
-   - **Setup:** Half-kneel on padding and lightly tuck the pelvis as if bringing the belt buckle upward.
-   - **Do:** Shift forward slightly until the front of the rear hip feels a gentle stretch.
-   - **Watch:** Avoid arching the lower back or pushing into the front of the hip.
-
-8. **Mobility A · Strap hamstring stretch** — 2 rounds · 45 sec / side · check each round
-   - Log as: Check-off only.
-   - **Setup:** Lie on your back with a strap around one foot and the opposite leg relaxed.
-   - **Do:** Raise the strapped leg with a soft knee until the back of the thigh feels a gentle stretch.
-   - **Watch:** Keep the pelvis down and avoid pulling into tingling, numbness, or sharp pain.
-
-9. **Optional Zone 2 cycling** — 25–40 min at RPE 2–3 · only when well recovered · optional
+6. **Optional Zone 2 cycling** — 25–40 min at RPE 2–3 · only when well recovered · optional
    - Log as: Time only.
    - **Setup:** Use a comfortable saddle height and begin with several easy minutes.
    - **Do:** Ride steadily at RPE 2–3, where full sentences remain easy.
    - **Watch:** This is optional recovery volume; skip it when sleep, legs, running, or joints are not normal.
+
+7. **Mobility A · Cat–cow** — 1 round · 6 slow cycles
+   - Log as: Check-off only.
+   - **Setup:** Start on hands and knees with hands under shoulders and knees under hips.
+   - **Do:** Move slowly between a comfortable rounded and gently extended spine for six controlled cycles.
+   - **Watch:** Spread the movement across the spine; do not force the neck or lower back into end range.
+
+8. **Mobility A · Dynamic frog rock-back** — 1 round · 8 slow reps
+   - Log as: Check-off only.
+   - **Setup:** On padding, place both knees comfortably wide with the lower legs supported and keep the spine neutral.
+   - **Do:** Rock the hips backward and forward through a mild inner-thigh stretch for eight slow repetitions.
+   - **Watch:** Use a narrower knee position if needed; stop before groin, hip, or knee pain.
+
+9. **Mobility A · Half-kneeling lateral lunge** — 1 round · 6 controlled reps / side
+   - Log as: Check-off only.
+   - **Setup:** Half-kneel on padding, place the other foot out to the side, and keep that whole foot planted.
+   - **Do:** Shift gently toward the planted foot for six controlled repetitions, keeping its knee aligned with the toes.
+   - **Watch:** Use a shallow range and support the hands on a bench if balance or the knee feels uncertain.
+
+10. **Mobility A · Bridge leg lift** — 1 round · 6 alternating reps / side
+   - Log as: Check-off only.
+   - **Setup:** Lie on your back with knees bent, feet planted, and lift into a comfortable glute bridge.
+   - **Do:** Keep the pelvis level while alternately lifting one foot only a few centimetres for six repetitions per side.
+   - **Watch:** This is a stability drill, not a stretch; lower the hips if the back arches or hamstrings cramp.
+
+11. **Mobility A · Seated good morning** — 1 round · 8 slow unloaded reps
+   - Log as: Check-off only.
+   - **Setup:** Sit near the front of a bench with feet comfortably wide, whole feet planted, and hands across the chest.
+   - **Do:** Keep a long spine and hinge forward from the hips for eight slow, unloaded repetitions.
+   - **Watch:** Stop at a mild posterior-chain stretch; do not round forcefully, bounce, or add weight.
 
 ### Thursday — Legs B + Run 2
 **Theme:** Posterior chain · run quality  

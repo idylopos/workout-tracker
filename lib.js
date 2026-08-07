@@ -299,20 +299,30 @@ export const EXERCISE_GUIDANCE = {
     "Exhale and curl the ribs toward the pelvis, then return under control.",
     "Do not pull with the arms, sit the hips backward, or hold your breath.",
   ),
-  "mobility-a-calf": guidance(
-    "Face a wall with the stretching leg behind you, heel down, and toes forward.",
-    "Move the body forward until the calf stretch is gentle and steady.",
-    "Do not force pain or let the rear foot collapse inward.",
+  "mobility-a-cat-cow": guidance(
+    "Start on hands and knees with hands under shoulders and knees under hips.",
+    "Move slowly between a comfortable rounded and gently extended spine for six controlled cycles.",
+    "Spread the movement across the spine; do not force the neck or lower back into end range.",
   ),
-  "mobility-a-hip-flexor": guidance(
-    "Half-kneel on padding and lightly tuck the pelvis as if bringing the belt buckle upward.",
-    "Shift forward slightly until the front of the rear hip feels a gentle stretch.",
-    "Avoid arching the lower back or pushing into the front of the hip.",
+  "mobility-a-frog": guidance(
+    "On padding, place both knees comfortably wide with the lower legs supported and keep the spine neutral.",
+    "Rock the hips backward and forward through a mild inner-thigh stretch for eight slow repetitions.",
+    "Use a narrower knee position if needed; stop before groin, hip, or knee pain.",
   ),
-  "mobility-a-hamstring": guidance(
-    "Lie on your back with a strap around one foot and the opposite leg relaxed.",
-    "Raise the strapped leg with a soft knee until the back of the thigh feels a gentle stretch.",
-    "Keep the pelvis down and avoid pulling into tingling, numbness, or sharp pain.",
+  "mobility-a-lateral-lunge": guidance(
+    "Half-kneel on padding, place the other foot out to the side, and keep that whole foot planted.",
+    "Shift gently toward the planted foot for six controlled repetitions, keeping its knee aligned with the toes.",
+    "Use a shallow range and support the hands on a bench if balance or the knee feels uncertain.",
+  ),
+  "mobility-a-bridge-march": guidance(
+    "Lie on your back with knees bent, feet planted, and lift into a comfortable glute bridge.",
+    "Keep the pelvis level while alternately lifting one foot only a few centimetres for six repetitions per side.",
+    "This is a stability drill, not a stretch; lower the hips if the back arches or hamstrings cramp.",
+  ),
+  "mobility-a-seated-good-morning": guidance(
+    "Sit near the front of a bench with feet comfortably wide, whole feet planted, and hands across the chest.",
+    "Keep a long spine and hinge forward from the hips for eight slow, unloaded repetitions.",
+    "Stop at a mild posterior-chain stretch; do not round forcefully, bounce, or add weight.",
   ),
   "zone-2-cycle": guidance(
     "Use a comfortable saddle height and begin with several easy minutes.",
@@ -547,6 +557,7 @@ export const WEEK_PLAN = {
       "Easy bicycle · 3–5 min at RPE 2–3",
       "Ankle rocks · 8/side",
       "Bodyweight hip hinge · 8",
+      "3D lunge · 1 round/side: forward × 2, lateral × 2, reverse-diagonal × 2 · bodyweight and shallow comfortable range",
       "Bodyweight box squat · 8",
       "Low step-down · 5/side",
       "Glute bridge with breathing · 2 × 8",
@@ -612,7 +623,7 @@ export const WEEK_PLAN = {
     kicker: "Pull-up skill · recovery",
     estimate: "60–80 min",
     tone: "orange",
-    sequenceNote: "Optional cycling only when sleep, legs, running, and joints feel normal.",
+    sequenceNote: "Optional cycling only when well recovered. Complete Mobility A last and keep it easy—not a second leg workout.",
     warmup: [
       "Easy bicycle · 3 min",
       "Serratus wall slide · 1 × 8",
@@ -641,17 +652,23 @@ export const WEEK_PLAN = {
         2,
         75,
       ),
-      lift("mobility-a-calf", "Mobility A · Calf stretch", "2 rounds · 45 sec / side · check each round", 2, 0, "completion", {
-        category: "Mobility",
-      }),
-      lift("mobility-a-hip-flexor", "Mobility A · Hip-flexor stretch", "2 rounds · 45 sec / side · check each round", 2, 0, "completion", {
-        category: "Mobility",
-      }),
-      lift("mobility-a-hamstring", "Mobility A · Strap hamstring stretch", "2 rounds · 45 sec / side · check each round", 2, 0, "completion", {
-        category: "Mobility",
-      }),
       activity("zone-2-cycle", "Optional Zone 2 cycling", "25–40 min at RPE 2–3 · only when well recovered", "duration", {
         optional: true,
+      }),
+      lift("mobility-a-cat-cow", "Mobility A · Cat–cow", "1 round · 6 slow cycles", 1, 0, "completion", {
+        category: "Mobility",
+      }),
+      lift("mobility-a-frog", "Mobility A · Dynamic frog rock-back", "1 round · 8 slow reps", 1, 0, "completion", {
+        category: "Mobility",
+      }),
+      lift("mobility-a-lateral-lunge", "Mobility A · Half-kneeling lateral lunge", "1 round · 6 controlled reps / side", 1, 0, "completion", {
+        category: "Mobility",
+      }),
+      lift("mobility-a-bridge-march", "Mobility A · Bridge leg lift", "1 round · 6 alternating reps / side", 1, 0, "completion", {
+        category: "Mobility",
+      }),
+      lift("mobility-a-seated-good-morning", "Mobility A · Seated good morning", "1 round · 8 slow unloaded reps", 1, 0, "completion", {
+        category: "Mobility",
       }),
     ],
   },
