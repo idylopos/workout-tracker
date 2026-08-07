@@ -1190,8 +1190,9 @@ function createExerciseCard(exercise, index, savedExercise) {
     state.exerciseConfigs[exerciseConfigKey(exercise.id)] = earlier.measurement;
     persistState();
     renderSetRows(card, earlier.measurement, preparePreviousSets(earlier.sets, todaySetCount, earlier.measurement));
+    clearImportedCompletion(card);
     markWorkoutDirty();
-    showToast(`${exercise.name}: previous values loaded into ${todaySetCount} unchecked sets.`);
+    showToast(`${exercise.name}: values loaded; today remains not done.`);
     updateSessionProgress();
   });
   $(".copy-first-set", card).addEventListener("click", () => copyFirstSetIntoEmpty(card, select.value));
@@ -1211,6 +1212,19 @@ function renderSetRows(card, measurement, sets, options = {}) {
     setList.append(createSetRow(measurement, index, set, Number(card.dataset.rest), options)),
   );
   updateCopyFirstSetButton(card, measurement);
+}
+
+function clearImportedCompletion(card) {
+  $$(".set-row", card).forEach((row) => {
+    $(".set-done input", row).checked = false;
+    row.classList.remove("is-done");
+  });
+
+  const performance = $(".progression-performance-qualified", card);
+  const recovery = $(".progression-recovery-qualified", card);
+  if (performance) performance.checked = false;
+  if (recovery) recovery.checked = false;
+  if (card.dataset.progression === "pullup") updatePullupProgressStatus(card);
 }
 
 function repeatableFields(measurement) {
