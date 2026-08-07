@@ -94,7 +94,7 @@ prior set provides starting values for the additional rows. Importing values nev
 
 ## Mobility placement and limits
 
-Monday's 3D lunges are a brief dynamic rehearsal before the squat and jump sequence, not extra working sets. Wednesday
+Monday's lunge twists are a brief dynamic rehearsal before the squat and jump sequence, not extra working sets. Wednesday
 Mobility A is performed last (after optional cycling) as one easy round of movement practice. The five-exercise sequence
 itself has not been shown to be uniquely superior: cat–cow, frog rock-backs, lateral lunges, and seated good mornings
 practice comfortable motion, while bridge leg lifts primarily train trunk–pelvic stability.

@@ -14,7 +14,7 @@ prior set provides starting values for the additional rows. Importing values nev
 
 ## Mobility placement and limits
 
-Monday's 3D lunges are a brief dynamic rehearsal before the squat and jump sequence, not extra working sets. Wednesday
+Monday's lunge twists are a brief dynamic rehearsal before the squat and jump sequence, not extra working sets. Wednesday
 Mobility A is performed last (after optional cycling) as one easy round of movement practice. The five-exercise sequence
 itself has not been shown to be uniquely superior: cat–cow, frog rock-backs, lateral lunges, and seated good mornings
 practice comfortable motion, while bridge leg lifts primarily train trunk–pelvic stability.
@@ -63,7 +63,7 @@ work; Saturday stays at 8–10 km easy.
 - Easy bicycle · 3–5 min at RPE 2–3
 - Ankle rocks · 8/side
 - Bodyweight hip hinge · 8
-- 3D lunge · 1 round/side: forward × 2, lateral × 2, reverse-diagonal × 2 · bodyweight and shallow comfortable range
+- Lunge twist · 1 × 4/side · step forward, use a shallow comfortable lunge, rotate the upper torso toward the lead leg, then return
 - Bodyweight box squat · 8
 - Low step-down · 5/side
 - Glute bridge with breathing · 2 × 8

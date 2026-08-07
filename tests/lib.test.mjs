@@ -209,11 +209,12 @@ test("rebalances direct abdominal and deltoid work without stacking Friday press
   assert.equal(friday.filter((exercise) => exercise.id.startsWith("mobility-b-")).length, 3);
 });
 
-test("keeps multidirectional preparation and Mobility A low-volume", () => {
+test("keeps lunge-twist preparation and Mobility A low-volume", () => {
   const mondayWarmup = WEEK_PLAN.monday.warmup;
   const wednesday = WEEK_PLAN.wednesday.exercises;
   const mobilityA = wednesday.filter((exercise) => exercise.id.startsWith("mobility-a-"));
-  assert.match(mondayWarmup.join(" "), /3D lunge/);
+  assert.match(mondayWarmup.join(" "), /Lunge twist/);
+  assert.match(mondayWarmup.join(" "), /rotate the upper torso toward the lead leg/);
   assert.equal(mobilityA.length, 5);
   assert.ok(mobilityA.every((exercise) => exercise.sets === 1 && exercise.measurement === "completion"));
   assert.equal(wednesday.at(-1).id, "mobility-a-seated-good-morning");
