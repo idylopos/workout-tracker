@@ -208,6 +208,7 @@ export const EXERCISE_GUIDANCE = {
     "Kneel on padding with the ankles firmly anchored; use a band or hands for assistance.",
     "Keep hips extended and lower the body as one line as slowly as possible, then assist the return.",
     "Start with a short range. Stop for hamstring cramping, sharp pain, or loss of hip position.",
+    "No ankle anchor or band: use bridge hamstring walkouts for 2 × 6–10. If available, use slider or stability-ball leg curls for 2 × 8–12, or a seated/lying leg-curl machine for 2 × 8–12. Move slowly; these preserve knee-flexion hamstring work but are not identical to Nordic eccentric exposure.",
   ),
   "hip-abduction": guidance(
     "Set the machine or cable so the pelvis stays level and the working leg begins under control.",
@@ -1000,8 +1001,20 @@ export function getAllExercises(weekPlan = WEEK_PLAN) {
   return [...unique.values()].sort((a, b) => a.name.localeCompare(b.name));
 }
 
-export function findPreviousExerciseLog(workoutLogs, exerciseId, beforeDate, planId = "form-flow") {
-  return Object.values(workoutLogs)
+export function findPreviousExerciseLog(
+  workoutLogs,
+  exerciseId,
+  beforeDate,
+  planId = "form-flow",
+  workoutDrafts = {},
+) {
+  const recordsByPlanAndDate = new Map();
+  [...Object.values(workoutLogs || {}), ...Object.values(workoutDrafts || {})].forEach((log) => {
+    if (!log?.date) return;
+    recordsByPlanAndDate.set(`${log.planId || "form-flow"}::${log.date}`, log);
+  });
+
+  return [...recordsByPlanAndDate.values()]
     .filter(
       (log) =>
         (log.planId || "form-flow") === planId &&

@@ -71,6 +71,8 @@ test("the readable workout plan is rendered from the built-in plan", async () =>
   assert.match(generated, /non-exportable browser unlock key/);
   assert.match(generated, /Use Last.*keeps today's planned set count/);
   assert.match(generated, /Importing values never marks today's exercise complete/);
+  assert.match(generated, /skipped weeks do not hide the latest entry/);
+  assert.match(generated, /bridge hamstring walkouts/);
   assert.match(generated, /Monday's lunge twists are a brief dynamic rehearsal/);
   assert.match(generated, /bridge leg lifts primarily train trunk–pelvic stability/);
 });

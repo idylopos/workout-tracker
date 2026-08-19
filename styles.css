@@ -933,6 +933,11 @@ textarea {
   color: #27578c;
 }
 
+.form-guide.has-alternative {
+  border-color: #a8bee8;
+  background: #f6f9ff;
+}
+
 .exercise-guide {
   display: grid;
   gap: 14px;
@@ -1621,11 +1626,11 @@ textarea {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 9px;
   margin-top: 16px;
-  padding: 8px 9px 8px 14px;
+  padding: 5px 7px 5px 11px;
   border: 1px solid var(--ink);
-  border-radius: 16px;
+  border-radius: 12px;
   background: var(--card);
   box-shadow: var(--shadow);
 }
@@ -1636,14 +1641,33 @@ textarea {
 }
 
 .save-bar strong {
-  font-size: 12px;
+  overflow: hidden;
+  font-size: 11px;
   line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .save-bar span {
-  color: var(--ink-soft);
-  font-size: 9px;
-  line-height: 1.2;
+  display: none;
+}
+
+.save-bar .button {
+  min-height: 34px;
+  padding: 6px 11px;
+  border-radius: 8px;
+  box-shadow: 2px 2px 0 var(--ink);
+  font-size: 11px;
+}
+
+.save-bar[data-status="restored"] {
+  border-color: #7d9bd4;
+  background: #f2f6ff;
+}
+
+.save-bar[data-status="error"] {
+  border-color: #b44a3e;
+  background: #fff3ef;
 }
 
 .rest-card {

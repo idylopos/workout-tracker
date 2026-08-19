@@ -131,6 +131,7 @@ const els = {
   longRunCallout: $("#long-run-callout"),
   phaseGuide: $("#phase-guide"),
   sessionNotes: $("#session-notes"),
+  saveBar: $(".save-bar"),
   saveStatus: $("#save-status"),
   vaultSessionStatus: $("#vault-session-status"),
   toast: $("#toast"),
@@ -152,6 +153,11 @@ function persistState() {
       return false;
     });
   return saveQueue;
+}
+
+function setSaveStatus(message, status = "default") {
+  els.saveStatus.textContent = message;
+  els.saveBar.dataset.status = status;
 }
 
 function showToast(message, tone = "success") {
@@ -703,13 +709,13 @@ function renderToday() {
   const saved = state.workoutLogs[workoutLogKey(selectedDate)];
   const savedDraft = state.workoutDrafts[workoutLogKey(selectedDate)];
   if (draftSession) {
-    els.saveStatus.textContent = "Previous session loaded — review, then save";
+    setSaveStatus("Session loaded · review & save", "restored");
   } else if (savedDraft) {
-    els.saveStatus.textContent = "Encrypted draft restored — review, then save";
+    setSaveStatus("Draft restored · review & save", "restored");
   } else if (saved) {
-    els.saveStatus.textContent = `Saved ${formatDate(saved.updatedAt?.slice(0, 10) || selectedDate)}`;
+    setSaveStatus(`Saved ${formatDate(saved.updatedAt?.slice(0, 10) || selectedDate)}`, "saved");
   } else {
-    els.saveStatus.textContent = day.exercises.length ? "Not saved yet" : "Rest day";
+    setSaveStatus(day.exercises.length ? "Not saved yet" : "Rest day");
   }
   els.loadSession.disabled =
     !findPreviousSession(state.workoutLogs, dayKey, selectedDate, activePlan.id) || !day.exercises.length;
@@ -900,7 +906,7 @@ async function addExtraActivity(event) {
 function markWorkoutDirty() {
   workoutDirty = true;
   draftRevision += 1;
-  els.saveStatus.textContent = "Saving encrypted draft…";
+  setSaveStatus("Saving encrypted draft…", "saving");
   clearTimeout(draftSaveTimer);
   draftSaveTimer = setTimeout(() => {
     saveWorkoutDraftNow();
@@ -1094,6 +1100,8 @@ function setupExerciseGuidance(card, exercise) {
   });
   const option = $(".form-guide-option", details);
   if (guide.option) {
+    $(".form-guide summary small", details).textContent = "Setup · movement · alternative available";
+    details.classList.add("has-alternative");
     option.classList.remove("is-hidden");
     $('[data-guidance="option"]', option).textContent = guide.option;
   }
@@ -1155,7 +1163,13 @@ function createExerciseCard(exercise, index, savedExercise) {
     select.append(option);
   });
 
-  const previous = findPreviousExerciseLog(state.workoutLogs, exercise.id, selectedDate, activePlan.id);
+  const previous = findPreviousExerciseLog(
+    state.workoutLogs,
+    exercise.id,
+    selectedDate,
+    activePlan.id,
+    state.workoutDrafts,
+  );
   const previousLine = $(".previous-line", card);
   if (previous) {
     previousLine.textContent = `Last: ${formatDate(previous.date)} · ${summarizeSetPreview(previous.measurement, previous.sets)}`;
@@ -1183,7 +1197,13 @@ function createExerciseCard(exercise, index, savedExercise) {
     updateSessionProgress();
   });
   $(".load-previous", card).addEventListener("click", () => {
-    const earlier = findPreviousExerciseLog(state.workoutLogs, exercise.id, selectedDate, activePlan.id);
+    const earlier = findPreviousExerciseLog(
+      state.workoutLogs,
+      exercise.id,
+      selectedDate,
+      activePlan.id,
+      state.workoutDrafts,
+    );
     if (!earlier) return;
     const todaySetCount = $(".set-list", card).children.length || Number(card.dataset.defaultSets);
     select.value = earlier.measurement;
@@ -1433,9 +1453,9 @@ async function saveWorkoutDraftNow() {
   const saved = await persistState();
   if (saved && revision === draftRevision) {
     workoutDirty = false;
-    els.saveStatus.textContent = "Encrypted draft saved automatically";
+    setSaveStatus("Encrypted draft saved", "saved");
   } else if (!saved && revision === draftRevision) {
-    els.saveStatus.textContent = "Draft could not be saved — keep this page open";
+    setSaveStatus("Draft not saved · keep this page open", "error");
   }
   return saved;
 }

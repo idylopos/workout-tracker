@@ -11,6 +11,7 @@ passphrase, and **Lock app** clears the remembered key immediately.
 During logging, **Use Last** keeps today's planned set count, copies reusable values from the prior workout, and clears
 all completion, effort, and pull-up qualification fields. When today has more sets than the prior workout, the last
 prior set provides starting values for the additional rows. Importing values never marks today's exercise complete.
+The lookup searches every earlier completed workout and encrypted draft, so skipped weeks do not hide the latest entry.
 
 ## Mobility placement and limits
 
@@ -94,6 +95,7 @@ work; Saturday stays at 8–10 km easy.
    - **Setup:** Kneel on padding with the ankles firmly anchored; use a band or hands for assistance.
    - **Do:** Keep hips extended and lower the body as one line as slowly as possible, then assist the return.
    - **Watch:** Start with a short range. Stop for hamstring cramping, sharp pain, or loss of hip position.
+   - **Alternative:** No ankle anchor or band: use bridge hamstring walkouts for 2 × 6–10. If available, use slider or stability-ball leg curls for 2 × 8–12, or a seated/lying leg-curl machine for 2 × 8–12. Move slowly; these preserve knee-flexion hamstring work but are not identical to Nordic eccentric exposure.
 
 5. **Machine or cable hip abduction** — 2 × 12–20 · rest 1 min
    - Log as: Weight × reps.

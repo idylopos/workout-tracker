@@ -225,6 +225,7 @@ test("provides a quick form guide for every built-in exercise", () => {
     .map((exercise) => exercise.id)
     .filter((exerciseId) => !EXERCISE_GUIDANCE[exerciseId]);
   assert.deepEqual(missing, []);
+  assert.match(EXERCISE_GUIDANCE["assisted-nordic"].option, /bridge hamstring walkouts/i);
   assert.match(EXERCISE_GUIDANCE["mobility-a-bridge-march"].watch, /stability drill, not a stretch/i);
   assert.match(EXERCISE_GUIDANCE["mobility-b-adductor"].setup, /not the adductor machine/i);
   assert.match(EXERCISE_GUIDANCE["cable-scaption"].option, /machine lateral raise/i);
@@ -244,6 +245,29 @@ test("finds the most recent earlier exercise log", () => {
   const previous = findPreviousExerciseLog(logs, "squat", "2026-07-10");
   assert.equal(previous.date, "2026-07-08");
   assert.equal(previous.sets[0].weight, 55);
+});
+
+test("finds the last exercise across skipped weeks and encrypted drafts", () => {
+  const logs = {
+    old: {
+      date: "2026-06-01",
+      exercises: { squat: { measurement: "weight_reps", sets: [{ weight: 50, reps: 8 }] } },
+    },
+    recentWithoutSquat: {
+      date: "2026-07-20",
+      exercises: { press: { measurement: "weight_reps", sets: [{ weight: 20, reps: 10 }] } },
+    },
+  };
+  const drafts = {
+    newerSquat: {
+      date: "2026-07-06",
+      exercises: { squat: { measurement: "weight_reps", sets: [{ weight: 57.5, reps: 6 }] } },
+    },
+  };
+
+  const previous = findPreviousExerciseLog(logs, "squat", "2026-08-01", "form-flow", drafts);
+  assert.equal(previous.date, "2026-07-06");
+  assert.equal(previous.sets[0].weight, 57.5);
 });
 
 test("keeps previous exercise values separated by plan", () => {

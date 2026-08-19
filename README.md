@@ -44,10 +44,13 @@ For repeated working sets, enter the first set and choose **Fill empty sets from
 **Use Last** keeps the number of sets currently planned for today, copies reusable values from the previous workout,
 and leaves every completion box and RIR/RPE field clear. If today has more sets, the final previous set supplies the
 extra row’s starting values. It also clears pull-up performance/recovery qualification checks, so importing values
-cannot mark the current exercise complete.
+cannot mark the current exercise complete. The lookup searches every earlier saved workout and encrypted draft, so
+skipped weeks do not hide the most recent entry.
 
 Every built-in exercise includes a collapsible **Quick form guide** covering setup, execution, the main thing to watch,
 and a substitute when appropriate. Folder-based plans can provide the same guidance in `plan.json`.
+Exercises with a substitute advertise **alternative available** in the guide header. Assisted Nordic hamstrings include
+no-anchor walkouts plus slider, stability-ball, and machine leg-curl options.
 
 Pull-up sessions include a six-step performance roadmap with separate same-day technique and following-morning
 recovery checks. The Week view groups the 16 long-run stages into four phases, retains each workout’s assigned stage,
