@@ -21,6 +21,7 @@ import {
   normalizeResponseRating,
   normalizeState,
   preparePreviousSets,
+  shouldShowRestTimer,
   startOfWeek,
   summarizeCardioRange,
   summarizeExercise,
@@ -487,6 +488,7 @@ function switchView(view) {
   window.scrollTo({ top: 0, behavior: "smooth" });
   if (view === "week") renderWeek();
   if (view === "progress") renderProgress();
+  syncTimerVisibility();
 }
 
 function currentLog() {
@@ -2024,6 +2026,15 @@ function clearTimerFinishedState() {
   timer.finishedTimeout = null;
   $("#rest-timer").classList.remove("is-finished");
   $("#timer-label").textContent = "REST";
+  syncTimerVisibility();
+}
+
+function syncTimerVisibility() {
+  const restTimer = $("#rest-timer");
+  restTimer.classList.toggle(
+    "is-context-hidden",
+    !shouldShowRestTimer(activeView, timer.running, restTimer.classList.contains("is-finished")),
+  );
 }
 
 function setTimer(seconds, start = false) {
@@ -2067,6 +2078,7 @@ function updateTimerUi() {
   $("#timer-play").setAttribute("aria-label", timer.running ? "Pause rest timer" : "Start rest timer");
   $("#rest-timer").style.setProperty("--timer-progress", `${timer.total ? (timer.remaining / timer.total) * 360 : 0}deg`);
   $$("[data-timer]").forEach((button) => button.classList.toggle("is-active", Number(button.dataset.timer) === timer.total));
+  syncTimerVisibility();
 }
 
 function formatTimer(seconds) {
@@ -2077,6 +2089,7 @@ function timerFinished() {
   updateTimerUi();
   $("#rest-timer").classList.add("is-finished");
   $("#timer-label").textContent = "REST DONE";
+  syncTimerVisibility();
   timer.finishedTimeout = setTimeout(clearTimerFinishedState, 5000);
   try {
     const audio = new AudioContext();

@@ -2499,6 +2499,10 @@ body[data-active-view="today"] .timer {
   bottom: 104px;
 }
 
+.timer.is-context-hidden {
+  display: none;
+}
+
 .timer-top {
   display: grid;
   grid-template-columns: 1fr 52px;

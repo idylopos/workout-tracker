@@ -84,6 +84,10 @@ export function preparePreviousSets(previousSets, targetCount, measurement) {
   });
 }
 
+export function shouldShowRestTimer(view, running, finished) {
+  return view === "today" || Boolean(running) || Boolean(finished);
+}
+
 export const PULL_UP_STEPS = [
   {
     id: 1,

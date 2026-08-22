@@ -14,10 +14,18 @@ import {
   normalizeResponseRating,
   normalizeState,
   preparePreviousSets,
+  shouldShowRestTimer,
   summarizeCardioRange,
   summarizeExercise,
   validateBackup,
 } from "../lib.js";
+
+test("shows the rest timer outside Today only while active or finished", () => {
+  assert.equal(shouldShowRestTimer("today", false, false), true);
+  assert.equal(shouldShowRestTimer("progress", false, false), false);
+  assert.equal(shouldShowRestTimer("progress", true, false), true);
+  assert.equal(shouldShowRestTimer("data", false, true), true);
+});
 
 test("Use Last preserves today's set count and clears completion and effort", () => {
   const copied = preparePreviousSets(
