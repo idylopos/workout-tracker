@@ -6,12 +6,16 @@ import {
   LONG_RUN_PHASES,
   LONG_RUNS,
   MEASUREMENT_TYPES,
+  OPTIONAL_RECOVERY_RULE,
   PULL_UP_STEPS,
   RESPONSE_SCALE,
+  RUN_QUALITY_PROGRESSION,
+  STRENGTH_PROGRESSION,
   STORAGE_KEY,
   WEEK_PLAN,
   addDays,
   createDefaultState,
+  countQualifiedLongRuns,
   dateToDayKey,
   evaluateLongRunProgress,
   findPreviousExerciseLog,
@@ -59,20 +63,20 @@ const RUNNING_PHASES = {
   1: {
     number: "BLOCK 1",
     title: "Build to a comfortable 10 km",
-    copy: "Use this phase until you can complete 10 km comfortably and your joints and usual energy recover by the following morning.",
+    copy: "Stay here until two 10 km runs are completed at RPE 4 or below with a Comfortable or Mild following-morning response.",
     points: [
       ["Tuesday", "30 min easy · RPE 2–4"],
       ["Thursday", "25–35 min easy · lift first"],
-      ["Saturday", "Follow the 16-stage long-run progression"],
+      ["Saturday", "Follow the 18-stage long-run progression"],
     ],
   },
   2: {
     number: "BLOCK 2",
     title: "Improve your comfortable 10 km",
-    copy: "Start only after 10 km feels repeatable. This phase keeps the aerobic base and adds controlled speed work.",
+    copy: "Start after two qualified 10 km runs. Keep most running easy and alternate completed Thursday quality sessions.",
     points: [
       ["Tuesday", "30–40 min easy + 4 × 20-sec strides"],
-      ["Thursday", "Start with tempo, then alternate with intervals · run first"],
+      ["Thursday", "Start Tempo 3 × 6 min / Intervals 6 × 2 min · progress after 2 stable exposures"],
       ["Saturday", "8–10 km easy"],
     ],
   },
@@ -596,6 +600,41 @@ function longRunEvaluation(stage) {
   };
 }
 
+function qualifiedTenKmRuns() {
+  return countQualifiedLongRuns(activeWorkoutLogs(), 10, longRunExerciseId());
+}
+
+function latestSleepLog() {
+  return [...state.sleepLogs]
+    .filter((entry) => entry?.week && entry.week <= selectedDate && Number.isFinite(Number(entry.hours)))
+    .sort((a, b) => b.week.localeCompare(a.week))[0] || null;
+}
+
+function renderTrainingRules(day) {
+  const card = $("#training-rules-card");
+  const hasStrength = day.exercises.some((exercise) => exercise.category === "Strength");
+  card.classList.toggle("is-hidden", !hasStrength);
+  if (!hasStrength) return;
+
+  $("#strength-rule-effort").textContent = STRENGTH_PROGRESSION.effort;
+  $("#strength-rule-load").textContent = STRENGTH_PROGRESSION.load;
+  $("#strength-rule-volume").textContent = STRENGTH_PROGRESSION.volume;
+
+  const sleep = latestSleepLog();
+  const gate = $("#recovery-gate");
+  const hours = Number(sleep?.hours);
+  const sleepReady = sleep && hours >= OPTIONAL_RECOVERY_RULE.sleepHours;
+  gate.dataset.status = sleepReady ? "ready" : "hold";
+  $("#recovery-gate-title").textContent = sleepReady
+    ? `${numberFormatter.format(hours)} h/night · sleep gate met`
+    : sleep
+      ? `${numberFormatter.format(hours)} h/night · keep optional work off`
+      : "No weekly sleep logged · default to recovery";
+  $("#recovery-gate-copy").textContent = sleepReady
+    ? "Sleep meets the first gate. Add only one optional session when joints, legs, and usual energy have also been stable the following morning for two weeks."
+    : OPTIONAL_RECOVERY_RULE.copy;
+}
+
 function longRunStatusCopy(evaluation) {
   if (evaluation.date) return `${evaluation.label} · ${formatDate(evaluation.date)}`;
   return evaluation.label;
@@ -627,6 +666,11 @@ function renderPhaseGuide() {
   $("#phase-guide-points").innerHTML = phase.points
     .map(([day, task]) => `<span><strong>${escapeHtml(day)}</strong>${escapeHtml(task)}</span>`)
     .join("");
+  const qualified = qualifiedTenKmRuns();
+  $("#phase-guide-status").textContent =
+    Number(state.settings.block) === 1
+      ? `${Math.min(qualified, 2)} of 2 qualified 10 km runs completed. Changing blocks changes only the running prescriptions.`
+      : `${qualified} qualified 10 km run${qualified === 1 ? "" : "s"} logged. Keep most running easy while adding one Thursday quality session.`;
   els.phaseGuide.dataset.block = state.settings.block;
 }
 
@@ -641,7 +685,7 @@ function activePrescription(exercise) {
   if (exercise.id === "run-2") {
     return block === 1
       ? "25–35 min easy · RPE 2–4 · lift first and separate by about 6 hours"
-      : "Start with tempo, then alternate weekly: tempo—10 min easy, 3 × 6 min at RPE 6–7 with 2 min easy; intervals—10 min easy, 6 × 2 min at RPE 8 with 2 min easy; cool down";
+      : `Alternate completed quality sessions: ${RUN_QUALITY_PROGRESSION.base}. ${RUN_QUALITY_PROGRESSION.progression}`;
   }
   if (exercise.id === "long-run") {
     return block === 1
@@ -704,6 +748,7 @@ function renderToday() {
   }
 
   renderWarmup(day, log);
+  renderTrainingRules(day);
   renderExercises(day, log);
   renderExtraActivities(day, log);
   loadResponseFields(log);
@@ -1378,6 +1423,7 @@ function summarizeSetPreview(measurement, sets = []) {
   }
   const set = sets[0];
   if (measurement === "weight_reps") return `${set.weight || "—"} kg × ${set.reps || "—"}`;
+  if (measurement === "weight_distance") return `${set.weight || "—"} kg × ${set.distance || "—"} m`;
   if (measurement === "assisted_reps") return `${set.assistance || "—"} kg assist × ${set.reps || "—"}`;
   if (measurement === "reps") return `${set.reps || "—"} reps`;
   if (measurement === "duration") return formatDuration(Number(set.minutes || 0) * 60 + Number(set.seconds || 0));
@@ -2128,8 +2174,20 @@ function bindEvents() {
     renderToday();
   });
   $$("[data-block]").forEach((button) => button.addEventListener("click", async () => {
+    const nextBlock = Number(button.dataset.block);
+    if (
+      nextBlock === 2 &&
+      Number(state.settings.block) !== 2 &&
+      activePlan.id === BUILT_IN_PLAN.id &&
+      qualifiedTenKmRuns() < 2 &&
+      !window.confirm(
+        `Block 2 is recommended after two 10 km runs at RPE 4 or below with a Comfortable or Mild following-morning response. You currently have ${qualifiedTenKmRuns()} of 2. Switch anyway?`,
+      )
+    ) {
+      return;
+    }
     await saveWorkoutDraftNow();
-    state.settings.block = Number(button.dataset.block);
+    state.settings.block = nextBlock;
     await persistState();
     renderToday();
   }));

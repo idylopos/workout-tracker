@@ -66,7 +66,15 @@ test("the readable workout plan is rendered from the built-in plan", async () =>
   assert.match(generated, /### Friday — Push B \+ Mobility B/);
   assert.match(generated, /This is not the adductor machine/);
   assert.match(generated, /Pull-up progression — choose by performance/);
-  assert.match(generated, /Stage 16: 6–7 km recovery easy/);
+  assert.match(generated, /Stage 17: 10\.0 km repeat easy/);
+  assert.match(generated, /Stage 18: 6–7 km recovery easy/);
+  assert.match(generated, /two separate 10 km runs/);
+  assert.match(generated, /Tempo—10 min easy, 3 × 6 min/);
+  assert.match(generated, /12–13 fractional sets/);
+  assert.match(generated, /6 direct dynamic sets/);
+  assert.match(generated, /three-exercise Pull B base remains planned/);
+  assert.match(generated, /3 × 6 → 3 × 7 → 3 × 8 min/);
+  assert.match(generated, /Weight \+ distance/);
   assert.match(generated, /both the performance check/);
   assert.match(generated, /non-exportable browser unlock key/);
   assert.match(generated, /Use Last.*keeps today's planned set count/);

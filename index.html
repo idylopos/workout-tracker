@@ -101,7 +101,7 @@
               Use this phase until you can complete 10 km comfortably and recover normally by the following morning.
             </p>
             <div class="phase-guide-points" id="phase-guide-points"></div>
-            <small>Changing blocks changes the running prescriptions only. Your strength plan stays the same.</small>
+            <small id="phase-guide-status">Changing blocks changes the running prescriptions only. Your strength plan stays the same.</small>
           </article>
 
           <div id="long-run-callout" class="callout is-hidden"></div>
@@ -116,6 +116,21 @@
             </summary>
             <div class="warmup-list" id="warmup-list"></div>
           </details>
+
+          <aside class="training-rules-card" id="training-rules-card" aria-label="Training progression rules">
+            <div>
+              <span>STRENGTH PROGRESSION</span>
+              <strong>Leave productive reps in reserve</strong>
+              <p id="strength-rule-effort"></p>
+              <small id="strength-rule-load"></small>
+              <small id="strength-rule-volume"></small>
+            </div>
+            <div class="recovery-gate" id="recovery-gate">
+              <span>OPTIONAL-SESSION GATE</span>
+              <strong id="recovery-gate-title">Recovery check</strong>
+              <p id="recovery-gate-copy"></p>
+            </div>
+          </aside>
 
           <div class="exercise-section-head">
             <div>
@@ -204,7 +219,7 @@
                 <p>Progress by recovery, not by the calendar. Repeating or stepping back is part of the plan.</p>
               </div>
               <div class="long-run-roadmap-meta">
-                <strong id="long-run-stage-count">Stage 1 of 16</strong>
+                <strong id="long-run-stage-count">Stage 1 of 18</strong>
                 <label>
                   <span>Jump to stage</span>
                   <select id="long-run-week"></select>

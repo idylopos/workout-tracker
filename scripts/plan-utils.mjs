@@ -3,6 +3,7 @@ export const DAY_KEYS = new Set(["monday", "tuesday", "wednesday", "thursday", "
 export const MEASUREMENT_KEYS = new Set([
   "completion",
   "weight_reps",
+  "weight_distance",
   "reps",
   "assisted_reps",
   "duration",

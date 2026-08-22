@@ -4,7 +4,10 @@ import {
   APP_VERSION,
   EXERCISE_GUIDANCE,
   LONG_RUN_PHASES,
+  LONG_RUNS,
+  MEASUREMENT_TYPES,
   WEEK_PLAN,
+  countQualifiedLongRuns,
   createDefaultState,
   dateToDayKey,
   evaluateLongRunProgress,
@@ -76,6 +79,31 @@ test("normalizes a partial persisted state", () => {
   assert.deepEqual(state.workoutLogs, {});
   assert.deepEqual(state.workoutDrafts, {});
   assert.deepEqual(state.sleepLogs, []);
+  assert.equal(state.settings.builtInPlanRevision, 2);
+});
+
+test("migrates the old built-in suitcase carry default without changing other measurement preferences", () => {
+  const state = normalizeState({
+    settings: { builtInPlanRevision: 1 },
+    exerciseConfigs: { "suitcase-carry": "weight_reps", "box-squat": "reps" },
+    workoutLogs: {
+      "2026-08-21": {
+        date: "2026-08-21",
+        exercises: {
+          "suitcase-carry": {
+            measurement: "weight_reps",
+            sets: [{ completed: true, weight: 20, reps: 30, rir: 2 }],
+          },
+        },
+      },
+    },
+  });
+  assert.equal(state.exerciseConfigs["suitcase-carry"], undefined);
+  assert.equal(state.exerciseConfigs["box-squat"], "reps");
+  assert.deepEqual(state.workoutLogs["2026-08-21"].exercises["suitcase-carry"], {
+    measurement: "weight_distance",
+    sets: [{ completed: true, weight: 20, distance: 30, rir: 2 }],
+  });
 });
 
 test("keeps pull-up progression within the supported roadmap", () => {
@@ -92,8 +120,10 @@ test("keeps long-run progression within the supported settings range", () => {
     [1, 4],
     [5, 8],
     [9, 12],
-    [13, 16],
+    [13, 18],
   ]);
+  assert.equal(LONG_RUNS.length, 18);
+  assert.equal(LONG_RUNS[16], "10.0 km repeat");
 });
 
 test("evaluates long-run readiness from target, RPE, and next-morning response", () => {
@@ -140,6 +170,21 @@ test("evaluates long-run readiness from target, RPE, and next-morning response",
     "5.6 km",
   );
   assert.equal(repeat.status, "repeat");
+});
+
+test("requires two separately qualified 10 km runs before Block 2", () => {
+  const qualified = (date) => ({
+    date,
+    exercises: {
+      "long-run": {
+        measurement: "distance_time",
+        sets: [{ completed: true, distance: 10, minutes: 72, rpe: 4 }],
+      },
+    },
+    response: { scaleVersion: 2, painNext: 1 },
+  });
+  assert.equal(countQualifiedLongRuns({ first: qualified("2026-08-01") }), 1);
+  assert.equal(countQualifiedLongRuns({ first: qualified("2026-08-01"), second: qualified("2026-08-15") }), 2);
 });
 
 test("maps legacy 0–10 pain logs to the descriptive five-level scale", () => {
@@ -213,24 +258,50 @@ test("keeps encrypted workout drafts during state normalization", () => {
   assert.deepEqual(state.workoutDrafts["2026-07-31"], draft);
 });
 
-test("rebalances direct abdominal and deltoid work without stacking Friday presses", () => {
+test("uses high-return chest, back, and rectus-abdominis volumes without removing functional core work", () => {
   const tuesday = WEEK_PLAN.tuesday.exercises;
   const wednesday = WEEK_PLAN.wednesday.exercises;
   const friday = WEEK_PLAN.friday.exercises;
+  const saturday = WEEK_PLAN.saturday.exercises;
   assert.equal(tuesday.find((exercise) => exercise.id === "cable-lateral-raise").sets, 3);
+  assert.equal(tuesday.find((exercise) => exercise.id === "cable-chest-fly").sets, 2);
+  assert.equal(tuesday.find((exercise) => exercise.id === "kneeling-cable-crunch").sets, 3);
   assert.equal(wednesday.find((exercise) => exercise.id === "face-pull").sets, 3);
   assert.equal(wednesday[4].id, "pallof-press");
   assert.equal(wednesday[4].sets, 2);
   assert.equal(wednesday[4].measurement, "weight_reps");
-  assert.equal(wednesday.some((exercise) => exercise.id === "kneeling-cable-crunch"), false);
   assert.equal(friday.find((exercise) => exercise.id === "cable-scaption").sets, 3);
-  assert.equal(friday[5].id, "suitcase-carry");
-  assert.equal(friday[5].sets, 2);
-  assert.equal(friday[5].measurement, "weight_reps");
-  assert.equal(friday.some((exercise) => exercise.id === "reverse-crunch"), false);
+  assert.equal(friday.find((exercise) => exercise.id === "cable-chest-fly").sets, 2);
+  assert.equal(friday.find((exercise) => exercise.id === "reverse-crunch").sets, 3);
+  assert.equal(friday.find((exercise) => exercise.id === "suitcase-carry").sets, 2);
+  assert.equal(friday.find((exercise) => exercise.id === "suitcase-carry").measurement, "weight_distance");
+  assert.equal(MEASUREMENT_TYPES.weight_distance.label, "Weight + distance");
   assert.equal(friday.some((exercise) => exercise.id === "push-up-plus"), false);
   assert.equal(friday.some((exercise) => exercise.id === "mobility-b"), false);
   assert.equal(friday.filter((exercise) => exercise.id.startsWith("mobility-b-")).length, 3);
+  assert.ok(["pull-up-progression", "one-arm-cable-row", "db-pullover"].every((id) => !saturday.find((exercise) => exercise.id === id).optional));
+  assert.ok(["face-pull", "cable-curl"].every((id) => saturday.find((exercise) => exercise.id === id).optional));
+
+  const fractionalChestSets =
+    tuesday.find((exercise) => exercise.id === "neutral-db-bench").sets +
+    tuesday.find((exercise) => exercise.id === "cable-chest-fly").sets +
+    tuesday.find((exercise) => exercise.id === "half-kneeling-landmine-press").sets * 0.5 +
+    friday.find((exercise) => exercise.id === "neutral-incline-db-press").sets +
+    friday.find((exercise) => exercise.id === "cable-chest-fly").sets +
+    friday.find((exercise) => exercise.id === "one-arm-landmine-press").sets * 0.5;
+  const directBackSets =
+    wednesday.find((exercise) => exercise.id === "pull-up-progression").sets +
+    wednesday.find((exercise) => exercise.id === "chest-supported-row").sets +
+    saturday.find((exercise) => exercise.id === "pull-up-progression").sets +
+    saturday.find((exercise) => exercise.id === "one-arm-cable-row").sets +
+    saturday.find((exercise) => exercise.id === "db-pullover").sets;
+  assert.equal(fractionalChestSets, 12.5);
+  assert.equal(directBackSets, 12);
+  assert.equal(
+    tuesday.find((exercise) => exercise.id === "kneeling-cable-crunch").sets +
+      friday.find((exercise) => exercise.id === "reverse-crunch").sets,
+    6,
+  );
 });
 
 test("keeps lunge-twist preparation and Mobility A low-volume", () => {
@@ -255,6 +326,7 @@ test("provides a quick form guide for every built-in exercise", () => {
   assert.match(EXERCISE_GUIDANCE["cable-scaption"].option, /machine lateral raise/i);
   assert.match(EXERCISE_GUIDANCE["cable-scaption"].setup, /one-arm cable scaption raise/i);
   assert.match(EXERCISE_GUIDANCE["cable-scaption"].action, /side deltoid.*shoulder width/i);
+  assert.match(EXERCISE_GUIDANCE["cable-chest-fly"].watch, /shoulder discomfort/i);
 });
 
 test("finds the most recent earlier exercise log", () => {
@@ -329,6 +401,28 @@ test("summarizes strength sessions and estimated best performance", () => {
   assert.equal(summary.latest, "22 kg × 8");
   assert.equal(summary.best, "22 kg × 8");
   assert.equal(summary.points.length, 2);
+});
+
+test("summarizes loaded carries as weight-distance work", () => {
+  const summary = summarizeExercise(
+    {
+      session: {
+        date: "2026-08-21",
+        exercises: {
+          "suitcase-carry": {
+            measurement: "weight_distance",
+            sets: [
+              { weight: 20, distance: 30 },
+              { weight: 22, distance: 25 },
+            ],
+          },
+        },
+      },
+    },
+    "suitcase-carry",
+  );
+  assert.equal(summary.latest, "20 kg × 30 m");
+  assert.equal(summary.volume, "1,150");
 });
 
 test("summarizes check-off mobility rounds", () => {

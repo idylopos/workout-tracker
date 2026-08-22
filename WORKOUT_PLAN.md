@@ -41,23 +41,67 @@ Evidence: [acute stretching review](https://pubmed.ncbi.nlm.nih.gov/26642915/),
 - **Knee:** track the response during training, later that day, and the following morning. Reduce load, range, or volume
   when symptoms clearly rise.
 
+## Strength progression
+
+- **Working-set effort:** Finish compound working sets with 2–3 RIR and isolation working sets with 1–3 RIR. Power, mobility, cardio, and pull-up work follow their own prescriptions.
+- **Double progression:** When every planned working set reaches the top of its rep range at the target RIR with stable technique and symptoms in two sessions, add the smallest available load and restart near the lower end of the range.
+- **Volume target:** Full weekly targets are about 12–13 fractional chest sets, 12 direct lat/mid-back sets plus rear-delt work, and 6 direct dynamic rectus-abdominis sets. For newly added work, perform 2 sets on the first two exposures before using the full prescription.
+- Use longer accessory rests when one minute causes a large repetition or technique drop; 75–90 seconds is appropriate.
+- Do not increase long-run distance, Thursday running intensity, lower-body lifting load, jump volume, and extra cardio
+  at the same time. Change one major lower-body stressor at a time.
+
+### How the hypertrophy volume is counted
+
+- **Chest:** 15 chest-related working sets, approximately 12–13 fractional sets when each landmine-press set is counted
+  as half a chest set. The two weekly cable-fly slots add chest work without adding another heavy press.
+- **Back:** 12 direct lat/mid-back sets from pull-ups, rows, and pullovers. Wednesday face pulls add 3 rear-delt and
+  upper-back sets; Saturday face pulls remain optional rather than being required to reach the back target.
+- **Rectus abdominis:** 6 direct dynamic sets from cable crunches and reverse crunches. Pallof presses and suitcase
+  carries remain for anti-rotation and lateral trunk function, but are not counted as rectus-hypertrophy sets.
+- Start each newly added chest or abdominal exercise with 2 sets for its first two exposures. Use the full prescription
+  only when technique, performance, shoulder/knee response, and following-morning recovery remain stable.
+
+There is no research-defined universal “maximal” set count. These are high-return targets that account for indirect
+work and the rest of this six-day concurrent plan, rather than a claim that more sets cannot ever produce more growth.
+
+### Visible-abs reality check
+
+Cable crunches and reverse crunches give the rectus abdominis progressive, dynamic resistance and may make it larger.
+They do not selectively remove abdominal fat. Ab visibility also depends on total fat loss and individual fat
+distribution, so continue tracking body weight and waist rather than adding more abdominal sets when waist reduction
+stalls. The first progression should be more repetitions or load at the target RIR, not more weekly exercises.
+
+## Recovery gate for optional sessions
+
+Keep optional Zone 2 cycling and Saturday accessory add-ons off by default until weekly average sleep is at least 7 hours and joints, legs, and usual energy have returned to baseline the following morning for two stable weeks. Then add only one optional item at a time.
+
+The sleep threshold is a readiness rule, not a guarantee. Sunday remains complete rest. When recovery is limited, skip
+Wednesday Zone 2 cycling first, then Saturday face pulls and curls; the three-exercise Pull B base remains planned.
+Do not replace skipped work with hard extra cardio.
+
 ## Block 1 and Block 2
 
 ### Block 1 — Build to a comfortable 10 km
 
-Stay here until 10 km feels repeatable and your joints and usual energy return to baseline by the following morning.
-Keep easy runs conversational and follow the long-run progression.
+Stay here until two separate 10 km runs are completed at RPE 4 or below with a Comfortable or Mild following-morning
+response. Keep easy runs conversational and follow the 18-stage long-run progression.
 
 ### Block 2 — Improve comfortable 10 km speed
 
 Start only after Block 1 is achieved. Tuesday adds relaxed strides; Thursday alternates controlled tempo and interval
-work; Saturday stays at 8–10 km easy.
+work after each completed quality session; Saturday stays at 8–10 km easy. Begin with Tempo, then alternate:
+
+- **Tempo:** 10 min easy; 3 × 6 min at RPE 6–7 with 2 min easy; 5–10 min easy cooldown.
+- **Intervals:** 10 min easy; 6 × 2 min at RPE 8 with 2 min easy; 8–10 min easy cooldown.
+- **Progression:** Complete each workout twice with stable form, joints, and following-morning recovery before adding work. Then progress tempo 3 × 6 → 3 × 7 → 3 × 8 min and intervals 6 × 2 → 5 × 3 → 4 × 4 min. Change duration rather than deliberately increasing pace, and use an easy Thursday when accumulated fatigue is above normal.
+- Keep fast running controlled rather than maximal. Repeat the same prescription instead of progressing when form,
+  joints, or following-morning recovery are not stable.
 
 ## Weekly plan
 
 ### Monday — Legs A + bicycle HIIT
-**Theme:** Strength · power · intervals  
-**Estimated time:** 70–90 min + later HIIT  
+**Theme:** Strength · power · intervals<br>
+**Estimated time:** 70–90 min + later HIIT<br>
 **Sequence note:** Keep the bicycle HIIT at least 6 hours after lifting.
 
 #### Warm-up
@@ -128,8 +172,8 @@ work; Saturday stays at 8–10 km easy.
    - **Watch:** Hard does not mean all-out. Keep cadence controlled and stop for chest pain, dizziness, or unusual breathlessness.
 
 ### Tuesday — Push A + easy run
-**Theme:** Upper strength · aerobic base  
-**Estimated time:** 70–90 min total  
+**Theme:** Upper strength · aerobic base<br>
+**Estimated time:** 85–105 min total<br>
 **Sequence note:** Keep the run conversational. Separate it from lifting when practical.
 
 #### Warm-up
@@ -153,40 +197,53 @@ work; Saturday stays at 8–10 km easy.
    - **Do:** Lower with elbows roughly 30–45° from the torso, then press without bouncing.
    - **Watch:** Stop the descent before shoulder discomfort and keep the shoulder blades comfortably supported.
 
-3. **Cable lateral raise** — 3 × 12–20 · stop before shrugging · rest 1 min
+3. **Cable chest fly** — 2 × 10–15 · comfortable shoulder range · rest 2 min
+   - Log as: Weight × reps.
+   - **Setup:** Set two cable handles around mid-chest height, use a split stance, and begin with the elbows softly bent and the hands only slightly behind the torso.
+   - **Do:** Bring the upper arms inward in a wide hugging arc, pause when the hands meet, then return slowly through a comfortable chest stretch.
+   - **Watch:** Keep the shoulders down and ribs stacked. Do not chase a deep stretch, let the elbows drift far behind the body, or continue through front-of-shoulder discomfort.
+   - **Alternative:** Use a neutral-grip machine chest press for 2 × 10–15 if the fly path is not completely comfortable.
+
+4. **Cable lateral raise** — 3 × 12–20 · stop before shrugging · rest 1 min
    - Log as: Weight × reps.
    - **Setup:** Stand tall with the cable low and the arm slightly in front of the body.
    - **Do:** Lead with the elbow and raise only through a comfortable range, then lower for about two seconds.
    - **Watch:** Use light weight; do not shrug, swing, or push through shoulder discomfort.
 
-4. **Rope triceps press-down** — 2 × 10–15 · rest 1 min
+5. **Rope triceps press-down** — 2 × 10–15 · rest 1 min
    - Log as: Weight × reps.
    - **Setup:** Stand tall with elbows close to the ribs and shoulders relaxed.
    - **Do:** Extend the elbows, separate the rope slightly at the bottom, and return without moving the upper arms.
    - **Watch:** Avoid leaning your body onto the cable or letting the shoulders roll forward.
 
-5. **Cable external rotation** — 2 × 12–20 · rest 1 min
+6. **Cable external rotation** — 2 × 12–20 · rest 1 min
    - Log as: Weight × reps.
    - **Setup:** Set a light cable at elbow height and keep the elbow gently against the side, bent 90°.
    - **Do:** Rotate the forearm outward while the upper arm stays still, then return slowly.
    - **Watch:** Use a small, painless range. Do not twist the torso or chase heavier loads.
 
-6. **Easy run** — Block 1: 30 min easy at RPE 2–4 · Block 2: 30–40 min easy + 4 × 20-sec relaxed strides
+7. **Kneeling cable crunch** — 3 × 8–15 · controlled spinal flexion · rest 2 min
+   - Log as: Weight × reps.
+   - **Setup:** Kneel facing the cable with the rope beside the head and hips mostly still.
+   - **Do:** Exhale and curl the ribs toward the pelvis, then return under control.
+   - **Watch:** Do not pull with the arms, sit the hips backward, or hold your breath.
+
+8. **Easy run** — Block 1: 30 min easy at RPE 2–4 · Block 2: 30–40 min easy + 4 × 20-sec relaxed strides
    - Log as: Distance + time.
    - **Setup:** Begin with 5–10 minutes very easy and use a relaxed, natural stride.
    - **Do:** Keep the effort conversational at RPE 2–4; walk breaks are allowed.
    - **Watch:** Reduce duration or pace if knee symptoms rise during the run or are worse the following morning.
 
-7. **Pelvic-floor routine** — 5 breaths; 8 × 5-sec holds with full relaxation; 8 quick contractions
+9. **Pelvic-floor routine** — 5 breaths; 8 × 5-sec holds with full relaxation; 8 quick contractions
    - Log as: Time only.
    - **Setup:** Breathe normally and imagine gently lifting around the urethra and anus without moving the pelvis.
    - **Do:** Use a submaximal contraction, then fully release for at least as long as each hold.
    - **Watch:** Do not hold your breath, bear down, or keep the muscles clenched between reps.
 
 ### Wednesday — Pull A + Mobility A
-**Theme:** Pull-up skill · recovery  
-**Estimated time:** 60–80 min  
-**Sequence note:** Optional cycling only when well recovered. Complete Mobility A last and keep it easy—not a second leg workout.
+**Theme:** Pull-up skill · recovery<br>
+**Estimated time:** 60–80 min<br>
+**Sequence note:** Optional cycling stays off by default until the sleep and following-morning recovery gate is met. Complete Mobility A last and keep it easy—not a second leg workout.
 
 #### Warm-up
 - Easy bicycle · 3 min
@@ -227,7 +284,7 @@ work; Saturday stays at 8–10 km easy.
    - **Do:** Press the handle straight out until the arms are extended, hold for two seconds, then return under control.
    - **Watch:** Keep the hips and shoulders square. Do not let the cable rotate the torso. Reduce the load if the ribs flare or you hold your breath.
 
-6. **Optional Zone 2 cycling** — 25–40 min at RPE 2–3 · only when well recovered · optional
+6. **Optional Zone 2 cycling** — 25–40 min at RPE 2–3 · only after the optional-session recovery gate is met · optional
    - Log as: Time only.
    - **Setup:** Use a comfortable saddle height and begin with several easy minutes.
    - **Do:** Ride steadily at RPE 2–3, where full sentences remain easy.
@@ -264,8 +321,8 @@ work; Saturday stays at 8–10 km easy.
    - **Watch:** Stop at a mild posterior-chain stretch; do not round forcefully, bounce, or add weight.
 
 ### Thursday — Legs B + Run 2
-**Theme:** Posterior chain · run quality  
-**Estimated time:** 75–100 min total  
+**Theme:** Posterior chain · run quality<br>
+**Estimated time:** 75–100 min total<br>
 **Sequence note:** Block 1: lift first. Block 2: quality run first. Separate sessions by about 6 hours.
 
 #### Warm-up
@@ -321,7 +378,7 @@ work; Saturday stays at 8–10 km easy.
    - **Do:** Lift the forefeet and toes toward the shins, pause, then lower slowly.
    - **Watch:** Keep the heels planted and shorten the stance if the front of the shin cramps.
 
-8. **Run 2** — Block 1: 25–35 min easy · Block 2: alternate tempo and intervals; run first and separate sessions by about 6 hours
+8. **Run 2** — Block 1: 25–35 min easy at RPE 2–4 · Block 2 alternates completed quality sessions: Tempo—10 min easy, 3 × 6 min at RPE 6–7 with 2 min easy, then 5–10 min easy; Intervals—10 min easy, 6 × 2 min at RPE 8 with 2 min easy, then 8–10 min easy
    - Log as: Distance + time.
    - **Setup:** Complete the prescribed easy warm-up before any faster work.
    - **Do:** Follow the current block’s effort and recovery exactly; keep fast reps controlled rather than maximal.
@@ -334,8 +391,8 @@ work; Saturday stays at 8–10 km easy.
    - **Watch:** Do not hold your breath, bear down, or keep the muscles clenched between reps.
 
 ### Friday — Push B + Mobility B
-**Theme:** Upper hypertrophy · mobility  
-**Estimated time:** 60–80 min  
+**Theme:** Upper hypertrophy · mobility<br>
+**Estimated time:** 75–95 min<br>
 **Sequence note:** Use comfortable shoulder paths; do not force clicking or pinching.
 
 #### Warm-up
@@ -359,64 +416,77 @@ work; Saturday stays at 8–10 km easy.
    - **Do:** Press up and forward while allowing the shoulder blade to move, then lower slowly.
    - **Watch:** Do not twist, lean back, shrug, or force an uncomfortable endpoint.
 
-3. **One-arm cable scaption raise (side delt)** — 3 × 12–20 · raise only through a fully comfortable range; otherwise use the guide’s substitute · rest 1 min
+3. **Cable chest fly** — 2 × 10–15 · comfortable shoulder range · rest 2 min
+   - Log as: Weight × reps.
+   - **Setup:** Set two cable handles around mid-chest height, use a split stance, and begin with the elbows softly bent and the hands only slightly behind the torso.
+   - **Do:** Bring the upper arms inward in a wide hugging arc, pause when the hands meet, then return slowly through a comfortable chest stretch.
+   - **Watch:** Keep the shoulders down and ribs stacked. Do not chase a deep stretch, let the elbows drift far behind the body, or continue through front-of-shoulder discomfort.
+   - **Alternative:** Use a neutral-grip machine chest press for 2 × 10–15 if the fly path is not completely comfortable.
+
+4. **One-arm cable scaption raise (side delt)** — 3 × 12–20 · raise only through a fully comfortable range; otherwise use the guide’s substitute · rest 1 min
    - Log as: Weight × reps.
    - **Setup:** This is simply a one-arm cable scaption raise: set a cable pulley at its lowest position with a very light load. Stand sideways with the working arm farther from the machine and hold the handle with a slight elbow bend.
    - **Do:** Set the arm 20–30° forward of directly sideways—like a wide V when viewed from above—with the thumb up or slightly forward. Raise slowly to the highest completely comfortable point (shoulder height is a ceiling, not a requirement), then lower for about two seconds. This trains the side deltoid to help build shoulder width.
    - **Watch:** First reduce the load or range and stop before discomfort. If the shoulder still feels uncomfortable, do not force the exercise.
    - **Alternative:** Use a supported machine lateral raise for 2–3 × 12–20 in a comfortable path. If that also feels uncomfortable, omit Friday’s raise and keep the landmine presses.
 
-4. **Cross-body cable triceps extension** — 2 × 10–15 · rest 1 min
+5. **Cross-body cable triceps extension** — 2 × 10–15 · rest 1 min
    - Log as: Weight × reps.
    - **Setup:** Set the cable above shoulder height and hold it with the opposite hand across the body.
    - **Do:** Keep the upper arm quiet while straightening the elbow down and across, then return slowly.
    - **Watch:** Use a shoulder position that feels natural; do not pull the shoulder forward.
 
-5. **Cable external rotation** — 2 × 12–20 · rest 1 min
+6. **Cable external rotation** — 2 × 12–20 · rest 1 min
    - Log as: Weight × reps.
    - **Setup:** Set a light cable at elbow height and keep the elbow gently against the side, bent 90°.
    - **Do:** Rotate the forearm outward while the upper arm stays still, then return slowly.
    - **Watch:** Use a small, painless range. Do not twist the torso or chase heavier loads.
 
-6. **Suitcase carry** — 2 × 20–30 m / side · rest 1 min
-   - Log as: Weight × reps.
+7. **Suitcase carry** — 2 × 20–30 m / side · rest 1 min
+   - Log as: Weight + distance.
    - **Setup:** Hold one kettlebell or dumbbell at the side. Stand tall with the shoulders level and the free arm relaxed.
    - **Do:** Walk with short, controlled steps for the set distance, then switch sides.
    - **Watch:** Do not lean away from the weight or let the hip drop. Stop the set if grip fails before the trunk does, and note it in the log.
 
-7. **Mobility B · Doorway chest stretch** — 2 rounds · 45 sec / side
+8. **Reverse crunch** — 3 × 10–20 · curl the pelvis; do not swing · rest 1 min
+   - Log as: Reps only.
+   - **Setup:** Lie on your back with hips and knees bent and arms supported beside you.
+   - **Do:** Exhale, gently roll the pelvis toward the ribs, and lift the tailbone slightly before lowering slowly.
+   - **Watch:** Do not swing the legs, throw the hips overhead, or hold your breath.
+
+9. **Mobility B · Doorway chest stretch** — 2 rounds · 45 sec / side
    - Log as: Check-off only.
    - **Setup:** Place the forearm on a doorway with the elbow below shoulder height.
    - **Do:** Step or turn away gently until the chest feels a mild stretch.
    - **Watch:** Do not force the shoulder forward or continue if the front of the shoulder pinches.
 
-8. **Mobility B · Cross-body shoulder stretch** — 2 rounds · 45 sec / side
+10. **Mobility B · Cross-body shoulder stretch** — 2 rounds · 45 sec / side
    - Log as: Check-off only.
    - **Setup:** Bring one arm across the chest and support it above the elbow with the other arm.
    - **Do:** Draw it gently closer while keeping the shoulder down and relaxed.
    - **Watch:** The stretch should be behind the shoulder, not a pinch at the front or top.
 
-9. **Mobility B · Adductor Rock Back** — 2 rounds · 45 sec / side
+11. **Mobility B · Adductor Rock Back** — 2 rounds · 45 sec / side
    - Log as: Check-off only.
    - **Setup:** This is not the adductor machine. Put both hands on a bench, keep one knee under the hip, and extend the other leg to the side with its foot flat.
    - **Do:** Keep the spine neutral and slowly send the hips backward until the inner thigh feels a gentle stretch.
    - **Watch:** Use the bench for support and stop before groin, hip, or knee pain.
 
-### Saturday — Long run + swim + optional Pull B
-**Theme:** Endurance · technique  
-**Estimated time:** 75–130 min total  
-**Sequence note:** Walk breaks are allowed. Pull B is optional and only for a fresh, well-recovered day.
+### Saturday — Long run + swim + Pull B
+**Theme:** Endurance · technique<br>
+**Estimated time:** 105–155 min total<br>
+**Sequence note:** Long run and the three-exercise Pull B base are planned. Separate them by at least 4 hours when practical. Keep swimming easy; optional face pulls and curls are the first strength work to skip when recovery is limited.
 
 #### Warm-up
 - Long run · start with 5–10 min very easy
 - Swim · begin with relaxed technique lengths
-- Pull B if fresh · 2–3 min easy movement
-- Pull B if fresh · wall slide 1 × 6
-- Pull B if fresh · highly assisted pull-up 1 × 5
-- Pull B if fresh · light cable row 1 × 8
+- Pull B · 2–3 min easy movement
+- Pull B · wall slide 1 × 6
+- Pull B · highly assisted pull-up 1 × 5
+- Pull B · light cable row 1 × 8
 
 #### Exercises and activities
-1. **Long run** — Block 1: use the 16-stage progression below · Block 2: 8–10 km easy; walk breaks allowed
+1. **Long run** — Block 1: use the 18-stage progression below · Block 2: 8–10 km easy; walk breaks allowed
    - Log as: Distance + time.
    - **Setup:** Start 5–10 minutes very easily and choose a flat, familiar route when possible.
    - **Do:** Stay conversational and use planned or unplanned walk breaks to keep the effort easy.
@@ -428,19 +498,19 @@ work; Saturday stays at 8–10 km easy.
    - **Do:** Keep the effort at RPE 2–3 with generous rest as needed.
    - **Watch:** Avoid paddles, hard butterfly, or fatigued overhead work; stop any stroke that provokes shoulder discomfort.
 
-3. **Optional pull-up progression** — Repeat your current performance step only when fresh · optional · rest 3 min
+3. **Pull-up progression** — Repeat your current performance step · stop with the prescribed RIR · rest 3 min
    - Log as: Assistance × reps.
    - **Setup:** Use a neutral grip, begin with controlled shoulder blades, and select the assistance shown in your current step.
    - **Do:** Pull the chest toward the handles without kicking, then lower to the step’s full controlled range.
    - **Watch:** Stop before grinding or shoulder pain. Advance only after the performance checks shown below.
 
-4. **Optional one-arm cable row** — 2 × 10–15 / side · optional · rest 2 min
+4. **One-arm cable row** — 2 × 10–15 / side · rest 2 min
    - Log as: Weight × reps.
    - **Setup:** Stand or sit square to the cable with the arm reaching forward under control.
    - **Do:** Pull the elbow toward the hip without rotating the torso, then return slowly.
    - **Watch:** Keep the shoulder away from the ear and use a comfortable reach.
 
-5. **Optional light dumbbell pullover** — 2 × 10–15 · optional · rest 2 min
+5. **Light dumbbell pullover** — 2 × 10–15 · rest 2 min
    - Log as: Weight × reps.
    - **Setup:** Lie supported on a bench, hold one light dumbbell over the chest, and keep a small elbow bend.
    - **Do:** Lower only until the shoulders remain comfortable, then bring the weight back over the chest.
@@ -465,8 +535,8 @@ work; Saturday stays at 8–10 km easy.
    - **Watch:** Do not hold your breath, bear down, or keep the muscles clenched between reps.
 
 ### Sunday — Complete rest
-**Theme:** Recover · review · reset  
-**Estimated time:** No training  
+**Theme:** Recover · review · reset<br>
+**Estimated time:** No training<br>
 **Sequence note:** Ordinary relaxed movement is fine. Review sleep, load, pain, and next-morning responses.
 
 #### Warm-up
@@ -478,7 +548,7 @@ Complete rest. Ordinary relaxed movement is fine.
 ## Saturday long-run progression — Block 1
 
 These are performance-and-recovery stages, not fixed calendar weeks. The app groups them as
-Foundation (1–4), Build (5–8), Extend (9–12), 10 km (13–16).
+Foundation (1–4), Build (5–8), Extend (9–12), 10 km (13–18).
 
 - Stage 1: 4.5 km easy
 - Stage 2: 4.8 km easy
@@ -495,12 +565,18 @@ Foundation (1–4), Build (5–8), Extend (9–12), 10 km (13–16).
 - Stage 13: 8.8 km easy
 - Stage 14: 9.4 km easy
 - Stage 15: 10.0 km easy
-- Stage 16: 6–7 km recovery easy
+- Stage 16: 8.0 km cutback easy
+- Stage 17: 10.0 km repeat easy
+- Stage 18: 6–7 km recovery easy
 
 Repeat a stage when the distance is not yet easy or the next-morning response is not stable. Walk breaks are allowed.
 The tracker records the stage used with that workout and enables the next-stage action after the target is completed at
 RPE 4 or below with a Comfortable or Mild following-morning response. This is a recommendation; the user retains the
 final decision and can repeat or step back.
+
+Stages 15 and 17 are the two 10 km qualification opportunities, separated by an 8 km cutback. Block 2 is recommended
+only after two qualifying 10 km sessions. The app warns before an early Block 2 switch but leaves the final decision
+with the user.
 
 ## Pull-up progression — choose by performance
 
@@ -526,3 +602,25 @@ recovery check. Advance after two qualified sessions; stepping back does not del
 
 This is informational exercise guidance, not a diagnosis or individualized medical clearance. Stop and seek professional
 assessment for persistent or worsening symptoms.
+
+## Recent evidence check
+
+- [ACSM 2026 resistance-training guidance](https://acsm.org/resistance-training-guidelines-update-2026/) supports
+  goal-specific loading, multiple weekly sets, and avoiding a requirement to train to failure.
+- [2024 proximity-to-failure meta-regression](https://pubmed.ncbi.nlm.nih.gov/38970765/) supports recording RIR while
+  acknowledging that the exact hypertrophy relationship remains uncertain.
+- [2026 weekly-volume and frequency meta-regressions](https://pubmed.ncbi.nlm.nih.gov/41343037/) found increasing
+  hypertrophy with higher fractional weekly set volume, with diminishing returns and substantial individual uncertainty.
+- Direct long-term abdominal-hypertrophy evidence is limited. An [abdominal-crunch resistance study](https://pubmed.ncbi.nlm.nih.gov/37621710/)
+  supports loading the crunch across conventional resistance-training set structures, while an
+  [ultrasound exercise comparison](https://pubmed.ncbi.nlm.nih.gov/38288259/) found greater rectus shortening and
+  thickening during crunching than leg-raise variations; neither establishes a unique optimal abdominal program.
+- A randomized [abdominal resistance-training trial](https://pubmed.ncbi.nlm.nih.gov/2528028/) improved abdominal
+  muscular function but did not reduce abdominal skinfolds or girth, supporting the distinction between building the
+  rectus abdominis and losing the fat covering it.
+- [2025 running-load cohort](https://pubmed.ncbi.nlm.nih.gov/40623829/) found higher overuse-injury rates when one run
+  exceeded the longest run in the prior 30 days by more than 10%; this does not make smaller increases risk-free.
+- [2025 training-intensity-distribution meta-analysis](https://pubmed.ncbi.nlm.nih.gov/39888556/) found no universally
+  superior intensity distribution, supporting a predominantly easy plan with limited controlled quality work.
+- [CDC adult sleep guidance](https://www.cdc.gov/sleep/about/index.html) recommends at least 7 hours for adults aged
+  18–60; the optional-session gate applies that threshold conservatively.

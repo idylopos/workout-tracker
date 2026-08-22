@@ -671,6 +671,52 @@ textarea {
   border-top: 1px solid var(--line);
 }
 
+.training-rules-card {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 1px;
+  margin: -8px 0 26px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--line);
+}
+
+.training-rules-card > div {
+  display: grid;
+  align-content: start;
+  gap: 5px;
+  padding: 15px 18px;
+  background: var(--card);
+}
+
+.training-rules-card span {
+  color: #3e6c58;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.11em;
+}
+
+.training-rules-card strong {
+  font-size: 15px;
+}
+
+.training-rules-card p,
+.training-rules-card small {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.training-rules-card .recovery-gate[data-status="hold"] {
+  background: #fff3e4;
+}
+
+.training-rules-card .recovery-gate[data-status="ready"] {
+  background: #edf7ef;
+}
+
 .check-row {
   display: grid;
   grid-template-columns: auto 1fr;
@@ -3033,6 +3079,10 @@ body[data-active-view="today"] .timer {
   }
 
   .warmup-list {
+    grid-template-columns: 1fr;
+  }
+
+  .training-rules-card {
     grid-template-columns: 1fr;
   }
 

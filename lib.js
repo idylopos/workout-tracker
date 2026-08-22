@@ -4,6 +4,22 @@ export const STORAGE_KEY = "formflow.training.v1";
 export const EXTRA_ACTIVITY_TYPES = ["walking", "cycling", "elliptical", "swimming", "running", "custom"];
 export const EXTRA_ACTIVITY_MEASUREMENTS = ["duration", "distance_time", "distance"];
 
+export const STRENGTH_PROGRESSION = {
+  effort: "Finish compound working sets with 2–3 RIR and isolation working sets with 1–3 RIR. Power, mobility, cardio, and pull-up work follow their own prescriptions.",
+  load: "When every planned working set reaches the top of its rep range at the target RIR with stable technique and symptoms in two sessions, add the smallest available load and restart near the lower end of the range.",
+  volume: "Full weekly targets are about 12–13 fractional chest sets, 12 direct lat/mid-back sets plus rear-delt work, and 6 direct dynamic rectus-abdominis sets. For newly added work, perform 2 sets on the first two exposures before using the full prescription.",
+};
+
+export const OPTIONAL_RECOVERY_RULE = {
+  sleepHours: 7,
+  copy: "Keep optional Zone 2 cycling and Saturday accessory add-ons off by default until weekly average sleep is at least 7 hours and joints, legs, and usual energy have returned to baseline the following morning for two stable weeks. Then add only one optional item at a time.",
+};
+
+export const RUN_QUALITY_PROGRESSION = {
+  base: "Tempo—10 min easy, 3 × 6 min at RPE 6–7 with 2 min easy, then 5–10 min easy; Intervals—10 min easy, 6 × 2 min at RPE 8 with 2 min easy, then 8–10 min easy",
+  progression: "Complete each workout twice with stable form, joints, and following-morning recovery before adding work. Then progress tempo 3 × 6 → 3 × 7 → 3 × 8 min and intervals 6 × 2 → 5 × 3 → 4 × 4 min. Change duration rather than deliberately increasing pace, and use an easy Thursday when accumulated fatigue is above normal.",
+};
+
 export const MEASUREMENT_TYPES = {
   completion: {
     label: "Check-off only",
@@ -16,6 +32,15 @@ export const MEASUREMENT_TYPES = {
     fields: [
       { key: "weight", label: "Weight", unit: "kg", min: 0, step: 0.5 },
       { key: "reps", label: "Reps", unit: "", min: 0, step: 1 },
+      { key: "rir", label: "RIR", unit: "", min: 0, max: 10, step: 1 },
+    ],
+  },
+  weight_distance: {
+    label: "Weight + distance",
+    short: "Carry",
+    fields: [
+      { key: "weight", label: "Weight", unit: "kg", min: 0, step: 0.5 },
+      { key: "distance", label: "Distance", unit: "m", min: 0, step: 1 },
       { key: "rir", label: "RIR", unit: "", min: 0, max: 10, step: 1 },
     ],
   },
@@ -373,6 +398,12 @@ export const EXERCISE_GUIDANCE = {
     "Lower with elbows in a comfortable 30–45° path, then press smoothly.",
     "Use the lowest comfortable incline and stop the descent before pinching or clicking becomes uncomfortable.",
   ),
+  "cable-chest-fly": guidance(
+    "Set two cable handles around mid-chest height, use a split stance, and begin with the elbows softly bent and the hands only slightly behind the torso.",
+    "Bring the upper arms inward in a wide hugging arc, pause when the hands meet, then return slowly through a comfortable chest stretch.",
+    "Keep the shoulders down and ribs stacked. Do not chase a deep stretch, let the elbows drift far behind the body, or continue through front-of-shoulder discomfort.",
+    "Use a neutral-grip machine chest press for 2 × 10–15 if the fly path is not completely comfortable.",
+  ),
   "one-arm-landmine-press": guidance(
     "Stand in a split stance with the bar near the working shoulder and ribs stacked over the pelvis.",
     "Press up and forward while allowing the shoulder blade to move, then lower slowly.",
@@ -541,6 +572,12 @@ export function evaluateLongRunProgress(log, target, exerciseId = "long-run") {
   };
 }
 
+export function countQualifiedLongRuns(workoutLogs, targetDistance = 10, exerciseId = "long-run") {
+  return Object.values(workoutLogs || {}).filter(
+    (log) => evaluateLongRunProgress(log, `${targetDistance} km`, exerciseId).status === "ready",
+  ).length;
+}
+
 const lift = (id, name, prescription, sets, rest = 90, measurement = "weight_reps", options = {}) => ({
   id,
   name,
@@ -606,7 +643,7 @@ export const WEEK_PLAN = {
     short: "TUE",
     focus: "Push A + easy run",
     kicker: "Upper strength · aerobic base",
-    estimate: "70–90 min total",
+    estimate: "85–105 min total",
     tone: "blue",
     sequenceNote: "Keep the run conversational. Separate it from lifting when practical.",
     warmup: [
@@ -626,9 +663,11 @@ export const WEEK_PLAN = {
         120,
       ),
       lift("neutral-db-bench", "Neutral-grip dumbbell bench press", "3 × 6–10", 3, 150),
+      lift("cable-chest-fly", "Cable chest fly", "2 × 10–15 · comfortable shoulder range", 2, 90),
       lift("cable-lateral-raise", "Cable lateral raise", "3 × 12–20 · stop before shrugging", 3, 75),
       lift("rope-pressdown", "Rope triceps press-down", "2 × 10–15", 2, 75),
       lift("cable-external-rotation", "Cable external rotation", "2 × 12–20", 2, 60),
+      lift("kneeling-cable-crunch", "Kneeling cable crunch", "3 × 8–15 · controlled spinal flexion", 3, 90),
       activity("easy-run", "Easy run", "Block 1: 30 min, RPE 2–4 · Block 2: 30–40 min + 4 × 20-sec strides", "distance_time"),
       activity("pelvic-floor", "Pelvic-floor routine", "5 breaths; 8 × 5-sec holds with full relaxation; 8 quick contractions", "duration", {
         category: "Recovery",
@@ -642,7 +681,7 @@ export const WEEK_PLAN = {
     kicker: "Pull-up skill · recovery",
     estimate: "60–80 min",
     tone: "orange",
-    sequenceNote: "Optional cycling only when well recovered. Complete Mobility A last and keep it easy—not a second leg workout.",
+    sequenceNote: "Optional cycling stays off by default until the sleep and following-morning recovery gate is met. Complete Mobility A last and keep it easy—not a second leg workout.",
     warmup: [
       "Easy bicycle · 3 min",
       "Serratus wall slide · 1 × 8",
@@ -671,7 +710,7 @@ export const WEEK_PLAN = {
         2,
         60,
       ),
-      activity("zone-2-cycle", "Optional Zone 2 cycling", "25–40 min at RPE 2–3 · only when well recovered", "duration", {
+      activity("zone-2-cycle", "Optional Zone 2 cycling", "25–40 min at RPE 2–3 · only after the optional-session recovery gate is met", "duration", {
         optional: true,
       }),
       lift("mobility-a-cat-cow", "Mobility A · Cat–cow", "1 round · 6 slow cycles", 1, 0, "completion", {
@@ -720,7 +759,7 @@ export const WEEK_PLAN = {
       activity(
         "run-2",
         "Run 2",
-        "Block 1 easy 25–35 min · Block 2 alternates tempo and 6 × 2-min intervals",
+        `Block 1: 25–35 min easy at RPE 2–4 · Block 2 alternates completed quality sessions: ${RUN_QUALITY_PROGRESSION.base}`,
         "distance_time",
       ),
       activity("pelvic-floor", "Pelvic-floor routine", "5 breaths; 8 × 5-sec holds; 8 quick contractions", "duration", {
@@ -733,7 +772,7 @@ export const WEEK_PLAN = {
     short: "FRI",
     focus: "Push B + Mobility B",
     kicker: "Upper hypertrophy · mobility",
-    estimate: "60–80 min",
+    estimate: "75–95 min",
     tone: "purple",
     sequenceNote: "Use comfortable shoulder paths; do not force clicking or pinching.",
     warmup: [
@@ -747,6 +786,7 @@ export const WEEK_PLAN = {
     exercises: [
       lift("neutral-incline-db-press", "Neutral-grip incline dumbbell press", "3 × 8–12", 3, 150),
       lift("one-arm-landmine-press", "One-arm landmine press", "2 × 10–12 / side", 2, 120),
+      lift("cable-chest-fly", "Cable chest fly", "2 × 10–15 · comfortable shoulder range", 2, 90),
       lift(
         "cable-scaption",
         "One-arm cable scaption raise (side delt)",
@@ -762,7 +802,9 @@ export const WEEK_PLAN = {
         "2 × 20–30 m / side",
         2,
         60,
+        "weight_distance",
       ),
+      lift("reverse-crunch", "Reverse crunch", "3 × 10–20 · curl the pelvis; do not swing", 3, 75, "reps"),
       lift("mobility-b-chest", "Mobility B · Doorway chest stretch", "2 rounds · 45 sec / side", 2, 0, "completion", {
         category: "Mobility",
       }),
@@ -777,33 +819,33 @@ export const WEEK_PLAN = {
   saturday: {
     label: "Saturday",
     short: "SAT",
-    focus: "Long run + swim + optional Pull B",
+    focus: "Long run + swim + Pull B",
     kicker: "Endurance · technique",
-    estimate: "75–130 min total",
+    estimate: "105–155 min total",
     tone: "teal",
-    sequenceNote: "Walk breaks are allowed. Pull B is optional and only for a fresh, well-recovered day.",
+    sequenceNote: "Long run and the three-exercise Pull B base are planned. Separate them by at least 4 hours when practical. Keep swimming easy; optional face pulls and curls are the first strength work to skip when recovery is limited.",
     warmup: [
       "Long run · start with 5–10 min very easy",
       "Swim · begin with relaxed technique lengths",
-      "Pull B if fresh · 2–3 min easy movement",
-      "Pull B if fresh · wall slide 1 × 6",
-      "Pull B if fresh · highly assisted pull-up 1 × 5",
-      "Pull B if fresh · light cable row 1 × 8",
+      "Pull B · 2–3 min easy movement",
+      "Pull B · wall slide 1 × 6",
+      "Pull B · highly assisted pull-up 1 × 5",
+      "Pull B · light cable row 1 × 8",
     ],
     exercises: [
-      activity("long-run", "Long run", "Block 1: use the 16-week progression · Block 2: 8–10 km easy", "distance_time"),
+      activity("long-run", "Long run", "Block 1: use the 18-stage progression · Block 2: 8–10 km easy", "distance_time"),
       activity("easy-swim", "Technique-focused swim", "25–40 min at RPE 2–3 · no paddles, hard butterfly, or fatigued overhead work", "duration"),
       lift(
         "pull-up-progression",
-        "Optional pull-up progression",
-        "Repeat your current performance step only when fresh",
+        "Pull-up progression",
+        "Repeat your current performance step · stop with the prescribed RIR",
         2,
         150,
         "assisted_reps",
-        { optional: true, progression: "pullup" },
+        { progression: "pullup" },
       ),
-      lift("one-arm-cable-row", "Optional one-arm cable row", "2 × 10–15 / side", 2, 90, "weight_reps", { optional: true }),
-      lift("db-pullover", "Optional light dumbbell pullover", "2 × 10–15", 2, 90, "weight_reps", { optional: true }),
+      lift("one-arm-cable-row", "One-arm cable row", "2 × 10–15 / side", 2, 90),
+      lift("db-pullover", "Light dumbbell pullover", "2 × 10–15", 2, 90),
       lift("face-pull", "Optional face pull", "2 × 12–20", 2, 75, "weight_reps", { optional: true }),
       lift("cable-curl", "Optional cable curl", "1–2 × 10–15", 2, 75, "weight_reps", { optional: true }),
       activity("pelvic-floor", "Pelvic-floor routine", "5 breaths; 8 × 5-sec holds; 8 quick contractions", "duration", {
@@ -840,6 +882,8 @@ export const LONG_RUNS = [
   "8.8 km",
   "9.4 km",
   "10.0 km",
+  "8.0 km cutback",
+  "10.0 km repeat",
   "6–7 km recovery",
 ];
 
@@ -847,7 +891,7 @@ export const LONG_RUN_PHASES = [
   { id: 1, name: "Foundation", start: 1, end: 4 },
   { id: 2, name: "Build", start: 5, end: 8 },
   { id: 3, name: "Extend", start: 9, end: 12 },
-  { id: 4, name: "10 km", start: 13, end: 16 },
+  { id: 4, name: "10 km", start: 13, end: 18 },
 ];
 
 export function createDefaultState() {
@@ -859,6 +903,7 @@ export function createDefaultState() {
       pullupStep: 1,
       weekOffset: 0,
       activePlanId: "form-flow",
+      builtInPlanRevision: 2,
     },
     exerciseConfigs: {},
     workoutLogs: {},
@@ -896,22 +941,60 @@ function isValidExtraActivity(activity, requireSets = false) {
   );
 }
 
+function migrateSuitcaseCarryLogs(records) {
+  return Object.fromEntries(
+    Object.entries(records || {}).map(([key, log]) => {
+      const carry = log?.exercises?.["suitcase-carry"];
+      if (carry?.measurement !== "weight_reps" || !Array.isArray(carry.sets)) return [key, log];
+      return [
+        key,
+        {
+          ...log,
+          exercises: {
+            ...log.exercises,
+            "suitcase-carry": {
+              ...carry,
+              measurement: "weight_distance",
+              sets: carry.sets.map(({ reps, ...set }) => ({
+                ...set,
+                ...(reps !== undefined && reps !== "" ? { distance: reps } : {}),
+              })),
+            },
+          },
+        },
+      ];
+    }),
+  );
+}
+
 export function normalizeState(value) {
   const fallback = createDefaultState();
   if (!value || typeof value !== "object") return fallback;
+  const previousBuiltInPlanRevision = Number(value.settings?.builtInPlanRevision) || 1;
   const settings = { ...fallback.settings, ...(value.settings || {}) };
   settings.block = Number(settings.block) === 2 ? 2 : 1;
   settings.longRunWeek = Math.max(1, Math.min(52, Number(settings.longRunWeek) || 1));
   settings.pullupStep = Math.max(1, Math.min(PULL_UP_STEPS.length, Number(settings.pullupStep) || 1));
+  settings.builtInPlanRevision = 2;
+  const exerciseConfigs =
+    value.exerciseConfigs && typeof value.exerciseConfigs === "object" ? { ...value.exerciseConfigs } : {};
+  if (previousBuiltInPlanRevision < 2 && exerciseConfigs["suitcase-carry"] === "weight_reps") {
+    delete exerciseConfigs["suitcase-carry"];
+  }
+  const sourceWorkoutLogs = value.workoutLogs && typeof value.workoutLogs === "object" ? value.workoutLogs : {};
+  const sourceWorkoutDrafts =
+    value.workoutDrafts && typeof value.workoutDrafts === "object" && !Array.isArray(value.workoutDrafts)
+      ? value.workoutDrafts
+      : {};
+  const workoutLogs = previousBuiltInPlanRevision < 2 ? migrateSuitcaseCarryLogs(sourceWorkoutLogs) : sourceWorkoutLogs;
+  const workoutDrafts =
+    previousBuiltInPlanRevision < 2 ? migrateSuitcaseCarryLogs(sourceWorkoutDrafts) : sourceWorkoutDrafts;
   return {
     version: APP_VERSION,
     settings,
-    exerciseConfigs: value.exerciseConfigs && typeof value.exerciseConfigs === "object" ? value.exerciseConfigs : {},
-    workoutLogs: value.workoutLogs && typeof value.workoutLogs === "object" ? value.workoutLogs : {},
-    workoutDrafts:
-      value.workoutDrafts && typeof value.workoutDrafts === "object" && !Array.isArray(value.workoutDrafts)
-        ? value.workoutDrafts
-        : {},
+    exerciseConfigs,
+    workoutLogs,
+    workoutDrafts,
     savedActivities: Array.isArray(value.savedActivities)
       ? value.savedActivities.filter((activity) => isValidExtraActivity(activity))
       : [],
@@ -1133,6 +1216,19 @@ function bestSetMetric(measurement, sets = []) {
         value: weight * (1 + reps / 30),
         label: `${weight || 0} kg × ${reps || 0}`,
         volume: weight * reps,
+      };
+    });
+    const best = [...evaluated].sort((a, b) => b.value - a.value)[0];
+    return { ...best, volume: evaluated.reduce((sum, set) => sum + set.volume, 0) };
+  }
+  if (measurement === "weight_distance") {
+    const evaluated = sets.map((set) => {
+      const weight = numeric(set.weight);
+      const distance = numeric(set.distance);
+      return {
+        value: weight * distance,
+        label: `${weight || 0} kg × ${distance || 0} m`,
+        volume: weight * distance,
       };
     });
     const best = [...evaluated].sort((a, b) => b.value - a.value)[0];

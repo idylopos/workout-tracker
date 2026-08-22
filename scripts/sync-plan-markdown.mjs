@@ -6,7 +6,10 @@ import {
   LONG_RUN_PHASES,
   LONG_RUNS,
   MEASUREMENT_TYPES,
+  OPTIONAL_RECOVERY_RULE,
   PULL_UP_STEPS,
+  RUN_QUALITY_PROGRESSION,
+  STRENGTH_PROGRESSION,
   WEEK_PLAN,
 } from "../lib.js";
 
@@ -21,10 +24,10 @@ function prescription(exercise) {
     return "Block 1: 30 min easy at RPE 2–4 · Block 2: 30–40 min easy + 4 × 20-sec relaxed strides";
   }
   if (exercise.id === "run-2") {
-    return "Block 1: 25–35 min easy · Block 2: alternate tempo and intervals; run first and separate sessions by about 6 hours";
+    return `Block 1: 25–35 min easy at RPE 2–4 · Block 2 alternates completed quality sessions: ${RUN_QUALITY_PROGRESSION.base}`;
   }
   if (exercise.id === "long-run") {
-    return "Block 1: use the 16-stage progression below · Block 2: 8–10 km easy; walk breaks allowed";
+    return "Block 1: use the 18-stage progression below · Block 2: 8–10 km easy; walk breaks allowed";
   }
   return exercise.prescription;
 }
@@ -57,8 +60,8 @@ function dayMarkdown(dayKey, day) {
     : "Complete rest. Ordinary relaxed movement is fine.";
   return [
     `### ${day.label} — ${day.focus}`,
-    `**Theme:** ${day.kicker}  `,
-    `**Estimated time:** ${day.estimate}  `,
+    `**Theme:** ${day.kicker}<br>`,
+    `**Estimated time:** ${day.estimate}<br>`,
     `**Sequence note:** ${day.sequenceNote}`,
     "",
     "#### Warm-up",
@@ -121,17 +124,61 @@ Evidence: [acute stretching review](https://pubmed.ncbi.nlm.nih.gov/26642915/),
 - **Knee:** track the response during training, later that day, and the following morning. Reduce load, range, or volume
   when symptoms clearly rise.
 
+## Strength progression
+
+- **Working-set effort:** ${STRENGTH_PROGRESSION.effort}
+- **Double progression:** ${STRENGTH_PROGRESSION.load}
+- **Volume target:** ${STRENGTH_PROGRESSION.volume}
+- Use longer accessory rests when one minute causes a large repetition or technique drop; 75–90 seconds is appropriate.
+- Do not increase long-run distance, Thursday running intensity, lower-body lifting load, jump volume, and extra cardio
+  at the same time. Change one major lower-body stressor at a time.
+
+### How the hypertrophy volume is counted
+
+- **Chest:** 15 chest-related working sets, approximately 12–13 fractional sets when each landmine-press set is counted
+  as half a chest set. The two weekly cable-fly slots add chest work without adding another heavy press.
+- **Back:** 12 direct lat/mid-back sets from pull-ups, rows, and pullovers. Wednesday face pulls add 3 rear-delt and
+  upper-back sets; Saturday face pulls remain optional rather than being required to reach the back target.
+- **Rectus abdominis:** 6 direct dynamic sets from cable crunches and reverse crunches. Pallof presses and suitcase
+  carries remain for anti-rotation and lateral trunk function, but are not counted as rectus-hypertrophy sets.
+- Start each newly added chest or abdominal exercise with 2 sets for its first two exposures. Use the full prescription
+  only when technique, performance, shoulder/knee response, and following-morning recovery remain stable.
+
+There is no research-defined universal “maximal” set count. These are high-return targets that account for indirect
+work and the rest of this six-day concurrent plan, rather than a claim that more sets cannot ever produce more growth.
+
+### Visible-abs reality check
+
+Cable crunches and reverse crunches give the rectus abdominis progressive, dynamic resistance and may make it larger.
+They do not selectively remove abdominal fat. Ab visibility also depends on total fat loss and individual fat
+distribution, so continue tracking body weight and waist rather than adding more abdominal sets when waist reduction
+stalls. The first progression should be more repetitions or load at the target RIR, not more weekly exercises.
+
+## Recovery gate for optional sessions
+
+${OPTIONAL_RECOVERY_RULE.copy}
+
+The sleep threshold is a readiness rule, not a guarantee. Sunday remains complete rest. When recovery is limited, skip
+Wednesday Zone 2 cycling first, then Saturday face pulls and curls; the three-exercise Pull B base remains planned.
+Do not replace skipped work with hard extra cardio.
+
 ## Block 1 and Block 2
 
 ### Block 1 — Build to a comfortable 10 km
 
-Stay here until 10 km feels repeatable and your joints and usual energy return to baseline by the following morning.
-Keep easy runs conversational and follow the long-run progression.
+Stay here until two separate 10 km runs are completed at RPE 4 or below with a Comfortable or Mild following-morning
+response. Keep easy runs conversational and follow the 18-stage long-run progression.
 
 ### Block 2 — Improve comfortable 10 km speed
 
 Start only after Block 1 is achieved. Tuesday adds relaxed strides; Thursday alternates controlled tempo and interval
-work; Saturday stays at 8–10 km easy.
+work after each completed quality session; Saturday stays at 8–10 km easy. Begin with Tempo, then alternate:
+
+- **Tempo:** 10 min easy; 3 × 6 min at RPE 6–7 with 2 min easy; 5–10 min easy cooldown.
+- **Intervals:** 10 min easy; 6 × 2 min at RPE 8 with 2 min easy; 8–10 min easy cooldown.
+- **Progression:** ${RUN_QUALITY_PROGRESSION.progression}
+- Keep fast running controlled rather than maximal. Repeat the same prescription instead of progressing when form,
+  joints, or following-morning recovery are not stable.
 
 ## Weekly plan
 
@@ -148,6 +195,10 @@ Repeat a stage when the distance is not yet easy or the next-morning response is
 The tracker records the stage used with that workout and enables the next-stage action after the target is completed at
 RPE 4 or below with a Comfortable or Mild following-morning response. This is a recommendation; the user retains the
 final decision and can repeat or step back.
+
+Stages 15 and 17 are the two 10 km qualification opportunities, separated by an 8 km cutback. Block 2 is recommended
+only after two qualifying 10 km sessions. The app warns before an early Block 2 switch but leaves the final decision
+with the user.
 
 ## Pull-up progression — choose by performance
 
@@ -168,6 +219,28 @@ ${pullUpMarkdown()}
 
 This is informational exercise guidance, not a diagnosis or individualized medical clearance. Stop and seek professional
 assessment for persistent or worsening symptoms.
+
+## Recent evidence check
+
+- [ACSM 2026 resistance-training guidance](https://acsm.org/resistance-training-guidelines-update-2026/) supports
+  goal-specific loading, multiple weekly sets, and avoiding a requirement to train to failure.
+- [2024 proximity-to-failure meta-regression](https://pubmed.ncbi.nlm.nih.gov/38970765/) supports recording RIR while
+  acknowledging that the exact hypertrophy relationship remains uncertain.
+- [2026 weekly-volume and frequency meta-regressions](https://pubmed.ncbi.nlm.nih.gov/41343037/) found increasing
+  hypertrophy with higher fractional weekly set volume, with diminishing returns and substantial individual uncertainty.
+- Direct long-term abdominal-hypertrophy evidence is limited. An [abdominal-crunch resistance study](https://pubmed.ncbi.nlm.nih.gov/37621710/)
+  supports loading the crunch across conventional resistance-training set structures, while an
+  [ultrasound exercise comparison](https://pubmed.ncbi.nlm.nih.gov/38288259/) found greater rectus shortening and
+  thickening during crunching than leg-raise variations; neither establishes a unique optimal abdominal program.
+- A randomized [abdominal resistance-training trial](https://pubmed.ncbi.nlm.nih.gov/2528028/) improved abdominal
+  muscular function but did not reduce abdominal skinfolds or girth, supporting the distinction between building the
+  rectus abdominis and losing the fat covering it.
+- [2025 running-load cohort](https://pubmed.ncbi.nlm.nih.gov/40623829/) found higher overuse-injury rates when one run
+  exceeded the longest run in the prior 30 days by more than 10%; this does not make smaller increases risk-free.
+- [2025 training-intensity-distribution meta-analysis](https://pubmed.ncbi.nlm.nih.gov/39888556/) found no universally
+  superior intensity distribution, supporting a predominantly easy plan with limited controlled quality work.
+- [CDC adult sleep guidance](https://www.cdc.gov/sleep/about/index.html) recommends at least 7 hours for adults aged
+  18–60; the optional-session gate applies that threshold conservatively.
 `;
 }
 
