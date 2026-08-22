@@ -2161,7 +2161,15 @@ function timerFinished() {
 }
 
 function bindEvents() {
-  $$("[data-nav]").forEach((button) => button.addEventListener("click", () => switchView(button.dataset.nav)));
+  $$("[data-nav]").forEach((button) => button.addEventListener("click", async () => {
+    if (button.dataset.nav === "today") {
+      await saveWorkoutDraftNow();
+      selectedDate = toIsoDate();
+      draftSession = null;
+      renderToday();
+    }
+    switchView(button.dataset.nav);
+  }));
   $("#plan-select").addEventListener("change", async (event) => {
     await saveWorkoutDraftNow();
     await changePlan(event.target.value);
