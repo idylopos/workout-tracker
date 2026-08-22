@@ -308,6 +308,11 @@ export const EXERCISE_GUIDANCE = {
     "Exhale and curl the ribs toward the pelvis, then return under control.",
     "Do not pull with the arms, sit the hips backward, or hold your breath.",
   ),
+  "pallof-press": guidance(
+    "Set a cable at chest height. Stand side-on, hold the handle at the sternum with both hands, and place the feet hip-width apart.",
+    "Press the handle straight out until the arms are extended, hold for two seconds, then return under control.",
+    "Keep the hips and shoulders square. Do not let the cable rotate the torso. Reduce the load if the ribs flare or you hold your breath.",
+  ),
   "mobility-a-cat-cow": guidance(
     "Start on hands and knees with hands under shoulders and knees under hips.",
     "Move slowly between a comfortable rounded and gently extended spine for six controlled cycles.",
@@ -388,6 +393,11 @@ export const EXERCISE_GUIDANCE = {
     "Lie on your back with hips and knees bent and arms supported beside you.",
     "Exhale, gently roll the pelvis toward the ribs, and lift the tailbone slightly before lowering slowly.",
     "Do not swing the legs, throw the hips overhead, or hold your breath.",
+  ),
+  "suitcase-carry": guidance(
+    "Hold one kettlebell or dumbbell at the side. Stand tall with the shoulders level and the free arm relaxed.",
+    "Walk with short, controlled steps for the set distance, then switch sides.",
+    "Do not lean away from the weight or let the hip drop. Stop the set if grip fails before the trunk does, and note it in the log.",
   ),
   "mobility-b-chest": guidance(
     "Place the forearm on a doorway with the elbow below shoulder height.",
@@ -655,11 +665,11 @@ export const WEEK_PLAN = {
       lift("face-pull", "Face pull", "3 × 12–20 · controlled rear-delt focus", 3, 75),
       lift("hammer-curl", "Neutral-grip hammer curl", "2 × 8–15", 2, 75),
       lift(
-        "kneeling-cable-crunch",
-        "Kneeling cable crunch",
-        "2 × 10–15 · exhale as you curl · no breath-holding",
+        "pallof-press",
+        "Pallof press",
+        "2 × 8–10 / side · 2-sec hold at full extension",
         2,
-        75,
+        60,
       ),
       activity("zone-2-cycle", "Optional Zone 2 cycling", "25–40 min at RPE 2–3 · only when well recovered", "duration", {
         optional: true,
@@ -747,12 +757,11 @@ export const WEEK_PLAN = {
       lift("cross-body-triceps", "Cross-body cable triceps extension", "2 × 10–15", 2, 75),
       lift("cable-external-rotation", "Cable external rotation", "2 × 12–20", 2, 60),
       lift(
-        "reverse-crunch",
-        "Reverse crunch",
-        "2 × 10–20 · posterior pelvic tilt · no swinging",
+        "suitcase-carry",
+        "Suitcase carry",
+        "2 × 20–30 m / side",
         2,
-        75,
-        "reps",
+        60,
       ),
       lift("mobility-b-chest", "Mobility B · Doorway chest stretch", "2 rounds · 45 sec / side", 2, 0, "completion", {
         category: "Mobility",

@@ -219,9 +219,15 @@ test("rebalances direct abdominal and deltoid work without stacking Friday press
   const friday = WEEK_PLAN.friday.exercises;
   assert.equal(tuesday.find((exercise) => exercise.id === "cable-lateral-raise").sets, 3);
   assert.equal(wednesday.find((exercise) => exercise.id === "face-pull").sets, 3);
-  assert.equal(wednesday.find((exercise) => exercise.id === "kneeling-cable-crunch").sets, 2);
+  assert.equal(wednesday[4].id, "pallof-press");
+  assert.equal(wednesday[4].sets, 2);
+  assert.equal(wednesday[4].measurement, "weight_reps");
+  assert.equal(wednesday.some((exercise) => exercise.id === "kneeling-cable-crunch"), false);
   assert.equal(friday.find((exercise) => exercise.id === "cable-scaption").sets, 3);
-  assert.equal(friday.find((exercise) => exercise.id === "reverse-crunch").sets, 2);
+  assert.equal(friday[5].id, "suitcase-carry");
+  assert.equal(friday[5].sets, 2);
+  assert.equal(friday[5].measurement, "weight_reps");
+  assert.equal(friday.some((exercise) => exercise.id === "reverse-crunch"), false);
   assert.equal(friday.some((exercise) => exercise.id === "push-up-plus"), false);
   assert.equal(friday.some((exercise) => exercise.id === "mobility-b"), false);
   assert.equal(friday.filter((exercise) => exercise.id.startsWith("mobility-b-")).length, 3);

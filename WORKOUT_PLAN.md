@@ -221,11 +221,11 @@ work; Saturday stays at 8–10 km easy.
    - **Do:** Curl without moving the upper arms, then lower under control.
    - **Watch:** Avoid swinging, leaning back, or letting the shoulders roll forward.
 
-5. **Kneeling cable crunch** — 2 × 10–15 · exhale as you curl · no breath-holding · rest 1 min
+5. **Pallof press** — 2 × 8–10 / side · 2-sec hold at full extension · rest 1 min
    - Log as: Weight × reps.
-   - **Setup:** Kneel facing the cable with the rope beside the head and hips mostly still.
-   - **Do:** Exhale and curl the ribs toward the pelvis, then return under control.
-   - **Watch:** Do not pull with the arms, sit the hips backward, or hold your breath.
+   - **Setup:** Set a cable at chest height. Stand side-on, hold the handle at the sternum with both hands, and place the feet hip-width apart.
+   - **Do:** Press the handle straight out until the arms are extended, hold for two seconds, then return under control.
+   - **Watch:** Keep the hips and shoulders square. Do not let the cable rotate the torso. Reduce the load if the ribs flare or you hold your breath.
 
 6. **Optional Zone 2 cycling** — 25–40 min at RPE 2–3 · only when well recovered · optional
    - Log as: Time only.
@@ -378,11 +378,11 @@ work; Saturday stays at 8–10 km easy.
    - **Do:** Rotate the forearm outward while the upper arm stays still, then return slowly.
    - **Watch:** Use a small, painless range. Do not twist the torso or chase heavier loads.
 
-6. **Reverse crunch** — 2 × 10–20 · posterior pelvic tilt · no swinging · rest 1 min
-   - Log as: Reps only.
-   - **Setup:** Lie on your back with hips and knees bent and arms supported beside you.
-   - **Do:** Exhale, gently roll the pelvis toward the ribs, and lift the tailbone slightly before lowering slowly.
-   - **Watch:** Do not swing the legs, throw the hips overhead, or hold your breath.
+6. **Suitcase carry** — 2 × 20–30 m / side · rest 1 min
+   - Log as: Weight × reps.
+   - **Setup:** Hold one kettlebell or dumbbell at the side. Stand tall with the shoulders level and the free arm relaxed.
+   - **Do:** Walk with short, controlled steps for the set distance, then switch sides.
+   - **Watch:** Do not lean away from the weight or let the hip drop. Stop the set if grip fails before the trunk does, and note it in the log.
 
 7. **Mobility B · Doorway chest stretch** — 2 rounds · 45 sec / side
    - Log as: Check-off only.
