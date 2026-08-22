@@ -14,6 +14,7 @@ import {
   normalizeResponseRating,
   normalizeState,
   preparePreviousSets,
+  shouldCollapseExerciseByDefault,
   shouldShowRestTimer,
   summarizeCardioRange,
   summarizeExercise,
@@ -25,6 +26,15 @@ test("shows the rest timer outside Today only while active or finished", () => {
   assert.equal(shouldShowRestTimer("progress", false, false), false);
   assert.equal(shouldShowRestTimer("progress", true, false), true);
   assert.equal(shouldShowRestTimer("data", false, true), true);
+});
+
+test("collapses only untouched optional exercises on compact screens", () => {
+  const optional = { optional: true };
+  const required = { optional: false };
+  assert.equal(shouldCollapseExerciseByDefault(optional, null, true), true);
+  assert.equal(shouldCollapseExerciseByDefault(optional, { sets: [] }, true), false);
+  assert.equal(shouldCollapseExerciseByDefault(required, null, true), false);
+  assert.equal(shouldCollapseExerciseByDefault(optional, null, false), false);
 });
 
 test("Use Last preserves today's set count and clears completion and effort", () => {

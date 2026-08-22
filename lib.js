@@ -88,6 +88,10 @@ export function shouldShowRestTimer(view, running, finished) {
   return view === "today" || Boolean(running) || Boolean(finished);
 }
 
+export function shouldCollapseExerciseByDefault(exercise, savedExercise, compactViewport) {
+  return Boolean(compactViewport && exercise?.optional && !savedExercise);
+}
+
 export const PULL_UP_STEPS = [
   {
     id: 1,

@@ -21,6 +21,7 @@ import {
   normalizeResponseRating,
   normalizeState,
   preparePreviousSets,
+  shouldCollapseExerciseByDefault,
   shouldShowRestTimer,
   startOfWeek,
   summarizeCardioRange,
@@ -1185,6 +1186,11 @@ function createExerciseCard(exercise, index, savedExercise) {
     : Array.from({ length: Number(card.dataset.defaultSets) }, () => ({}));
   renderSetRows(card, measurement, sets);
   if (exercise.progression === "pullup") setupPullupGuide(card, exercise, savedExercise);
+
+  if (shouldCollapseExerciseByDefault(exercise, savedExercise, window.matchMedia("(max-width: 680px)").matches)) {
+    card.classList.add("is-collapsed");
+    $(".exercise-toggle", card).setAttribute("aria-expanded", "false");
+  }
 
   $(".exercise-toggle", card).addEventListener("click", (event) => {
     const button = event.currentTarget;
