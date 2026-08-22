@@ -359,11 +359,11 @@ work; Saturday stays at 8–10 km easy.
    - **Do:** Press up and forward while allowing the shoulder blade to move, then lower slowly.
    - **Watch:** Do not twist, lean back, shrug, or force an uncomfortable endpoint.
 
-3. **Friday lateral-delt raise** — 3 × 12–20 · scaption only if comfortable; otherwise use the guide’s substitute · rest 1 min
+3. **One-arm cable scaption raise (side delt)** — 3 × 12–20 · raise only through a fully comfortable range; otherwise use the guide’s substitute · rest 1 min
    - Log as: Weight × reps.
-   - **Setup:** Use a very light low cable. Keep the thumb up and the arm about 20–30° forward of the side of the body.
-   - **Do:** Raise only to the height that remains fully comfortable, then lower for about two seconds.
-   - **Watch:** First reduce the load and stop before discomfort. If the shoulder still feels uncomfortable, do not force the exercise.
+   - **Setup:** This is simply a one-arm cable scaption raise: set a cable pulley at its lowest position with a very light load. Stand sideways with the working arm farther from the machine and hold the handle with a slight elbow bend.
+   - **Do:** Set the arm 20–30° forward of directly sideways—like a wide V when viewed from above—with the thumb up or slightly forward. Raise slowly to the highest completely comfortable point (shoulder height is a ceiling, not a requirement), then lower for about two seconds. This trains the side deltoid to help build shoulder width.
+   - **Watch:** First reduce the load or range and stop before discomfort. If the shoulder still feels uncomfortable, do not force the exercise.
    - **Alternative:** Use a supported machine lateral raise for 2–3 × 12–20 in a comfortable path. If that also feels uncomfortable, omit Friday’s raise and keep the landmine presses.
 
 4. **Cross-body cable triceps extension** — 2 × 10–15 · rest 1 min

@@ -229,6 +229,8 @@ test("provides a quick form guide for every built-in exercise", () => {
   assert.match(EXERCISE_GUIDANCE["mobility-a-bridge-march"].watch, /stability drill, not a stretch/i);
   assert.match(EXERCISE_GUIDANCE["mobility-b-adductor"].setup, /not the adductor machine/i);
   assert.match(EXERCISE_GUIDANCE["cable-scaption"].option, /machine lateral raise/i);
+  assert.match(EXERCISE_GUIDANCE["cable-scaption"].setup, /one-arm cable scaption raise/i);
+  assert.match(EXERCISE_GUIDANCE["cable-scaption"].action, /side deltoid.*shoulder width/i);
 });
 
 test("finds the most recent earlier exercise log", () => {
