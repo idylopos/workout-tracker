@@ -3523,6 +3523,11 @@ body[data-active-view="today"] .timer {
     padding-top: 12px;
   }
 
+  .exercise-toolbar-actions .text-button {
+    min-height: 44px;
+    padding-block: 12px;
+  }
+
   .progression-roadmap-head,
   .progression-check > div {
     align-items: stretch;
@@ -3539,10 +3544,20 @@ body[data-active-view="today"] .timer {
   }
 
   .set-row {
-    grid-template-columns: 42px repeat(var(--field-count), minmax(68px, 1fr)) 28px;
+    grid-template-columns: 42px repeat(var(--field-count), minmax(68px, 1fr)) 44px;
     gap: 6px;
-    min-width: calc(88px + (var(--field-count) * 78px));
+    min-width: calc(104px + (var(--field-count) * 78px));
     padding: 7px;
+  }
+
+  .remove-set {
+    width: 44px;
+    height: 44px;
+  }
+
+  .copy-first-set,
+  .add-set {
+    min-height: 44px;
   }
 
   .set-done {
