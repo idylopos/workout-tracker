@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import {
   APP_VERSION,
   EXERCISE_GUIDANCE,
+  EXERCISE_ALTERNATIVES,
   LONG_RUN_PHASES,
   LONG_RUNS,
   MEASUREMENT_TYPES,
@@ -12,6 +13,7 @@ import {
   dateToDayKey,
   evaluateLongRunProgress,
   findPreviousExerciseLog,
+  findOutstandingRecoveryLogs,
   getAllExercises,
   longRunTargetDistance,
   normalizeResponseRating,
@@ -21,6 +23,7 @@ import {
   shouldShowRestTimer,
   summarizeCardioRange,
   summarizeExercise,
+  summarizeWeeklySleep,
   validateBackup,
 } from "../lib.js";
 
@@ -79,7 +82,67 @@ test("normalizes a partial persisted state", () => {
   assert.deepEqual(state.workoutLogs, {});
   assert.deepEqual(state.workoutDrafts, {});
   assert.deepEqual(state.sleepLogs, []);
+  assert.deepEqual(state.dailySleepLogs, []);
+  assert.deepEqual(state.dailyCheckIns, {});
   assert.equal(state.settings.builtInPlanRevision, 2);
+});
+
+test("finds only recent workouts that still need a following-morning review", () => {
+  const logs = {
+    "2026-08-23": {
+      date: "2026-08-23",
+      dayKey: "sunday",
+      exercises: { run: { measurement: "distance", sets: [{ distance: 5 }] } },
+      response: { painNext: 1 },
+    },
+    "2026-08-24": {
+      date: "2026-08-24",
+      dayKey: "monday",
+      exercises: { squat: { measurement: "weight_reps", sets: [{ weight: 50, reps: 8 }] } },
+      response: { painDuring: 0, painNext: "" },
+    },
+    "2026-08-25": {
+      date: "2026-08-25",
+      dayKey: "tuesday",
+      exercises: { press: { measurement: "weight_reps", sets: [{ weight: 20, reps: 10 }] } },
+      response: {},
+    },
+  };
+
+  assert.deepEqual(findOutstandingRecoveryLogs(logs, "2026-08-25"), [
+    { key: "2026-08-24", date: "2026-08-24", dayKey: "monday" },
+  ]);
+});
+
+test("derives weekly sleep averages from nightly check-ins without rewriting legacy weeks", () => {
+  const summaries = summarizeWeeklySleep(
+    [
+      { week: "2026-08-10", hours: 7 },
+      { week: "2026-08-17", hours: 6.5 },
+    ],
+    [
+      { date: "2026-08-18", hours: 7 },
+      { date: "2026-08-19", hours: 8 },
+    ],
+  );
+
+  assert.deepEqual(summaries, [
+    { week: "2026-08-10", hours: 7, nights: 7, source: "weekly" },
+    { week: "2026-08-17", hours: 7.5, nights: 2, source: "daily" },
+  ]);
+});
+
+test("validates optional daily sleep and check-in records in backups", () => {
+  const backup = createDefaultState();
+  backup.dailySleepLogs.push({ date: "2026-08-25", hours: 7.5 });
+  backup.dailyCheckIns["2026-08-25"] = {
+    status: "completed",
+    recoveryUnknown: ["2026-08-24"],
+  };
+  assert.equal(validateBackup(backup).valid, true);
+
+  backup.dailySleepLogs[0].hours = 25;
+  assert.equal(validateBackup(backup).valid, false);
 });
 
 test("migrates the old built-in suitcase carry default without changing other measurement preferences", () => {
@@ -329,6 +392,20 @@ test("provides a quick form guide for every built-in exercise", () => {
   assert.match(EXERCISE_GUIDANCE["cable-chest-fly"].watch, /shoulder discomfort/i);
 });
 
+test("provides loggable assisted Nordic alternatives without changing the planned exercise", () => {
+  const nordic = WEEK_PLAN.monday.exercises.find((exercise) => exercise.id === "assisted-nordic");
+  const alternatives = EXERCISE_ALTERNATIVES[nordic.id];
+
+  assert.equal(nordic.name, "Assisted Nordic hamstring");
+  assert.equal(alternatives.length, 3);
+  assert.deepEqual(
+    alternatives.map((alternative) => alternative.id),
+    ["seated-or-lying-leg-curl", "slider-or-ball-leg-curl", "bridge-hamstring-walkout"],
+  );
+  assert.equal(alternatives[0].measurement, "weight_reps");
+  assert.ok(alternatives.every((alternative) => alternative.sets === 2));
+});
+
 test("finds the most recent earlier exercise log", () => {
   const logs = {
     "2026-07-01": {
@@ -343,6 +420,56 @@ test("finds the most recent earlier exercise log", () => {
   const previous = findPreviousExerciseLog(logs, "squat", "2026-07-10");
   assert.equal(previous.date, "2026-07-08");
   assert.equal(previous.sets[0].weight, 55);
+});
+
+test("finds previous logs for the selected exercise variation without mixing alternatives", () => {
+  const logs = {
+    "form-flow::2026-07-01": {
+      date: "2026-07-01",
+      planId: "form-flow",
+      exercises: {
+        "assisted-nordic": {
+          name: "Assisted Nordic hamstring",
+          measurement: "reps",
+          sets: [{ reps: 4 }],
+        },
+      },
+    },
+    "form-flow::2026-07-08": {
+      date: "2026-07-08",
+      planId: "form-flow",
+      exercises: {
+        "assisted-nordic": {
+          name: "Seated or lying leg curl",
+          variantId: "seated-or-lying-leg-curl",
+          variantName: "Seated or lying leg curl",
+          measurement: "weight_reps",
+          sets: [{ weight: 25, reps: 10 }],
+        },
+      },
+    },
+  };
+
+  const nordic = findPreviousExerciseLog(
+    logs,
+    "assisted-nordic",
+    "2026-07-15",
+    "form-flow",
+    {},
+    "assisted-nordic",
+  );
+  const legCurl = findPreviousExerciseLog(
+    logs,
+    "assisted-nordic",
+    "2026-07-15",
+    "form-flow",
+    {},
+    "seated-or-lying-leg-curl",
+  );
+
+  assert.equal(nordic.date, "2026-07-01");
+  assert.equal(legCurl.date, "2026-07-08");
+  assert.equal(legCurl.sets[0].weight, 25);
 });
 
 test("finds the last exercise across skipped weeks and encrypted drafts", () => {

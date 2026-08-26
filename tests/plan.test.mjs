@@ -75,6 +75,9 @@ test("the readable workout plan is rendered from the built-in plan", async () =>
   assert.match(generated, /three-exercise Pull B base remains planned/);
   assert.match(generated, /3 × 6 → 3 × 7 → 3 × 8 min/);
   assert.match(generated, /Weight \+ distance/);
+  assert.match(generated, /Cable lateral raise.*rest 1 min 15 sec/);
+  assert.match(generated, /Cable chest fly.*rest 1 min 30 sec/);
+  assert.match(generated, /Neutral-grip dumbbell bench press.*rest 2 min 30 sec/);
   assert.match(generated, /both the performance check/);
   assert.match(generated, /non-exportable browser unlock key/);
   assert.match(generated, /Use Last.*keeps today's planned set count/);

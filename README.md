@@ -49,8 +49,9 @@ skipped weeks do not hide the most recent entry.
 
 Every built-in exercise includes a collapsible **Quick form guide** covering setup, execution, the main thing to watch,
 and a substitute when appropriate. Folder-based plans can provide the same guidance in `plan.json`.
-Exercises with a substitute advertise **alternative available** in the guide header. Assisted Nordic hamstrings include
-no-anchor walkouts plus slider, stability-ball, and machine leg-curl options.
+Exercises with a substitute advertise **alternative available** in the guide header. Assisted Nordic hamstrings also
+show an **Alternatives** button for logging machine curls, slider/stability-ball curls, or bridge walkouts without
+replacing the planned exercise or rewriting earlier logs.
 
 Pull-up sessions include a six-step performance roadmap with separate same-day technique and following-morning
 recovery checks. The Week view groups the 16 long-run stages into four phases, retains each workout’s assigned stage,
@@ -58,6 +59,11 @@ and offers explicit repeat, step-back, and criteria-gated advance actions.
 
 The built-in plan uses a brief Monday lunge-twist warm-up and a separately logged, low-fatigue Wednesday Mobility A
 sequence. Each mobility movement is logged on its own rather than as one combined set.
+
+On the first unlocked visit each day, a non-blocking **Daily Check-in** asks only for inputs that are due: last night's
+sleep and any missing following-morning workout response from the previous two days. Answers save immediately to the
+encrypted vault. Following-morning answers update the original workout record, while nightly sleep records calculate
+the current weekly average without replacing legacy weekly sleep logs. The check-in can be deferred or skipped.
 
 The current built-in plan is also available as [WORKOUT_PLAN.md](WORKOUT_PLAN.md). It is generated from `lib.js` during
 `npm run build`; after changing the built-in plan, run `npm run sync-plan` and commit the updated Markdown together with

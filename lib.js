@@ -472,6 +472,32 @@ export const EXERCISE_GUIDANCE = {
   ),
 };
 
+export const EXERCISE_ALTERNATIVES = {
+  "assisted-nordic": [
+    {
+      id: "seated-or-lying-leg-curl",
+      name: "Seated or lying leg curl",
+      prescription: "2 × 8–12 · slow, controlled lowering",
+      sets: 2,
+      measurement: "weight_reps",
+    },
+    {
+      id: "slider-or-ball-leg-curl",
+      name: "Slider or stability-ball leg curl",
+      prescription: "2 × 8–12 · keep hips lifted",
+      sets: 2,
+      measurement: "reps",
+    },
+    {
+      id: "bridge-hamstring-walkout",
+      name: "Bridge hamstring walkout",
+      prescription: "2 × 6–10 · controlled steps out and back",
+      sets: 2,
+      measurement: "reps",
+    },
+  ],
+};
+
 export function normalizeResponseRating(value, scaleVersion = 1) {
   if (value === "" || value === null || value === undefined) return "";
   const rating = Number(value);
@@ -911,6 +937,8 @@ export function createDefaultState() {
     savedActivities: [],
     bodyLogs: [],
     sleepLogs: [],
+    dailySleepLogs: [],
+    dailyCheckIns: {},
   };
 }
 
@@ -1000,6 +1028,11 @@ export function normalizeState(value) {
       : [],
     bodyLogs: Array.isArray(value.bodyLogs) ? value.bodyLogs : [],
     sleepLogs: Array.isArray(value.sleepLogs) ? value.sleepLogs : [],
+    dailySleepLogs: Array.isArray(value.dailySleepLogs) ? value.dailySleepLogs : [],
+    dailyCheckIns:
+      value.dailyCheckIns && typeof value.dailyCheckIns === "object" && !Array.isArray(value.dailyCheckIns)
+        ? value.dailyCheckIns
+        : {},
   };
 }
 
@@ -1020,6 +1053,15 @@ export function validateBackup(value) {
   if (!Array.isArray(value.bodyLogs) || !Array.isArray(value.sleepLogs)) {
     return { valid: false, reason: "Body or sleep logs are malformed." };
   }
+  if (value.dailySleepLogs !== undefined && !Array.isArray(value.dailySleepLogs)) {
+    return { valid: false, reason: "Daily sleep logs are malformed." };
+  }
+  if (
+    value.dailyCheckIns !== undefined &&
+    (!value.dailyCheckIns || typeof value.dailyCheckIns !== "object" || Array.isArray(value.dailyCheckIns))
+  ) {
+    return { valid: false, reason: "Daily check-in records are malformed." };
+  }
   if (value.savedActivities !== undefined) {
     if (
       !Array.isArray(value.savedActivities) ||
@@ -1036,7 +1078,19 @@ export function validateBackup(value) {
   const sleepValid = value.sleepLogs.every(
     (entry) => entry && validDate(entry.week) && validNumber(entry.hours) && Number(entry.hours) <= 24,
   );
-  if (!bodyValid || !sleepValid) {
+  const dailySleepValid = (value.dailySleepLogs || []).every(
+    (entry) => entry && validDate(entry.date) && validNumber(entry.hours) && Number(entry.hours) <= 24,
+  );
+  const checkInsValid = Object.entries(value.dailyCheckIns || {}).every(
+    ([date, entry]) =>
+      validDate(date) &&
+      entry &&
+      typeof entry === "object" &&
+      ["open", "deferred", "skipped", "completed"].includes(entry.status || "open") &&
+      (entry.sleepUnknown === undefined || typeof entry.sleepUnknown === "boolean") &&
+      (entry.recoveryUnknown === undefined || Array.isArray(entry.recoveryUnknown)),
+  );
+  if (!bodyValid || !sleepValid || !dailySleepValid || !checkInsValid) {
     return { valid: false, reason: "A body or sleep record contains an invalid date or value." };
   }
   const validWorkoutRecord = (log) => {
@@ -1091,6 +1145,42 @@ export function addDays(date, amount) {
   return result;
 }
 
+export function findOutstandingRecoveryLogs(workoutLogs, today = toIsoDate(), lookbackDays = 2) {
+  const earliest = toIsoDate(addDays(new Date(`${today}T12:00:00`), -Math.max(1, Number(lookbackDays) || 2)));
+  return Object.entries(workoutLogs || {})
+    .filter(([, log]) => {
+      if (!log?.date || log.date >= today || log.date < earliest) return false;
+      const response = log.response || {};
+      const hasFollowingMorning =
+        response.painNext !== undefined && response.painNext !== null && response.painNext !== "";
+      return !hasFollowingMorning && Object.keys(log.exercises || {}).length > 0;
+    })
+    .sort(([, a], [, b]) => b.date.localeCompare(a.date))
+    .map(([key, log]) => ({ key, date: log.date, dayKey: log.dayKey || dateToDayKey(log.date) }));
+}
+
+export function summarizeWeeklySleep(weeklySleepLogs = [], dailySleepLogs = []) {
+  const summaries = new Map(
+    weeklySleepLogs.map((entry) => [entry.week, { ...entry, nights: 7, source: "weekly" }]),
+  );
+  const dailyByWeek = new Map();
+  dailySleepLogs.forEach((entry) => {
+    if (!entry?.date || !Number.isFinite(Number(entry.hours))) return;
+    const week = toIsoDate(startOfWeek(new Date(`${entry.date}T12:00:00`)));
+    if (!dailyByWeek.has(week)) dailyByWeek.set(week, []);
+    dailyByWeek.get(week).push(Number(entry.hours));
+  });
+  dailyByWeek.forEach((hours, week) => {
+    summaries.set(week, {
+      week,
+      hours: hours.reduce((sum, value) => sum + value, 0) / hours.length,
+      nights: hours.length,
+      source: "daily",
+    });
+  });
+  return [...summaries.values()].sort((a, b) => a.week.localeCompare(b.week));
+}
+
 export function getAllExercises(weekPlan = WEEK_PLAN) {
   const unique = new Map();
   Object.values(weekPlan).forEach((day) => {
@@ -1107,6 +1197,7 @@ export function findPreviousExerciseLog(
   beforeDate,
   planId = "form-flow",
   workoutDrafts = {},
+  variantId,
 ) {
   const recordsByPlanAndDate = new Map();
   [...Object.values(workoutLogs || {}), ...Object.values(workoutDrafts || {})].forEach((log) => {
@@ -1116,10 +1207,15 @@ export function findPreviousExerciseLog(
 
   return [...recordsByPlanAndDate.values()]
     .filter(
-      (log) =>
-        (log.planId || "form-flow") === planId &&
-        log.date < beforeDate &&
-        log.exercises?.[exerciseId]?.sets?.length,
+      (log) => {
+        const exercise = log.exercises?.[exerciseId];
+        return (
+          (log.planId || "form-flow") === planId &&
+          log.date < beforeDate &&
+          exercise?.sets?.length &&
+          (!variantId || (exercise.variantId || exerciseId) === variantId)
+        );
+      },
     )
     .sort((a, b) => b.date.localeCompare(a.date))
     .map((log) => ({ date: log.date, ...log.exercises[exerciseId] }))[0] || null;

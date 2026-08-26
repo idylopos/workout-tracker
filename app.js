@@ -1,5 +1,6 @@
 import {
   APP_VERSION,
+  EXERCISE_ALTERNATIVES,
   EXERCISE_GUIDANCE,
   EXTRA_ACTIVITY_MEASUREMENTS,
   EXTRA_ACTIVITY_TYPES,
@@ -20,6 +21,7 @@ import {
   evaluateLongRunProgress,
   findPreviousExerciseLog,
   findPreviousSession,
+  findOutstandingRecoveryLogs,
   formatDuration,
   getAllExercises,
   normalizeResponseRating,
@@ -30,6 +32,7 @@ import {
   startOfWeek,
   summarizeCardioRange,
   summarizeExercise,
+  summarizeWeeklySleep,
   toIsoDate,
   validateBackup,
 } from "./lib.js";
@@ -107,6 +110,10 @@ let longRunPreviewStage = null;
 let longRunViewedPhase = null;
 let unlockExpiresAt = null;
 let unlockExpiryTimer = null;
+let dailyCheckInAutoShown = false;
+let dailyCheckInQueue = [];
+let dailyCheckInIndex = 0;
+let dailyCheckInAnswers = { sleep: null, recoveries: [] };
 
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
@@ -605,9 +612,316 @@ function qualifiedTenKmRuns() {
 }
 
 function latestSleepLog() {
-  return [...state.sleepLogs]
+  return summarizeWeeklySleep(state.sleepLogs, state.dailySleepLogs)
     .filter((entry) => entry?.week && entry.week <= selectedDate && Number.isFinite(Number(entry.hours)))
     .sort((a, b) => b.week.localeCompare(a.week))[0] || null;
+}
+
+function dailyCheckInRecord(date = toIsoDate()) {
+  const existing = state.dailyCheckIns[date];
+  if (existing && typeof existing === "object") return existing;
+  state.dailyCheckIns[date] = { status: "open", recoveryUnknown: [] };
+  return state.dailyCheckIns[date];
+}
+
+function dueDailyCheckInItems(date = toIsoDate()) {
+  const record = state.dailyCheckIns[date] || {};
+  const items = [];
+  const sleepLogged = state.dailySleepLogs.some((entry) => entry.date === date);
+  if (!sleepLogged && !record.sleepUnknown) items.push({ type: "sleep", date });
+  const recoveryUnknown = new Set(record.recoveryUnknown || []);
+  findOutstandingRecoveryLogs(state.workoutLogs, date).forEach((workout) => {
+    if (!recoveryUnknown.has(workout.key)) items.push({ type: "recovery", ...workout });
+  });
+  return items;
+}
+
+function updateDailyCheckInReminder() {
+  const reminder = $("#daily-checkin-reminder");
+  const date = toIsoDate();
+  const record = state.dailyCheckIns[date] || {};
+  const items = dueDailyCheckInItems(date);
+  const hidden = !items.length || record.status === "skipped";
+  reminder.classList.toggle("is-hidden", hidden);
+  if (!hidden) {
+    $("#daily-checkin-reminder-title").textContent = `${items.length} check-in${items.length === 1 ? "" : "s"} due`;
+  }
+}
+
+function setDailyCheckInBusy(busy, message = "") {
+  $("#daily-checkin-save").disabled = busy;
+  $("#daily-checkin-unknown").disabled = busy;
+  $("#daily-checkin-later").disabled = busy;
+  $("#daily-checkin-skip").disabled = busy;
+  const status = $("#daily-checkin-status");
+  status.textContent = message;
+  status.dataset.tone = "";
+}
+
+function closeDailyCheckIn() {
+  const dialog = $("#daily-checkin-dialog");
+  if (dialog.open) dialog.close();
+  updateDailyCheckInReminder();
+}
+
+function dailyCheckInSummary() {
+  const parts = [];
+  if (dailyCheckInAnswers.sleep !== null) {
+    parts.push(`${numberFormatter.format(dailyCheckInAnswers.sleep)} hours sleep`);
+  }
+  if (dailyCheckInAnswers.recoveries.length) {
+    const latest = dailyCheckInAnswers.recoveries.at(-1);
+    parts.push(`joints ${latest.label.toLowerCase()}`);
+  }
+  const hasRecovery = dailyCheckInAnswers.recoveries.length > 0;
+  const stable = hasRecovery && dailyCheckInAnswers.recoveries.every((answer) => answer.value <= 1);
+  const hasSleep = dailyCheckInAnswers.sleep !== null;
+  const sleepOkay = dailyCheckInAnswers.sleep === null || dailyCheckInAnswers.sleep >= OPTIONAL_RECOVERY_RULE.sleepHours;
+  let guidance = "No recovery recommendation was changed. You can add the missing answers later.";
+  if (stable && sleepOkay && hasSleep) {
+    guidance = "Today's workout can stay as planned. You still make the final call.";
+  } else if (stable && !hasSleep) {
+    guidance = "Your joints are at baseline. Use your sleep and usual energy to make the final call.";
+  } else if (!hasRecovery && hasSleep && sleepOkay) {
+    guidance = "Sleep meets the first recovery gate. Check your joints, legs, and usual energy before optional work.";
+  } else if ((hasSleep && !sleepOkay) || (hasRecovery && !stable)) {
+    guidance = "Consider keeping optional work off and adjusting today's session to how you feel.";
+  }
+  return {
+    headline: parts.length ? parts.join(" · ") : "Check-in complete",
+    guidance,
+  };
+}
+
+function renderDailyCheckInStep() {
+  const question = $("#daily-checkin-question");
+  const save = $("#daily-checkin-save");
+  const unknown = $("#daily-checkin-unknown");
+  const later = $("#daily-checkin-later");
+  const skip = $("#daily-checkin-skip");
+  const progress = $("#daily-checkin-progress-bar");
+  $("#daily-checkin-status").textContent = "";
+
+  if (dailyCheckInIndex >= dailyCheckInQueue.length) {
+    const summary = dailyCheckInSummary();
+    $("#daily-checkin-title").textContent = "You're checked in.";
+    $("#daily-checkin-copy").textContent = "Your answers were saved to your encrypted records.";
+    question.innerHTML = `
+      <div class="daily-checkin-summary">
+        <h3>${escapeHtml(summary.headline)}</h3>
+        <p>${escapeHtml(summary.guidance)}</p>
+      </div>
+    `;
+    progress.style.width = "100%";
+    unknown.classList.add("is-hidden");
+    later.classList.add("is-hidden");
+    skip.classList.add("is-hidden");
+    save.textContent = "Done";
+    save.dataset.action = "done";
+    return;
+  }
+
+  const item = dailyCheckInQueue[dailyCheckInIndex];
+  $("#daily-checkin-title").textContent = dailyCheckInIndex ? "One more thing." : "Good morning.";
+  $("#daily-checkin-copy").textContent = `${dailyCheckInQueue.length} quick check-in${dailyCheckInQueue.length === 1 ? "" : "s"} · about 10 seconds`;
+  progress.style.width = `${(dailyCheckInIndex / dailyCheckInQueue.length) * 100}%`;
+  unknown.classList.remove("is-hidden");
+  later.classList.remove("is-hidden");
+  skip.classList.remove("is-hidden");
+  save.textContent = "Save & continue";
+  save.dataset.action = "save";
+
+  if (item.type === "sleep") {
+    question.innerHTML = `
+      <h3>How long did you sleep last night?</h3>
+      <p>A best estimate is enough. This will update your current weekly average.</p>
+      <div class="sleep-stepper">
+        <button type="button" data-sleep-adjust="-0.5" aria-label="Subtract 30 minutes">−</button>
+        <label>
+          <span class="sr-only">Hours slept</span>
+          <input id="daily-sleep-hours" type="number" min="0" max="24" step="0.1" inputmode="decimal" placeholder="7.5" />
+          <span aria-hidden="true">hr</span>
+        </label>
+        <button type="button" data-sleep-adjust="0.5" aria-label="Add 30 minutes">+</button>
+      </div>
+    `;
+    $$('[data-sleep-adjust]', question).forEach((button) => {
+      button.addEventListener("click", () => {
+        const input = $("#daily-sleep-hours");
+        const current = input.value === "" ? 7.5 : Number(input.value);
+        input.value = String(Math.max(0, Math.min(24, current + Number(button.dataset.sleepAdjust))));
+        input.focus();
+      });
+    });
+    requestAnimationFrame(() => $("#daily-sleep-hours")?.focus());
+    return;
+  }
+
+  question.innerHTML = `
+    <h3>How do your joints feel after ${escapeHtml(formatDate(item.date, { weekday: "long" }))}'s workout?</h3>
+    <p>Your answer will be added to that workout's Following morning review.</p>
+    <div class="checkin-rating-grid" role="radiogroup" aria-label="Following-morning joint response">
+      ${RESPONSE_SCALE.map(
+        (rating) => `
+          <label>
+            <input type="radio" name="daily-recovery-rating" value="${rating.value}" />
+            <span class="checkin-rating-choice">
+              <span aria-hidden="true">${rating.face}</span>
+              <strong>${escapeHtml(rating.label)}</strong>
+            </span>
+          </label>
+        `,
+      ).join("")}
+    </div>
+  `;
+  requestAnimationFrame(() => $('input[name="daily-recovery-rating"]', question)?.focus());
+}
+
+function openDailyCheckIn({ automatic = false } = {}) {
+  const date = toIsoDate();
+  const record = state.dailyCheckIns[date] || {};
+  if (automatic && ["deferred", "skipped", "completed"].includes(record.status)) return;
+  dailyCheckInQueue = dueDailyCheckInItems(date);
+  if (!dailyCheckInQueue.length) {
+    updateDailyCheckInReminder();
+    return;
+  }
+  dailyCheckInIndex = 0;
+  dailyCheckInAnswers = { sleep: null, recoveries: [] };
+  const dialog = $("#daily-checkin-dialog");
+  if (!dialog.open) dialog.show();
+  renderDailyCheckInStep();
+}
+
+async function deferDailyCheckIn() {
+  const date = toIsoDate();
+  const previous = state.dailyCheckIns[date] ? structuredClone(state.dailyCheckIns[date]) : null;
+  const record = dailyCheckInRecord();
+  record.status = "deferred";
+  setDailyCheckInBusy(true, "Saving for later…");
+  if (!(await persistState())) {
+    if (previous) state.dailyCheckIns[date] = previous;
+    else delete state.dailyCheckIns[date];
+    setDailyCheckInBusy(false);
+    const status = $("#daily-checkin-status");
+    status.textContent = "Couldn't save yet. Keep this open and try again.";
+    status.dataset.tone = "error";
+    return;
+  }
+  setDailyCheckInBusy(false);
+  closeDailyCheckIn();
+  showToast("Check-in saved for later.");
+}
+
+async function skipDailyCheckIn() {
+  const date = toIsoDate();
+  const previous = state.dailyCheckIns[date] ? structuredClone(state.dailyCheckIns[date]) : null;
+  const record = dailyCheckInRecord();
+  record.status = "skipped";
+  setDailyCheckInBusy(true, "Saving your choice…");
+  if (!(await persistState())) {
+    if (previous) state.dailyCheckIns[date] = previous;
+    else delete state.dailyCheckIns[date];
+    setDailyCheckInBusy(false);
+    const status = $("#daily-checkin-status");
+    status.textContent = "Couldn't save yet. Keep this open and try again.";
+    status.dataset.tone = "error";
+    return;
+  }
+  setDailyCheckInBusy(false);
+  closeDailyCheckIn();
+  showToast("Daily check-in skipped for today.");
+}
+
+function dismissDailyCheckIn() {
+  if (dailyCheckInIndex >= dailyCheckInQueue.length) closeDailyCheckIn();
+  else void deferDailyCheckIn();
+}
+
+async function saveDailyCheckInAnswer({ unknown = false } = {}) {
+  if (dailyCheckInIndex >= dailyCheckInQueue.length) {
+    closeDailyCheckIn();
+    return;
+  }
+  const item = dailyCheckInQueue[dailyCheckInIndex];
+  const record = dailyCheckInRecord();
+  const before = {
+    dailySleepLogs: structuredClone(state.dailySleepLogs),
+    dailyCheckIns: structuredClone(state.dailyCheckIns),
+    workout: item.type === "recovery" ? structuredClone(state.workoutLogs[item.key]) : null,
+  };
+  let savedSleep = null;
+  let savedRecovery = null;
+  setDailyCheckInBusy(true, "Saving encrypted check-in…");
+
+  if (unknown) {
+    if (item.type === "sleep") record.sleepUnknown = true;
+    else record.recoveryUnknown = [...new Set([...(record.recoveryUnknown || []), item.key])];
+  } else if (item.type === "sleep") {
+    const hours = Number($("#daily-sleep-hours")?.value);
+    if (!Number.isFinite(hours) || hours < 0 || hours > 24 || $("#daily-sleep-hours").value === "") {
+      setDailyCheckInBusy(false);
+      const status = $("#daily-checkin-status");
+      status.textContent = "Enter hours between 0 and 24, or choose Not sure.";
+      status.dataset.tone = "error";
+      return;
+    }
+    upsertByDate(state.dailySleepLogs, { date: item.date, hours });
+    savedSleep = hours;
+  } else {
+    const selected = $('input[name="daily-recovery-rating"]:checked');
+    if (!selected) {
+      setDailyCheckInBusy(false);
+      const status = $("#daily-checkin-status");
+      status.textContent = "Choose the closest response, or select Not sure.";
+      status.dataset.tone = "error";
+      return;
+    }
+    const rating = Number(selected.value);
+    const workout = state.workoutLogs[item.key];
+    if (!workout) {
+      setDailyCheckInBusy(false);
+      const status = $("#daily-checkin-status");
+      status.textContent = "That workout is no longer available. Close and reopen the check-in.";
+      status.dataset.tone = "error";
+      return;
+    }
+    state.workoutLogs[item.key] = {
+      ...workout,
+      response: { ...(workout.response || {}), scaleVersion: 2, painNext: rating },
+      updatedAt: new Date().toISOString(),
+    };
+    savedRecovery = RESPONSE_SCALE.find((entry) => entry.value === rating);
+  }
+
+  const lastItem = dailyCheckInIndex + 1 >= dailyCheckInQueue.length;
+  record.status = lastItem ? "completed" : "open";
+  const saved = await persistState();
+  if (!saved) {
+    state.dailySleepLogs = before.dailySleepLogs;
+    state.dailyCheckIns = before.dailyCheckIns;
+    if (item.type === "recovery" && before.workout) state.workoutLogs[item.key] = before.workout;
+    setDailyCheckInBusy(false);
+    const status = $("#daily-checkin-status");
+    status.textContent = "Couldn't save yet. Keep this open and try again.";
+    status.dataset.tone = "error";
+    return;
+  }
+  if (savedSleep !== null) dailyCheckInAnswers.sleep = savedSleep;
+  if (savedRecovery) dailyCheckInAnswers.recoveries.push(savedRecovery);
+  dailyCheckInIndex += 1;
+  setDailyCheckInBusy(false);
+  renderDailyCheckInStep();
+  updateDailyCheckInReminder();
+  if (activeView === "progress") renderSleep();
+  renderTrainingRules(activePlan.days[dateToDayKey(selectedDate)]);
+}
+
+function maybeOpenDailyCheckIn() {
+  updateDailyCheckInReminder();
+  if (dailyCheckInAutoShown) return;
+  dailyCheckInAutoShown = true;
+  requestAnimationFrame(() => openDailyCheckIn({ automatic: true }));
 }
 
 function renderTrainingRules(day) {
@@ -753,6 +1067,7 @@ function renderToday() {
   renderExtraActivities(day, log);
   loadResponseFields(log);
   updateSessionProgress();
+  updateDailyCheckInReminder();
 
   const saved = state.workoutLogs[workoutLogKey(selectedDate)];
   const savedDraft = state.workoutDrafts[workoutLogKey(selectedDate)];
@@ -1155,6 +1470,120 @@ function setupExerciseGuidance(card, exercise) {
   }
 }
 
+function exerciseVariants(exercise) {
+  const alternatives =
+    activePlan.id === BUILT_IN_PLAN.id ? EXERCISE_ALTERNATIVES[exercise.id] || [] : [];
+  return [
+    {
+      id: exercise.id,
+      name: exercise.name,
+      prescription: activePrescription(exercise),
+      sets: exercise.sets,
+      measurement: exercise.measurement,
+      original: true,
+    },
+    ...alternatives,
+  ];
+}
+
+function applyExerciseVariant(card, exercise, variant, { resetSets = false } = {}) {
+  card.dataset.variantId = variant.id;
+  card.dataset.variantName = variant.name;
+  card.dataset.defaultSets = variant.sets;
+  $(".exercise-name", card).textContent = variant.name;
+  $(".exercise-prescription", card).textContent = variant.prescription;
+  card.classList.toggle("has-selected-alternative", !variant.original);
+  const selectedTag = $(".selected-alternative-tag", card);
+  selectedTag?.classList.toggle("is-hidden", variant.original);
+
+  $$(".alternative-choice", card).forEach((button) => {
+    const selected = button.dataset.variantId === variant.id;
+    button.classList.toggle("is-selected", selected);
+    button.setAttribute("aria-pressed", String(selected));
+  });
+
+  if (resetSets) {
+    const select = $(".measurement-select", card);
+    select.value = variant.measurement;
+    renderSetRows(card, variant.measurement, Array.from({ length: variant.sets }, () => ({})));
+  }
+}
+
+function setupExerciseAlternatives(card, exercise, savedExercise) {
+  const variants = exerciseVariants(exercise);
+  if (variants.length === 1) return null;
+
+  const picker = $(".alternative-picker", card);
+  const toggle = $(".alternatives-button", card);
+  const choices = $(".alternative-choices", card);
+  toggle.classList.remove("is-hidden");
+  choices.replaceChildren();
+
+  variants.forEach((variant) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "alternative-choice";
+    button.dataset.variantId = variant.id;
+    button.setAttribute("aria-pressed", "false");
+    button.innerHTML = `
+      <span>${escapeHtml(variant.original ? "PLANNED EXERCISE" : "ALTERNATIVE")}</span>
+      <strong>${escapeHtml(variant.name)}</strong>
+      <small>${escapeHtml(variant.prescription)}</small>
+    `;
+    button.addEventListener("click", () => {
+      if (card.dataset.variantId === variant.id) {
+        picker.classList.add("is-hidden");
+        toggle.setAttribute("aria-expanded", "false");
+        return;
+      }
+      const hasEnteredSets = collectSetRows(card).some(hasSetContent);
+      if (
+        hasEnteredSets &&
+        !window.confirm(`Changing to ${variant.name} will clear the sets entered on this workout. Continue?`)
+      ) {
+        return;
+      }
+      applyExerciseVariant(card, exercise, variant, { resetSets: true });
+      updatePreviousExerciseState(card, exercise);
+      picker.classList.add("is-hidden");
+      toggle.setAttribute("aria-expanded", "false");
+      markWorkoutDirty();
+      updateSessionProgress();
+      showToast(`${variant.name} selected for this workout.`);
+    });
+    choices.append(button);
+  });
+
+  toggle.addEventListener("click", () => {
+    const opening = picker.classList.contains("is-hidden");
+    picker.classList.toggle("is-hidden", !opening);
+    toggle.setAttribute("aria-expanded", String(opening));
+  });
+
+  return variants.find((variant) => variant.id === savedExercise?.variantId) || variants[0];
+}
+
+function updatePreviousExerciseState(card, exercise) {
+  const previous = findPreviousExerciseLog(
+    state.workoutLogs,
+    exercise.id,
+    selectedDate,
+    activePlan.id,
+    state.workoutDrafts,
+    card.dataset.variantId,
+  );
+  const previousLine = $(".previous-line", card);
+  const loadPrevious = $(".load-previous", card);
+  if (previous) {
+    previousLine.textContent = `Last: ${formatDate(previous.date)} · ${summarizeSetPreview(previous.measurement, previous.sets)}`;
+    loadPrevious.disabled = false;
+  } else {
+    previousLine.textContent = "No earlier log for this exercise variation.";
+    loadPrevious.disabled = true;
+  }
+  return previous;
+}
+
 function createExerciseCard(exercise, index, savedExercise) {
   const card = $("#exercise-template").content.firstElementChild.cloneNode(true);
   const pullupStep =
@@ -1197,10 +1626,15 @@ function createExerciseCard(exercise, index, savedExercise) {
   `;
   setupExerciseGuidance(card, exercise);
 
+  const selectedVariant = setupExerciseAlternatives(card, exercise, savedExercise);
+  if (selectedVariant) applyExerciseVariant(card, exercise, selectedVariant);
+
   const measurement =
     savedExercise?.measurement ||
     pullupStep?.measurement ||
-    state.exerciseConfigs[exerciseConfigKey(exercise.id)] ||
+    (selectedVariant && !selectedVariant.original
+      ? selectedVariant.measurement
+      : state.exerciseConfigs[exerciseConfigKey(exercise.id)]) ||
     exercise.measurement;
   const select = $(".measurement-select", card);
   Object.entries(MEASUREMENT_TYPES).forEach(([key, config]) => {
@@ -1211,20 +1645,7 @@ function createExerciseCard(exercise, index, savedExercise) {
     select.append(option);
   });
 
-  const previous = findPreviousExerciseLog(
-    state.workoutLogs,
-    exercise.id,
-    selectedDate,
-    activePlan.id,
-    state.workoutDrafts,
-  );
-  const previousLine = $(".previous-line", card);
-  if (previous) {
-    previousLine.textContent = `Last: ${formatDate(previous.date)} · ${summarizeSetPreview(previous.measurement, previous.sets)}`;
-  } else {
-    previousLine.textContent = "No earlier log for this exercise.";
-    $(".load-previous", card).disabled = true;
-  }
+  updatePreviousExerciseState(card, exercise);
 
   const sets = savedExercise?.sets?.length
     ? savedExercise.sets
@@ -1256,6 +1677,7 @@ function createExerciseCard(exercise, index, savedExercise) {
       selectedDate,
       activePlan.id,
       state.workoutDrafts,
+      card.dataset.variantId,
     );
     if (!earlier) return;
     const todaySetCount = $(".set-list", card).children.length || Number(card.dataset.defaultSets);
@@ -1455,10 +1877,14 @@ function collectWorkoutRecord() {
     const sets = collectSetRows(card);
     if (sets.some(hasSetContent)) {
       const exerciseLog = {
-        name: card.dataset.exerciseName,
+        name: card.dataset.variantName || card.dataset.exerciseName,
         measurement: $(".measurement-select", card).value,
         sets,
       };
+      if (card.dataset.variantId && card.dataset.variantId !== card.dataset.exerciseId) {
+        exerciseLog.variantId = card.dataset.variantId;
+        exerciseLog.variantName = card.dataset.variantName;
+      }
       if (card.dataset.progression === "pullup") {
         exerciseLog.progressionStep = Number($(".progression-select", card).value);
         exerciseLog.progressionPerformanceQualified =
@@ -1904,16 +2330,17 @@ function renderBody() {
 }
 
 function renderSleep() {
-  const entries = [...state.sleepLogs].sort((a, b) => a.week.localeCompare(b.week));
+  const entries = summarizeWeeklySleep(state.sleepLogs, state.dailySleepLogs);
   const list = $("#sleep-log-list");
   list.replaceChildren();
   entries.slice(-5).reverse().forEach((entry) => {
     const row = document.createElement("div");
     row.className = "log-row";
+    const total = Number(entry.hours) * Number(entry.nights || 7);
     row.innerHTML = `
       <span>Week of ${formatDate(entry.week)}</span>
       <strong>${numberFormatter.format(entry.hours)} hr / night</strong>
-      <strong>${numberFormatter.format(entry.hours * 7)} hr total</strong>
+      <strong>${entry.source === "daily" ? `${entry.nights} night${entry.nights === 1 ? "" : "s"} logged` : `${numberFormatter.format(total)} hr total`}</strong>
     `;
     list.append(row);
   });
@@ -2202,6 +2629,25 @@ function bindEvents() {
   els.warmupList.addEventListener("change", updateWarmupCount);
   els.loadSession.addEventListener("click", loadLastSession);
   $("#save-workout").addEventListener("click", saveWorkout);
+  $("#daily-checkin-reminder").addEventListener("click", () => openDailyCheckIn());
+  $("#daily-checkin-close").addEventListener("click", dismissDailyCheckIn);
+  $("#daily-checkin-later").addEventListener("click", () => void deferDailyCheckIn());
+  $("#daily-checkin-skip").addEventListener("click", () => void skipDailyCheckIn());
+  $("#daily-checkin-unknown").addEventListener("click", () => void saveDailyCheckInAnswer({ unknown: true }));
+  $("#daily-checkin-save").addEventListener("click", (event) => {
+    if (event.currentTarget.dataset.action === "done") closeDailyCheckIn();
+    else void saveDailyCheckInAnswer();
+  });
+  $("#daily-checkin-dialog").addEventListener("cancel", (event) => {
+    event.preventDefault();
+    dismissDailyCheckIn();
+  });
+  $("#daily-checkin-dialog").addEventListener("keydown", (event) => {
+    if (event.key === "Enter" && event.target.matches("#daily-sleep-hours")) {
+      event.preventDefault();
+      void saveDailyCheckInAnswer();
+    }
+  });
   $("#view-today").addEventListener("input", (event) => {
     if (event.target.matches(".set-row input, #session-notes")) markWorkoutDirty();
   });
@@ -2334,6 +2780,7 @@ async function init() {
   renderLongRunOptions();
   renderToday();
   updateTimerUi();
+  maybeOpenDailyCheckIn();
 }
 
 init();

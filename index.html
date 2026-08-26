@@ -59,6 +59,14 @@
             </div>
           </div>
 
+          <button class="daily-checkin-reminder is-hidden" id="daily-checkin-reminder" type="button">
+            <span>
+              <small>DAILY CHECK-IN</small>
+              <strong id="daily-checkin-reminder-title">2 check-ins due</strong>
+            </span>
+            <span>Open <span aria-hidden="true">→</span></span>
+          </button>
+
           <article class="session-hero" id="session-hero">
             <div class="session-hero-copy">
               <div class="session-meta">
@@ -319,6 +327,7 @@
                 <div>
                   <p class="eyebrow">RECOVERY</p>
                   <h2>Weekly sleep</h2>
+                  <p>Nightly check-ins calculate the current average automatically. Manual weekly averages still work.</p>
                 </div>
               </div>
               <form class="inline-form sleep-form" id="sleep-form">
@@ -505,6 +514,30 @@
       </form>
     </dialog>
 
+    <dialog class="daily-checkin-dialog" id="daily-checkin-dialog" aria-labelledby="daily-checkin-title">
+      <div class="daily-checkin-shell">
+        <header class="daily-checkin-head">
+          <div>
+            <p class="eyebrow">DAILY CHECK-IN</p>
+            <h2 id="daily-checkin-title">Good morning.</h2>
+            <p id="daily-checkin-copy">A quick check-in keeps your recovery guidance useful.</p>
+          </div>
+          <button class="dialog-close" id="daily-checkin-close" type="button" aria-label="Do this later">×</button>
+        </header>
+        <div class="daily-checkin-progress" aria-hidden="true">
+          <span id="daily-checkin-progress-bar"></span>
+        </div>
+        <div class="daily-checkin-question" id="daily-checkin-question"></div>
+        <p class="daily-checkin-status" id="daily-checkin-status" role="status" aria-live="polite"></p>
+        <div class="daily-checkin-actions">
+          <button class="text-button" id="daily-checkin-unknown" type="button">Not sure</button>
+          <button class="button button-secondary" id="daily-checkin-later" type="button">Later</button>
+          <button class="button button-primary" id="daily-checkin-save" type="button">Save & continue</button>
+        </div>
+        <button class="daily-checkin-skip" id="daily-checkin-skip" type="button">Skip today</button>
+      </div>
+    </dialog>
+
     <template id="exercise-template">
       <article class="exercise-card">
         <div class="exercise-card-head">
@@ -524,8 +557,25 @@
               <span>Measure</span>
               <select class="measurement-select"></select>
             </label>
-            <button class="text-button load-previous" type="button">Use last</button>
+            <div class="exercise-toolbar-actions">
+              <button
+                class="text-button alternatives-button is-hidden"
+                type="button"
+                aria-expanded="false"
+              >Alternatives</button>
+              <button class="text-button load-previous" type="button">Use last</button>
+            </div>
           </div>
+          <section class="alternative-picker is-hidden" aria-label="Exercise alternatives">
+            <div class="alternative-picker-head">
+              <div>
+                <strong>Log an alternative</strong>
+                <small>Your saved entry keeps the original plan slot and records which variation you used.</small>
+              </div>
+              <span class="selected-alternative-tag is-hidden">ALTERNATIVE SELECTED</span>
+            </div>
+            <div class="alternative-choices"></div>
+          </section>
           <details class="form-guide is-hidden">
             <summary>
               <span>

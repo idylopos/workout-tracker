@@ -19,6 +19,15 @@ function measurementLabel(measurement) {
   return MEASUREMENT_TYPES[measurement]?.label || measurement;
 }
 
+function formatRest(seconds) {
+  const total = Math.max(0, Math.round(Number(seconds) || 0));
+  const minutes = Math.floor(total / 60);
+  const remainingSeconds = total % 60;
+  if (!minutes) return String(remainingSeconds) + " sec";
+  if (!remainingSeconds) return String(minutes) + " min";
+  return String(minutes) + " min " + String(remainingSeconds) + " sec";
+}
+
 function prescription(exercise) {
   if (exercise.id === "easy-run") {
     return "Block 1: 30 min easy at RPE 2–4 · Block 2: 30–40 min easy + 4 × 20-sec relaxed strides";
@@ -39,7 +48,7 @@ function guidanceFor(exercise) {
 function exerciseMarkdown(exercise, index) {
   const guidance = guidanceFor(exercise);
   const optional = exercise.optional ? " · optional" : "";
-  const rest = exercise.rest ? ` · rest ${Math.round(exercise.rest / 60)} min` : "";
+  const rest = exercise.rest ? " · rest " + formatRest(exercise.rest) : "";
   const lines = [
     `${index}. **${exercise.name}** — ${prescription(exercise)}${optional}${rest}`,
     `   - Log as: ${measurementLabel(exercise.measurement)}.`,

@@ -116,13 +116,13 @@ work after each completed quality session; Saturday stays at 8–10 km easy. Beg
 - Box-squat ramp · light × 8, 50% × 5, 70% × 3, optional 80–85% × 1
 
 #### Exercises and activities
-1. **Squat jump** — 2 × 3 · add only after 2 symptom-stable weeks · rest 2 min
+1. **Squat jump** — 2 × 3 · add only after 2 symptom-stable weeks · rest 1 min 30 sec
    - Log as: Reps only.
    - **Setup:** Stand about hip-width apart with a stable foot tripod.
    - **Do:** Dip only slightly, jump vertically, and land softly in the same stance. Reset before every rep.
    - **Watch:** Keep the landing quiet and knees tracking over the feet. Stop if knee symptoms rise.
 
-2. **Box squat** — 3 × 5–8 · rest 3 min
+2. **Box squat** — 3 × 5–8 · rest 2 min 30 sec
    - Log as: Weight × reps.
    - **Setup:** Set the box at a depth you can control. Brace, keep the whole foot planted, and sit back toward it.
    - **Do:** Touch down under control without relaxing, then drive the floor away to stand.
@@ -141,13 +141,13 @@ work after each completed quality session; Saturday stays at 8–10 km easy. Beg
    - **Watch:** Start with a short range. Stop for hamstring cramping, sharp pain, or loss of hip position.
    - **Alternative:** No ankle anchor or band: use bridge hamstring walkouts for 2 × 6–10. If available, use slider or stability-ball leg curls for 2 × 8–12, or a seated/lying leg-curl machine for 2 × 8–12. Move slowly; these preserve knee-flexion hamstring work but are not identical to Nordic eccentric exposure.
 
-5. **Machine or cable hip abduction** — 2 × 12–20 · rest 1 min
+5. **Machine or cable hip abduction** — 2 × 12–20 · rest 1 min 15 sec
    - Log as: Weight × reps.
    - **Setup:** Set the machine or cable so the pelvis stays level and the working leg begins under control.
    - **Do:** Move the thigh outward without leaning, pause briefly, and return slowly.
    - **Watch:** Use a range that comes from the hip rather than twisting the pelvis or turning the toes far outward.
 
-6. **Standing calf raise** — 2 × 8–15 · rest 1 min
+6. **Standing calf raise** — 2 × 8–15 · rest 1 min 15 sec
    - Log as: Weight × reps.
    - **Setup:** Stand tall with the ball of the foot secure and use light hand support.
    - **Do:** Rise onto the toes, pause at the top, then lower under control through a comfortable stretch.
@@ -191,26 +191,26 @@ work after each completed quality session; Saturday stays at 8–10 km easy. Beg
    - **Do:** Press up and forward along the bar path while allowing the shoulder blade to rotate, then lower slowly.
    - **Watch:** Do not lean back, shrug, or force a pinching range. Keep about two reps in reserve.
 
-2. **Neutral-grip dumbbell bench press** — 3 × 6–10 · rest 3 min
+2. **Neutral-grip dumbbell bench press** — 3 × 6–10 · rest 2 min 30 sec
    - Log as: Weight × reps.
    - **Setup:** Lie with feet planted and hold the dumbbells with palms facing each other.
    - **Do:** Lower with elbows roughly 30–45° from the torso, then press without bouncing.
    - **Watch:** Stop the descent before shoulder discomfort and keep the shoulder blades comfortably supported.
 
-3. **Cable chest fly** — 2 × 10–15 · comfortable shoulder range · rest 2 min
+3. **Cable chest fly** — 2 × 10–15 · comfortable shoulder range · rest 1 min 30 sec
    - Log as: Weight × reps.
    - **Setup:** Set two cable handles around mid-chest height, use a split stance, and begin with the elbows softly bent and the hands only slightly behind the torso.
    - **Do:** Bring the upper arms inward in a wide hugging arc, pause when the hands meet, then return slowly through a comfortable chest stretch.
    - **Watch:** Keep the shoulders down and ribs stacked. Do not chase a deep stretch, let the elbows drift far behind the body, or continue through front-of-shoulder discomfort.
    - **Alternative:** Use a neutral-grip machine chest press for 2 × 10–15 if the fly path is not completely comfortable.
 
-4. **Cable lateral raise** — 3 × 12–20 · stop before shrugging · rest 1 min
+4. **Cable lateral raise** — 3 × 12–20 · stop before shrugging · rest 1 min 15 sec
    - Log as: Weight × reps.
    - **Setup:** Stand tall with the cable low and the arm slightly in front of the body.
    - **Do:** Lead with the elbow and raise only through a comfortable range, then lower for about two seconds.
    - **Watch:** Use light weight; do not shrug, swing, or push through shoulder discomfort.
 
-5. **Rope triceps press-down** — 2 × 10–15 · rest 1 min
+5. **Rope triceps press-down** — 2 × 10–15 · rest 1 min 15 sec
    - Log as: Weight × reps.
    - **Setup:** Stand tall with elbows close to the ribs and shoulders relaxed.
    - **Do:** Extend the elbows, separate the rope slightly at the bottom, and return without moving the upper arms.
@@ -222,7 +222,7 @@ work after each completed quality session; Saturday stays at 8–10 km easy. Beg
    - **Do:** Rotate the forearm outward while the upper arm stays still, then return slowly.
    - **Watch:** Use a small, painless range. Do not twist the torso or chase heavier loads.
 
-7. **Kneeling cable crunch** — 3 × 8–15 · controlled spinal flexion · rest 2 min
+7. **Kneeling cable crunch** — 3 × 8–15 · controlled spinal flexion · rest 1 min 30 sec
    - Log as: Weight × reps.
    - **Setup:** Kneel facing the cable with the rope beside the head and hips mostly still.
    - **Do:** Exhale and curl the ribs toward the pelvis, then return under control.
@@ -254,7 +254,7 @@ work after each completed quality session; Saturday stays at 8–10 km easy. Beg
 - Moderately assisted pull-up · 1 × 2–3
 
 #### Exercises and activities
-1. **Pull-up progression** — Choose your current performance step below · rest 3 min
+1. **Pull-up progression** — Choose your current performance step below · rest 2 min 30 sec
    - Log as: Assistance × reps.
    - **Setup:** Use a neutral grip, begin with controlled shoulder blades, and select the assistance shown in your current step.
    - **Do:** Pull the chest toward the handles without kicking, then lower to the step’s full controlled range.
@@ -266,13 +266,13 @@ work after each completed quality session; Saturday stays at 8–10 km easy. Beg
    - **Do:** Pull the elbows back toward the hips, pause, and lower until the shoulder blades move naturally forward.
    - **Watch:** Do not lift the chest off the pad, shrug, or jerk the weight.
 
-3. **Face pull** — 3 × 12–20 · controlled rear-delt focus · rest 1 min
+3. **Face pull** — 3 × 12–20 · controlled rear-delt focus · rest 1 min 15 sec
    - Log as: Weight × reps.
    - **Setup:** Set the rope around upper-chest to face height and step back into light tension.
    - **Do:** Pull toward the nose or forehead with elbows comfortably out, then return slowly.
    - **Watch:** Keep the ribs down and shoulders away from the ears; use a painless path.
 
-4. **Neutral-grip hammer curl** — 2 × 8–15 · rest 1 min
+4. **Neutral-grip hammer curl** — 2 × 8–15 · rest 1 min 15 sec
    - Log as: Weight × reps.
    - **Setup:** Stand tall with palms facing each other and elbows near the ribs.
    - **Do:** Curl without moving the upper arms, then lower under control.
@@ -336,7 +336,7 @@ work after each completed quality session; Saturday stays at 8–10 km easy. Beg
 - Trap-bar ramp · 40% × 6, 60% × 4, 75% × 2, optional 85% × 1
 
 #### Exercises and activities
-1. **Kettlebell swing** — 2–3 × 8–12 · rest 2 min
+1. **Kettlebell swing** — 2–3 × 8–12 · rest 1 min 30 sec
    - Log as: Weight × reps.
    - **Setup:** Place the bell slightly ahead, hinge to grip it, and hike it back between the thighs.
    - **Do:** Snap the hips to float the bell, then let it return into the next hinge.
@@ -348,25 +348,25 @@ work after each completed quality session; Saturday stays at 8–10 km easy. Beg
    - **Do:** Push the floor away and stand tall, then hinge and bend the knees to return the bar under control.
    - **Watch:** Keep the load close and spine steady; do not jerk from the floor or lean back at lockout.
 
-3. **Barbell hip thrust** — 3 × 8–12 · rest 3 min
+3. **Barbell hip thrust** — 3 × 8–12 · rest 2 min 30 sec
    - Log as: Weight × reps.
    - **Setup:** Place the upper back on a bench, pad the bar, and set feet so the shins are near vertical at the top.
    - **Do:** Drive through the whole foot, finish by squeezing the glutes, and lower under control.
    - **Watch:** Do not overarch the lower back or throw the head backward.
 
-4. **Controlled step-down** — 2 × 6–10 / leg · 3-sec lowering · rest 2 min
+4. **Controlled step-down** — 2 × 6–10 / leg · 3-sec lowering · rest 1 min 30 sec
    - Log as: Weight × reps.
    - **Setup:** Stand on a low step with the working foot fully supported and use a rail if needed.
    - **Do:** Lower the free heel toward the floor for about three seconds, lightly touch, then rise.
    - **Watch:** Keep the pelvis level and knee tracking over the foot. Reduce step height if symptoms increase.
 
-5. **Machine or cable hip abduction** — 2 × 12–20 · rest 1 min
+5. **Machine or cable hip abduction** — 2 × 12–20 · rest 1 min 15 sec
    - Log as: Weight × reps.
    - **Setup:** Set the machine or cable so the pelvis stays level and the working leg begins under control.
    - **Do:** Move the thigh outward without leaning, pause briefly, and return slowly.
    - **Watch:** Use a range that comes from the hip rather than twisting the pelvis or turning the toes far outward.
 
-6. **Seated calf raise** — 2 × 10–15 · rest 1 min
+6. **Seated calf raise** — 2 × 10–15 · rest 1 min 15 sec
    - Log as: Weight × reps.
    - **Setup:** Sit with knees bent about 90° and the balls of the feet secure on the platform.
    - **Do:** Lift the heels, pause, and lower slowly through a comfortable range.
@@ -404,7 +404,7 @@ work after each completed quality session; Saturday stays at 8–10 km easy. Beg
 - Incline dumbbell press · 1 lighter set × 5
 
 #### Exercises and activities
-1. **Neutral-grip incline dumbbell press** — 3 × 8–12 · rest 3 min
+1. **Neutral-grip incline dumbbell press** — 3 × 8–12 · rest 2 min 30 sec
    - Log as: Weight × reps.
    - **Setup:** Use a low incline, plant the feet, and hold the dumbbells with palms facing each other.
    - **Do:** Lower with elbows in a comfortable 30–45° path, then press smoothly.
@@ -416,21 +416,21 @@ work after each completed quality session; Saturday stays at 8–10 km easy. Beg
    - **Do:** Press up and forward while allowing the shoulder blade to move, then lower slowly.
    - **Watch:** Do not twist, lean back, shrug, or force an uncomfortable endpoint.
 
-3. **Cable chest fly** — 2 × 10–15 · comfortable shoulder range · rest 2 min
+3. **Cable chest fly** — 2 × 10–15 · comfortable shoulder range · rest 1 min 30 sec
    - Log as: Weight × reps.
    - **Setup:** Set two cable handles around mid-chest height, use a split stance, and begin with the elbows softly bent and the hands only slightly behind the torso.
    - **Do:** Bring the upper arms inward in a wide hugging arc, pause when the hands meet, then return slowly through a comfortable chest stretch.
    - **Watch:** Keep the shoulders down and ribs stacked. Do not chase a deep stretch, let the elbows drift far behind the body, or continue through front-of-shoulder discomfort.
    - **Alternative:** Use a neutral-grip machine chest press for 2 × 10–15 if the fly path is not completely comfortable.
 
-4. **One-arm cable scaption raise (side delt)** — 3 × 12–20 · raise only through a fully comfortable range; otherwise use the guide’s substitute · rest 1 min
+4. **One-arm cable scaption raise (side delt)** — 3 × 12–20 · raise only through a fully comfortable range; otherwise use the guide’s substitute · rest 1 min 15 sec
    - Log as: Weight × reps.
    - **Setup:** This is simply a one-arm cable scaption raise: set a cable pulley at its lowest position with a very light load. Stand sideways with the working arm farther from the machine and hold the handle with a slight elbow bend.
    - **Do:** Set the arm 20–30° forward of directly sideways—like a wide V when viewed from above—with the thumb up or slightly forward. Raise slowly to the highest completely comfortable point (shoulder height is a ceiling, not a requirement), then lower for about two seconds. This trains the side deltoid to help build shoulder width.
    - **Watch:** First reduce the load or range and stop before discomfort. If the shoulder still feels uncomfortable, do not force the exercise.
    - **Alternative:** Use a supported machine lateral raise for 2–3 × 12–20 in a comfortable path. If that also feels uncomfortable, omit Friday’s raise and keep the landmine presses.
 
-5. **Cross-body cable triceps extension** — 2 × 10–15 · rest 1 min
+5. **Cross-body cable triceps extension** — 2 × 10–15 · rest 1 min 15 sec
    - Log as: Weight × reps.
    - **Setup:** Set the cable above shoulder height and hold it with the opposite hand across the body.
    - **Do:** Keep the upper arm quiet while straightening the elbow down and across, then return slowly.
@@ -448,7 +448,7 @@ work after each completed quality session; Saturday stays at 8–10 km easy. Beg
    - **Do:** Walk with short, controlled steps for the set distance, then switch sides.
    - **Watch:** Do not lean away from the weight or let the hip drop. Stop the set if grip fails before the trunk does, and note it in the log.
 
-8. **Reverse crunch** — 3 × 10–20 · curl the pelvis; do not swing · rest 1 min
+8. **Reverse crunch** — 3 × 10–20 · curl the pelvis; do not swing · rest 1 min 15 sec
    - Log as: Reps only.
    - **Setup:** Lie on your back with hips and knees bent and arms supported beside you.
    - **Do:** Exhale, gently roll the pelvis toward the ribs, and lift the tailbone slightly before lowering slowly.
@@ -498,31 +498,31 @@ work after each completed quality session; Saturday stays at 8–10 km easy. Beg
    - **Do:** Keep the effort at RPE 2–3 with generous rest as needed.
    - **Watch:** Avoid paddles, hard butterfly, or fatigued overhead work; stop any stroke that provokes shoulder discomfort.
 
-3. **Pull-up progression** — Repeat your current performance step · stop with the prescribed RIR · rest 3 min
+3. **Pull-up progression** — Repeat your current performance step · stop with the prescribed RIR · rest 2 min 30 sec
    - Log as: Assistance × reps.
    - **Setup:** Use a neutral grip, begin with controlled shoulder blades, and select the assistance shown in your current step.
    - **Do:** Pull the chest toward the handles without kicking, then lower to the step’s full controlled range.
    - **Watch:** Stop before grinding or shoulder pain. Advance only after the performance checks shown below.
 
-4. **One-arm cable row** — 2 × 10–15 / side · rest 2 min
+4. **One-arm cable row** — 2 × 10–15 / side · rest 1 min 30 sec
    - Log as: Weight × reps.
    - **Setup:** Stand or sit square to the cable with the arm reaching forward under control.
    - **Do:** Pull the elbow toward the hip without rotating the torso, then return slowly.
    - **Watch:** Keep the shoulder away from the ear and use a comfortable reach.
 
-5. **Light dumbbell pullover** — 2 × 10–15 · rest 2 min
+5. **Light dumbbell pullover** — 2 × 10–15 · rest 1 min 30 sec
    - Log as: Weight × reps.
    - **Setup:** Lie supported on a bench, hold one light dumbbell over the chest, and keep a small elbow bend.
    - **Do:** Lower only until the shoulders remain comfortable, then bring the weight back over the chest.
    - **Watch:** Keep the ribs down and do not chase a deep overhead stretch or painful clicking.
 
-6. **Optional face pull** — 2 × 12–20 · optional · rest 1 min
+6. **Optional face pull** — 2 × 12–20 · optional · rest 1 min 15 sec
    - Log as: Weight × reps.
    - **Setup:** Set the rope around upper-chest to face height and step back into light tension.
    - **Do:** Pull toward the nose or forehead with elbows comfortably out, then return slowly.
    - **Watch:** Keep the ribs down and shoulders away from the ears; use a painless path.
 
-7. **Optional cable curl** — 1–2 × 10–15 · optional · rest 1 min
+7. **Optional cable curl** — 1–2 × 10–15 · optional · rest 1 min 15 sec
    - Log as: Weight × reps.
    - **Setup:** Stand tall with elbows near the ribs and wrists neutral.
    - **Do:** Curl without moving the upper arms, then lower slowly.
