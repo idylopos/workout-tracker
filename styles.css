@@ -927,21 +927,21 @@ textarea {
 }
 
 .alternative-picker-head strong {
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .alternative-picker-head small {
   max-width: 470px;
-  margin-top: 2px;
+  margin-top: 4px;
   color: var(--ink-soft);
-  font-size: 10px;
-  line-height: 1.4;
+  font-size: 12px;
+  line-height: 1.5;
 }
 
 .selected-alternative-tag {
   flex: 0 0 auto;
   color: var(--blue);
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 900;
   letter-spacing: 0.08em;
 }
@@ -968,20 +968,21 @@ textarea {
 
 .alternative-choice span {
   color: var(--blue);
-  font-size: 8px;
+  font-size: 12px;
   font-weight: 900;
   letter-spacing: 0.09em;
 }
 
 .alternative-choice strong {
   margin-top: 3px;
-  font-size: 12px;
+  font-size: 14px;
 }
 
 .alternative-choice small {
-  margin-top: 2px;
+  margin-top: 4px;
   color: var(--ink-soft);
-  font-size: 10px;
+  font-size: 12px;
+  line-height: 1.4;
 }
 
 @media (max-width: 680px) {
