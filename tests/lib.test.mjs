@@ -43,7 +43,7 @@ test("collapses only untouched optional exercises on compact screens", () => {
   assert.equal(shouldCollapseExerciseByDefault(optional, null, false), false);
 });
 
-test("Use Last preserves today's set count and clears completion and effort", () => {
+test("Use Last fills today's sets from the final logged set and clears completion and effort", () => {
   const copied = preparePreviousSets(
     [
       { weight: 45, reps: 10, rir: 2, completed: true },
@@ -54,9 +54,27 @@ test("Use Last preserves today's set count and clears completion and effort", ()
   );
 
   assert.deepEqual(copied, [
-    { weight: 45, reps: 10, completed: false },
     { weight: 50, reps: 8, completed: false },
     { weight: 50, reps: 8, completed: false },
+    { weight: 50, reps: 8, completed: false },
+  ]);
+});
+
+test("Use Last ignores empty planned rows after the final logged set", () => {
+  const copied = preparePreviousSets(
+    [
+      { weight: 27, reps: 12, completed: true },
+      { weight: 29, reps: 12, completed: true },
+      { weight: "", reps: "", completed: false },
+    ],
+    3,
+    "weight_reps",
+  );
+
+  assert.deepEqual(copied, [
+    { weight: 29, reps: 12, completed: false },
+    { weight: 29, reps: 12, completed: false },
+    { weight: 29, reps: 12, completed: false },
   ]);
 });
 

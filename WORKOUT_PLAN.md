@@ -8,9 +8,9 @@ place to log sets, cardio, body measurements, sleep, pain response, and encrypte
 The tracker can remember a non-exportable browser unlock key for a fixed two-hour window. It never stores the
 passphrase, and **Lock app** clears the remembered key immediately.
 
-During logging, **Use Last** keeps today's planned set count, copies reusable values from the prior workout, and clears
-all completion, effort, and pull-up qualification fields. When today has more sets than the prior workout, the last
-prior set provides starting values for the additional rows. Importing values never marks today's exercise complete.
+During logging, **Use Last** keeps today's planned set count and fills every set with reusable values from the final
+logged set of the prior workout. It clears all completion, effort, and pull-up qualification fields.
+Importing values never marks today's exercise complete.
 The lookup searches every earlier completed workout and encrypted draft, so skipped weeks do not hide the latest entry.
 
 ## Mobility placement and limits

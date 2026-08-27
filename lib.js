@@ -97,8 +97,11 @@ export function preparePreviousSets(previousSets, targetCount, measurement) {
     .map((field) => field.key)
     .filter((key) => key !== "rir" && key !== "rpe");
 
-  return Array.from({ length: count }, (_, index) => {
-    const source = sources.length ? sources[Math.min(index, sources.length - 1)] : {};
+  const source = sources.findLast((set) =>
+    reusableFields.some((key) => set?.[key] !== undefined && set[key] !== null && set[key] !== ""),
+  ) || {};
+
+  return Array.from({ length: count }, () => {
     const nextSet = { completed: false };
     reusableFields.forEach((key) => {
       if (source[key] !== undefined && source[key] !== null && source[key] !== "") {

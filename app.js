@@ -1687,7 +1687,7 @@ function createExerciseCard(exercise, index, savedExercise) {
     renderSetRows(card, earlier.measurement, preparePreviousSets(earlier.sets, todaySetCount, earlier.measurement));
     clearImportedCompletion(card);
     markWorkoutDirty();
-    showToast(`${exercise.name}: values loaded; today remains not done.`);
+    showToast(`${exercise.name}: last set loaded into all ${todaySetCount} sets; today remains not done.`);
     updateSessionProgress();
   });
   $(".copy-first-set", card).addEventListener("click", () => copyFirstSetIntoEmpty(card, select.value));
@@ -1843,7 +1843,14 @@ function summarizeSetPreview(measurement, sets = []) {
   if (measurement === "completion") {
     return `${sets.filter((set) => set.completed).length} / ${sets.length} rounds`;
   }
-  const set = sets[0];
+  const reusableFields = MEASUREMENT_TYPES[measurement].fields
+    .map((field) => field.key)
+    .filter((key) => key !== "rir" && key !== "rpe");
+  const set = sets.findLast((candidate) =>
+    reusableFields.some(
+      (key) => candidate?.[key] !== undefined && candidate[key] !== null && candidate[key] !== "",
+    ),
+  ) || {};
   if (measurement === "weight_reps") return `${set.weight || "—"} kg × ${set.reps || "—"}`;
   if (measurement === "weight_distance") return `${set.weight || "—"} kg × ${set.distance || "—"} m`;
   if (measurement === "assisted_reps") return `${set.assistance || "—"} kg assist × ${set.reps || "—"}`;

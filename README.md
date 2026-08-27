@@ -41,9 +41,9 @@ never stored. **Save workout** confirms the draft as a completed workout log.
 
 For repeated working sets, enter the first set and choose **Fill empty sets from set 1**. The app copies load and reps
 (or the equivalent primary measurements) into blank fields while leaving RIR/RPE and any values already entered alone.
-**Use Last** keeps the number of sets currently planned for today, copies reusable values from the previous workout,
-and leaves every completion box and RIR/RPE field clear. If today has more sets, the final previous set supplies the
-extra row’s starting values. It also clears pull-up performance/recovery qualification checks, so importing values
+**Use Last** keeps the number of sets currently planned for today and fills every set with the reusable values from the
+final logged set of the previous workout. It leaves every completion box and RIR/RPE field clear. It also clears
+pull-up performance/recovery qualification checks, so importing values
 cannot mark the current exercise complete. The lookup searches every earlier saved workout and encrypted draft, so
 skipped weeks do not hide the most recent entry.
 
