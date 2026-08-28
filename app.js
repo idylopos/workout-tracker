@@ -21,13 +21,14 @@ import {
   evaluateLongRunProgress,
   findPreviousExerciseLog,
   findPreviousSession,
-  findOutstandingRecoveryLogs,
   formatDuration,
+  getDailyCheckInItems,
   getAllExercises,
   normalizeResponseRating,
   normalizeState,
   preparePreviousSets,
   shouldCollapseExerciseByDefault,
+  shouldAutoOpenDailyCheckIn,
   shouldShowRestTimer,
   startOfWeek,
   summarizeCardioRange,
@@ -110,7 +111,7 @@ let longRunPreviewStage = null;
 let longRunViewedPhase = null;
 let unlockExpiresAt = null;
 let unlockExpiryTimer = null;
-let dailyCheckInAutoShown = false;
+let dailyCheckInAutoShownDate = "";
 let dailyCheckInQueue = [];
 let dailyCheckInIndex = 0;
 let dailyCheckInAnswers = { sleep: null, recoveries: [] };
@@ -500,6 +501,7 @@ function switchView(view) {
   window.scrollTo({ top: 0, behavior: "smooth" });
   if (view === "week") renderWeek();
   if (view === "progress") renderProgress();
+  if (view === "today") maybeOpenDailyCheckIn();
   syncTimerVisibility();
 }
 
@@ -625,15 +627,12 @@ function dailyCheckInRecord(date = toIsoDate()) {
 }
 
 function dueDailyCheckInItems(date = toIsoDate()) {
-  const record = state.dailyCheckIns[date] || {};
-  const items = [];
-  const sleepLogged = state.dailySleepLogs.some((entry) => entry.date === date);
-  if (!sleepLogged && !record.sleepUnknown) items.push({ type: "sleep", date });
-  const recoveryUnknown = new Set(record.recoveryUnknown || []);
-  findOutstandingRecoveryLogs(state.workoutLogs, date).forEach((workout) => {
-    if (!recoveryUnknown.has(workout.key)) items.push({ type: "recovery", ...workout });
-  });
-  return items;
+  return getDailyCheckInItems(
+    state.workoutLogs,
+    state.dailySleepLogs,
+    state.dailyCheckIns,
+    date,
+  );
 }
 
 function updateDailyCheckInReminder() {
@@ -674,11 +673,14 @@ function dailyCheckInSummary() {
     parts.push(`joints ${latest.label.toLowerCase()}`);
   }
   const hasRecovery = dailyCheckInAnswers.recoveries.length > 0;
+  const hasRedFlag = dailyCheckInAnswers.recoveries.some((answer) => answer.value === 4);
   const stable = hasRecovery && dailyCheckInAnswers.recoveries.every((answer) => answer.value <= 1);
   const hasSleep = dailyCheckInAnswers.sleep !== null;
   const sleepOkay = dailyCheckInAnswers.sleep === null || dailyCheckInAnswers.sleep >= OPTIONAL_RECOVERY_RULE.sleepHours;
   let guidance = "No recovery recommendation was changed. You can add the missing answers later.";
-  if (stable && sleepOkay && hasSleep) {
+  if (hasRedFlag) {
+    guidance = "Prioritize recovery and consider seeking an assessment, especially if symptoms persist or worsen.";
+  } else if (stable && sleepOkay && hasSleep) {
     guidance = "Today's workout can stay as planned. You still make the final call.";
   } else if (stable && !hasSleep) {
     guidance = "Your joints are at baseline. Use your sleep and usual energy to make the final call.";
@@ -918,9 +920,12 @@ async function saveDailyCheckInAnswer({ unknown = false } = {}) {
 }
 
 function maybeOpenDailyCheckIn() {
+  const date = toIsoDate();
+  const record = state.dailyCheckIns[date] || {};
+  const items = dueDailyCheckInItems(date);
   updateDailyCheckInReminder();
-  if (dailyCheckInAutoShown) return;
-  dailyCheckInAutoShown = true;
+  if (!shouldAutoOpenDailyCheckIn(dailyCheckInAutoShownDate, date, items, record.status)) return;
+  dailyCheckInAutoShownDate = date;
   requestAnimationFrame(() => openDailyCheckIn({ automatic: true }));
 }
 
@@ -1856,6 +1861,9 @@ function summarizeSetPreview(measurement, sets = []) {
   if (measurement === "assisted_reps") return `${set.assistance || "—"} kg assist × ${set.reps || "—"}`;
   if (measurement === "reps") return `${set.reps || "—"} reps`;
   if (measurement === "duration") return formatDuration(Number(set.minutes || 0) * 60 + Number(set.seconds || 0));
+  if (measurement === "duration_calories") {
+    return `${formatDuration(Number(set.minutes || 0) * 60 + Number(set.seconds || 0))} · ${set.calories || "—"} kcal`;
+  }
   if (measurement === "distance_time") return `${set.distance || "—"} km · ${set.minutes || 0} min`;
   return `${set.distance || "—"} km`;
 }
@@ -2654,6 +2662,9 @@ function bindEvents() {
       event.preventDefault();
       void saveDailyCheckInAnswer();
     }
+  });
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") maybeOpenDailyCheckIn();
   });
   $("#view-today").addEventListener("input", (event) => {
     if (event.target.matches(".set-row input, #session-notes")) markWorkoutDirty();

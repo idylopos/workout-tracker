@@ -2,7 +2,7 @@ export const APP_VERSION = 1;
 export const STORAGE_KEY = "formflow.training.v1";
 
 export const EXTRA_ACTIVITY_TYPES = ["walking", "cycling", "elliptical", "swimming", "running", "custom"];
-export const EXTRA_ACTIVITY_MEASUREMENTS = ["duration", "distance_time", "distance"];
+export const EXTRA_ACTIVITY_MEASUREMENTS = ["duration", "duration_calories", "distance_time", "distance"];
 
 export const STRENGTH_PROGRESSION = {
   effort: "Finish compound working sets with 2–3 RIR and isolation working sets with 1–3 RIR. Power, mobility, cardio, and pull-up work follow their own prescriptions.",
@@ -67,6 +67,16 @@ export const MEASUREMENT_TYPES = {
     fields: [
       { key: "minutes", label: "Minutes", unit: "min", min: 0, step: 1 },
       { key: "seconds", label: "Seconds", unit: "sec", min: 0, max: 59, step: 1 },
+      { key: "rpe", label: "RPE", unit: "", min: 0, max: 10, step: 1 },
+    ],
+  },
+  duration_calories: {
+    label: "Time + calories",
+    short: "Time + kcal",
+    fields: [
+      { key: "minutes", label: "Minutes", unit: "min", min: 0, step: 1 },
+      { key: "seconds", label: "Seconds", unit: "sec", min: 0, max: 59, step: 1 },
+      { key: "calories", label: "Calories", unit: "kcal", min: 0, step: 1 },
       { key: "rpe", label: "RPE", unit: "", min: 0, max: 10, step: 1 },
     ],
   },
@@ -1162,6 +1172,33 @@ export function findOutstandingRecoveryLogs(workoutLogs, today = toIsoDate(), lo
     .map(([key, log]) => ({ key, date: log.date, dayKey: log.dayKey || dateToDayKey(log.date) }));
 }
 
+export function getDailyCheckInItems(
+  workoutLogs,
+  dailySleepLogs,
+  dailyCheckIns,
+  date = toIsoDate(),
+  lookbackDays = 2,
+) {
+  const record = dailyCheckIns?.[date] || {};
+  const items = [];
+  const sleepLogged = (dailySleepLogs || []).some((entry) => entry?.date === date);
+  if (!sleepLogged && !record.sleepUnknown) items.push({ type: "sleep", date });
+  const recoveryUnknown = new Set(record.recoveryUnknown || []);
+  findOutstandingRecoveryLogs(workoutLogs, date, lookbackDays).forEach((workout) => {
+    if (!recoveryUnknown.has(workout.key)) items.push({ type: "recovery", ...workout });
+  });
+  return items;
+}
+
+export function shouldAutoOpenDailyCheckIn(lastShownDate, date, items, status = "open") {
+  return (
+    lastShownDate !== date &&
+    Array.isArray(items) &&
+    items.length > 0 &&
+    !["deferred", "skipped", "completed"].includes(status)
+  );
+}
+
 export function summarizeWeeklySleep(weeklySleepLogs = [], dailySleepLogs = []) {
   const summaries = new Map(
     weeklySleepLogs.map((entry) => [entry.week, { ...entry, nights: 7, source: "weekly" }]),
@@ -1237,27 +1274,31 @@ function numeric(value) {
 
 function cardioEntryMetrics(entry) {
   if (!entry || !EXTRA_ACTIVITY_MEASUREMENTS.includes(entry.measurement) || !Array.isArray(entry.sets)) {
-    return { seconds: 0, distance: 0, rpeTotal: 0, rpeCount: 0, hasActivity: false };
+    return { seconds: 0, distance: 0, calories: 0, rpeTotal: 0, rpeCount: 0, hasActivity: false };
   }
   return entry.sets.reduce(
     (summary, set) => {
       const seconds =
-        entry.measurement === "duration" || entry.measurement === "distance_time"
+        entry.measurement === "duration" ||
+        entry.measurement === "duration_calories" ||
+        entry.measurement === "distance_time"
           ? numeric(set.minutes) * 60 + numeric(set.seconds)
           : 0;
       const distance =
         entry.measurement === "distance" || entry.measurement === "distance_time" ? numeric(set.distance) : 0;
+      const calories = entry.measurement === "duration_calories" ? numeric(set.calories) : 0;
       const hasRpe = set.rpe !== "" && set.rpe !== null && set.rpe !== undefined && Number.isFinite(Number(set.rpe));
       summary.seconds += seconds;
       summary.distance += distance;
+      summary.calories += calories;
       if (hasRpe) {
         summary.rpeTotal += numeric(set.rpe);
         summary.rpeCount += 1;
       }
-      summary.hasActivity ||= Boolean(set.completed || seconds > 0 || distance > 0 || hasRpe);
+      summary.hasActivity ||= Boolean(set.completed || seconds > 0 || distance > 0 || calories > 0 || hasRpe);
       return summary;
     },
-    { seconds: 0, distance: 0, rpeTotal: 0, rpeCount: 0, hasActivity: false },
+    { seconds: 0, distance: 0, calories: 0, rpeTotal: 0, rpeCount: 0, hasActivity: false },
   );
 }
 
@@ -1267,6 +1308,7 @@ export function summarizeCardioRange(workoutLogs, startDate, endDate, cardioExer
     seconds: 0,
     minutes: 0,
     distance: 0,
+    calories: 0,
     sessions: 0,
     extraSessions: 0,
     averageRpe: null,
@@ -1281,6 +1323,7 @@ export function summarizeCardioRange(workoutLogs, startDate, endDate, cardioExer
       if (!metrics.hasActivity) return;
       totals.seconds += metrics.seconds;
       totals.distance += metrics.distance;
+      totals.calories += metrics.calories;
       totals.sessions += 1;
       rpeTotal += metrics.rpeTotal;
       rpeCount += metrics.rpeCount;
@@ -1290,6 +1333,7 @@ export function summarizeCardioRange(workoutLogs, startDate, endDate, cardioExer
       if (!metrics.hasActivity) return;
       totals.seconds += metrics.seconds;
       totals.distance += metrics.distance;
+      totals.calories += metrics.calories;
       totals.sessions += 1;
       totals.extraSessions += 1;
       rpeTotal += metrics.rpeTotal;
@@ -1343,9 +1387,11 @@ function bestSetMetric(measurement, sets = []) {
     const total = sets.reduce((sum, set) => sum + numeric(set.reps), 0);
     return { value: best, label: `${best} reps`, volume: total };
   }
-  if (measurement === "duration") {
+  if (measurement === "duration" || measurement === "duration_calories") {
     const seconds = sets.reduce((sum, set) => sum + numeric(set.minutes) * 60 + numeric(set.seconds), 0);
-    return { value: seconds / 60, label: formatDuration(seconds), volume: seconds };
+    const calories = sets.reduce((sum, set) => sum + numeric(set.calories), 0);
+    const label = `${formatDuration(seconds)}${measurement === "duration_calories" ? ` · ${calories} kcal` : ""}`;
+    return { value: seconds / 60, label, volume: seconds };
   }
   if (measurement === "distance_time") {
     const distance = sets.reduce((sum, set) => sum + numeric(set.distance), 0);

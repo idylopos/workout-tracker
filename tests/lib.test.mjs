@@ -14,11 +14,13 @@ import {
   evaluateLongRunProgress,
   findPreviousExerciseLog,
   findOutstandingRecoveryLogs,
+  getDailyCheckInItems,
   getAllExercises,
   longRunTargetDistance,
   normalizeResponseRating,
   normalizeState,
   preparePreviousSets,
+  shouldAutoOpenDailyCheckIn,
   shouldCollapseExerciseByDefault,
   shouldShowRestTimer,
   summarizeCardioRange,
@@ -130,6 +132,60 @@ test("finds only recent workouts that still need a following-morning review", ()
   assert.deepEqual(findOutstandingRecoveryLogs(logs, "2026-08-25"), [
     { key: "2026-08-24", date: "2026-08-24", dayKey: "monday" },
   ]);
+});
+
+test("finds multiple outstanding reviews across a month boundary in newest-first order", () => {
+  const logs = {
+    "2026-08-30": {
+      date: "2026-08-30",
+      exercises: { run: { measurement: "distance", sets: [{ distance: 5 }] } },
+      response: {},
+    },
+    "2026-08-31": {
+      date: "2026-08-31",
+      exercises: { squat: { measurement: "weight_reps", sets: [{ weight: 50, reps: 8 }] } },
+      response: { painNext: "" },
+    },
+  };
+
+  assert.deepEqual(findOutstandingRecoveryLogs(logs, "2026-09-01"), [
+    { key: "2026-08-31", date: "2026-08-31", dayKey: "monday" },
+    { key: "2026-08-30", date: "2026-08-30", dayKey: "sunday" },
+  ]);
+});
+
+test("daily check-in due items do not duplicate saved or explicitly unknown answers", () => {
+  const logs = {
+    "2026-08-30": {
+      date: "2026-08-30",
+      exercises: { run: { measurement: "distance", sets: [{ distance: 5 }] } },
+      response: {},
+    },
+    "2026-08-31": {
+      date: "2026-08-31",
+      exercises: { squat: { measurement: "weight_reps", sets: [{ weight: 50, reps: 8 }] } },
+      response: { painNext: 1 },
+    },
+  };
+
+  assert.deepEqual(
+    getDailyCheckInItems(
+      logs,
+      [{ date: "2026-09-01", hours: 7.5 }],
+      { "2026-09-01": { status: "open", recoveryUnknown: ["2026-08-30"] } },
+      "2026-09-01",
+    ),
+    [],
+  );
+});
+
+test("daily check-in automatic prompts reset on a new local calendar date", () => {
+  const items = [{ type: "sleep", date: "2026-09-01" }];
+  assert.equal(shouldAutoOpenDailyCheckIn("", "2026-09-01", items), true);
+  assert.equal(shouldAutoOpenDailyCheckIn("2026-09-01", "2026-09-01", items), false);
+  assert.equal(shouldAutoOpenDailyCheckIn("2026-08-31", "2026-09-01", items), true);
+  assert.equal(shouldAutoOpenDailyCheckIn("2026-08-31", "2026-09-01", items, "deferred"), false);
+  assert.equal(shouldAutoOpenDailyCheckIn("2026-08-31", "2026-09-01", []), false);
 });
 
 test("derives weekly sleep averages from nightly check-ins without rewriting legacy weeks", () => {
@@ -593,12 +649,66 @@ test("keeps valid reusable activities when normalizing saved state", () => {
   const state = normalizeState({
     savedActivities: [
       { id: "saved-incline-walk", name: "Incline walk", type: "walking", measurement: "duration" },
+      { id: "saved-stepmill", name: "Stepmill", type: "custom", measurement: "duration_calories" },
       { id: "invalid", name: "", type: "custom", measurement: "duration" },
     ],
   });
   assert.deepEqual(state.savedActivities, [
     { id: "saved-incline-walk", name: "Incline walk", type: "walking", measurement: "duration" },
+    { id: "saved-stepmill", name: "Stepmill", type: "custom", measurement: "duration_calories" },
   ]);
+});
+
+test("summarizes time, calories, and RPE for extra cardio", () => {
+  assert.deepEqual(
+    MEASUREMENT_TYPES.duration_calories.fields.map((field) => field.key),
+    ["minutes", "seconds", "calories", "rpe"],
+  );
+  const summary = summarizeCardioRange(
+    {
+      friday: {
+        date: "2026-08-28",
+        exercises: {},
+        extraActivities: [
+          {
+            id: "extra-stepmill",
+            type: "custom",
+            name: "Stepmill",
+            measurement: "duration_calories",
+            sets: [{ completed: true, minutes: 20, seconds: 30, calories: 185, rpe: 6 }],
+          },
+        ],
+      },
+    },
+    "2026-08-25",
+    "2026-09-01",
+  );
+
+  assert.equal(summary.seconds, 1230);
+  assert.equal(summary.calories, 185);
+  assert.equal(summary.sessions, 1);
+  assert.equal(summary.extraSessions, 1);
+  assert.equal(summary.averageRpe, 6);
+});
+
+test("accepts time-and-calorie extra activities in encrypted backup data", () => {
+  const backup = createDefaultState();
+  backup.workoutLogs["2026-08-28"] = {
+    date: "2026-08-28",
+    dayKey: "friday",
+    exercises: {},
+    extraActivities: [
+      {
+        id: "extra-stepmill",
+        type: "custom",
+        name: "Stepmill",
+        measurement: "duration_calories",
+        sets: [{ completed: true, minutes: 20, seconds: 0, calories: 180, rpe: 6 }],
+      },
+    ],
+  };
+
+  assert.equal(validateBackup(backup).valid, true);
 });
 
 test("combines planned and extra cardio in weekly totals", () => {

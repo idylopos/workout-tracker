@@ -25,8 +25,8 @@ Then open `http://localhost:8080`.
 ## Log extra cardio
 
 On any scheduled training day, choose **+ Add extra activity** below the planned exercises. Select walking, cycling,
-elliptical, swimming, running, or a custom activity; then choose time, distance plus time, or distance-only logging.
-Every option includes RPE.
+elliptical, swimming, running, or a custom activity; then choose time, time plus calories, distance plus time, or
+distance-only logging. Every option includes RPE.
 
 Select **Save this setup as a reusable activity** to add the configuration to the activity picker. Reusable activities
 and completed extra-cardio records are stored inside the encrypted browser vault and included in JSON backups. The Week
