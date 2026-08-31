@@ -30,7 +30,8 @@ distance-only logging. Every option includes RPE.
 
 Select **Save this setup as a reusable activity** to add the configuration to the activity picker. Reusable activities
 and completed extra-cardio records are stored inside the encrypted browser vault and included in JSON backups. The Week
-view shows the selected week’s combined planned and extra cardio, while Progress shows an eight-week duration trend.
+view shows the selected week’s combined planned and extra cardio. Progress starts with a four-week training and
+recovery snapshot, then shows exercise detail and an eight-week cardio duration trend.
 
 ## During a workout
 

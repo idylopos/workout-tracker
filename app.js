@@ -33,6 +33,7 @@ import {
   startOfWeek,
   summarizeCardioRange,
   summarizeExercise,
+  summarizeProgressOverview,
   summarizeWeeklySleep,
   toIsoDate,
   validateBackup,
@@ -2273,10 +2274,34 @@ function renderProgress() {
     option.selected = exercise.id === previousSelection;
     select.append(option);
   });
+  renderProgressOverview();
   renderExerciseStats();
   renderCardioStats();
   renderBody();
   renderSleep();
+}
+
+function renderProgressOverview() {
+  const summary = summarizeProgressOverview(activeWorkoutLogs(), state.dailySleepLogs);
+  $("#progress-stat-workouts").textContent = summary.workouts;
+  $("#progress-stat-workout-delta").textContent = summary.workoutDelta === 0
+    ? "Same as prior 4 weeks"
+    : `${summary.workoutDelta > 0 ? "+" : ""}${summary.workoutDelta} vs prior 4 weeks`;
+  $("#progress-stat-active-weeks").textContent = `${summary.activeWeeks} / 4`;
+  $("#progress-stat-sleep").textContent = summary.averageSleep === null
+    ? "—"
+    : `${numberFormatter.format(summary.averageSleep)} hr`;
+  $("#progress-stat-sleep-detail").textContent = summary.sleepNights
+    ? `${summary.sleepNights} of the last 7 nights logged`
+    : "No recent nights logged";
+  $("#progress-stat-recovery").textContent = summary.latestResponse?.label || "—";
+  $("#progress-stat-recovery-detail").textContent = summary.latestResponse
+    ? "Latest reviewed workout"
+    : "No morning response yet";
+  const insight = $("#progress-insight");
+  insight.dataset.tone = summary.insight.tone;
+  $("#progress-insight-title").textContent = summary.insight.title;
+  $("#progress-insight-body").textContent = summary.insight.body;
 }
 
 function renderExerciseStats() {

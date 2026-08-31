@@ -1221,6 +1221,109 @@ export function summarizeWeeklySleep(weeklySleepLogs = [], dailySleepLogs = []) 
   return [...summaries.values()].sort((a, b) => a.week.localeCompare(b.week));
 }
 
+export function summarizeProgressOverview(workoutLogs = {}, dailySleepLogs = [], today = toIsoDate()) {
+  const todayDate = new Date(`${today}T12:00:00`);
+  const currentStart = toIsoDate(addDays(todayDate, -27));
+  const currentEnd = toIsoDate(addDays(todayDate, 1));
+  const previousStart = toIsoDate(addDays(todayDate, -55));
+  const recentSleepStart = toIsoDate(addDays(todayDate, -6));
+  const logs = Object.values(workoutLogs || {}).filter((log) => log?.date);
+  const sessionsInRange = (start, end) =>
+    new Set(logs.filter((log) => log.date >= start && log.date < end).map((log) => log.date)).size;
+  const currentLogs = logs
+    .filter((log) => log.date >= currentStart && log.date < currentEnd)
+    .sort((a, b) => a.date.localeCompare(b.date));
+  const workouts = sessionsInRange(currentStart, currentEnd);
+  const previousWorkouts = sessionsInRange(previousStart, currentStart);
+  const currentStartTime = new Date(`${currentStart}T12:00:00`).getTime();
+  const activeWeeks = new Set(
+    currentLogs.map((log) =>
+      Math.floor((new Date(`${log.date}T12:00:00`).getTime() - currentStartTime) / (7 * 86_400_000)),
+    ),
+  ).size;
+
+  const recentSleep = (dailySleepLogs || [])
+    .filter(
+      (entry) =>
+        entry?.date >= recentSleepStart &&
+        entry.date < currentEnd &&
+        Number.isFinite(Number(entry.hours)),
+    )
+    .map((entry) => Number(entry.hours));
+  const averageSleep = recentSleep.length
+    ? recentSleep.reduce((sum, hours) => sum + hours, 0) / recentSleep.length
+    : null;
+
+  const reviewedLogs = currentLogs.filter((log) => {
+    const value = normalizeResponseRating(log.response?.painNext, log.response?.scaleVersion);
+    return value !== "";
+  });
+  const latestResponseValue = reviewedLogs.length
+    ? Number(normalizeResponseRating(reviewedLogs.at(-1).response?.painNext, reviewedLogs.at(-1).response?.scaleVersion))
+    : null;
+  const latestResponse = Number.isInteger(latestResponseValue)
+    ? RESPONSE_SCALE.find((option) => option.value === latestResponseValue) || null
+    : null;
+  const dueReviews = findOutstandingRecoveryLogs(workoutLogs, today).length;
+
+  let insight = {
+    tone: "steady",
+    title: "Keep building the picture",
+    body: "Log workouts and recovery consistently so changes become easier to separate from day-to-day noise.",
+  };
+  if (!workouts) {
+    insight = {
+      tone: "empty",
+      title: "Your first useful signal starts with one workout",
+      body: "Complete a workout, then add the following-morning response. Progress will connect training and recovery here.",
+    };
+  } else if (dueReviews) {
+    insight = {
+      tone: "attention",
+      title: `${dueReviews} following-morning review${dueReviews === 1 ? " is" : "s are"} due`,
+      body: "Add the response from Today so the training trend has recovery context.",
+    };
+  } else if (latestResponse && latestResponse.value >= 2) {
+    insight = {
+      tone: "attention",
+      title: `Latest morning response: ${latestResponse.label}`,
+      body: "Review what changed before adding load, range, or volume. You keep the final decision.",
+    };
+  } else if (averageSleep === null || recentSleep.length < 3) {
+    insight = {
+      tone: "attention",
+      title: "Recovery context is still limited",
+      body: "Log at least three recent nights of sleep to compare training with recovery.",
+    };
+  } else if (averageSleep < OPTIONAL_RECOVERY_RULE.sleepHours) {
+    insight = {
+      tone: "attention",
+      title: "Recent sleep is below your recovery guide",
+      body: `Your ${recentSleep.length}-night average is ${averageSleep.toFixed(1)} hours. Keep optional work conservative and reassess after more sleep data.`,
+    };
+  } else if (workouts > previousWorkouts) {
+    const difference = workouts - previousWorkouts;
+    insight = {
+      tone: "positive",
+      title: `Training is up ${difference} workout${difference === 1 ? "" : "s"}`,
+      body: "Use the exercise and cardio trends below to check whether performance and recovery are moving with it.",
+    };
+  }
+
+  return {
+    workouts,
+    previousWorkouts,
+    workoutDelta: workouts - previousWorkouts,
+    activeWeeks,
+    averageSleep,
+    sleepNights: recentSleep.length,
+    latestResponse,
+    reviewedWorkouts: reviewedLogs.length,
+    dueReviews,
+    insight,
+  };
+}
+
 export function getAllExercises(weekPlan = WEEK_PLAN) {
   const unique = new Map();
   Object.values(weekPlan).forEach((day) => {

@@ -2367,6 +2367,101 @@ textarea {
   min-width: 260px;
 }
 
+.progress-purpose {
+  max-width: 650px;
+  margin: 8px 0 0;
+  color: var(--ink-soft);
+}
+
+.progress-overview-panel {
+  margin-bottom: 16px;
+}
+
+.progress-overview-panel .panel-head > small {
+  color: var(--ink-soft);
+  font-size: 11px;
+}
+
+.progress-overview-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.progress-signal {
+  min-width: 0;
+  min-height: 132px;
+  padding: 20px 24px;
+  border-right: 1px solid var(--line);
+}
+
+.progress-signal:last-child {
+  border-right: 0;
+}
+
+.progress-signal span,
+.progress-signal strong,
+.progress-signal small {
+  display: block;
+}
+
+.progress-signal span,
+.progress-insight > span {
+  color: var(--ink-soft);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.progress-signal strong {
+  margin: 8px 0 5px;
+  overflow: hidden;
+  font-size: clamp(22px, 2.6vw, 34px);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.progress-signal small {
+  color: var(--ink-soft);
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.progress-insight {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+  padding: 18px 24px;
+  border-top: 1px solid var(--line);
+  border-left: 5px solid var(--teal);
+  background: #f4f2e8;
+}
+
+.progress-insight[data-tone="positive"] {
+  border-left-color: var(--teal);
+}
+
+.progress-insight[data-tone="attention"] {
+  border-left-color: var(--orange);
+}
+
+.progress-insight[data-tone="empty"] {
+  border-left-color: var(--blue);
+}
+
+.progress-insight strong {
+  display: block;
+  margin-bottom: 3px;
+  font-size: 16px;
+}
+
+.progress-insight p {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 13px;
+}
+
 .metric-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -3722,6 +3817,23 @@ body[data-active-view="today"] .timer {
   .panel-head select {
     min-width: 0;
     width: 100%;
+  }
+
+  .progress-overview-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .progress-signal:nth-child(2) {
+    border-right: 0;
+  }
+
+  .progress-signal:nth-child(-n + 2) {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .progress-insight {
+    grid-template-columns: 1fr;
+    gap: 6px;
   }
 
   .metric-card {

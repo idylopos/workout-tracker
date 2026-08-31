@@ -25,6 +25,7 @@ import {
   shouldShowRestTimer,
   summarizeCardioRange,
   summarizeExercise,
+  summarizeProgressOverview,
   summarizeWeeklySleep,
   validateBackup,
 } from "../lib.js";
@@ -689,6 +690,62 @@ test("summarizes time, calories, and RPE for extra cardio", () => {
   assert.equal(summary.sessions, 1);
   assert.equal(summary.extraSessions, 1);
   assert.equal(summary.averageRpe, 6);
+});
+
+test("summarizes a four-week training and recovery snapshot", () => {
+  const summary = summarizeProgressOverview(
+    {
+      previous: { date: "2026-07-20", exercises: { squat: { sets: [{}] } } },
+      first: {
+        date: "2026-08-10",
+        exercises: { squat: { sets: [{}] } },
+        response: { scaleVersion: 2, painNext: 0 },
+      },
+      second: {
+        date: "2026-08-24",
+        exercises: { squat: { sets: [{}] } },
+        response: { scaleVersion: 2, painNext: 1 },
+      },
+      duplicateDate: { date: "2026-08-24", exercises: { press: { sets: [{}] } } },
+    },
+    [
+      { date: "2026-08-24", hours: 7 },
+      { date: "2026-08-29", hours: 8 },
+      { date: "2026-08-30", hours: 7.5 },
+      { date: "2026-08-01", hours: 3 },
+    ],
+    "2026-08-30",
+  );
+
+  assert.equal(summary.workouts, 2);
+  assert.equal(summary.previousWorkouts, 1);
+  assert.equal(summary.workoutDelta, 1);
+  assert.equal(summary.activeWeeks, 2);
+  assert.equal(summary.averageSleep, 7.5);
+  assert.equal(summary.sleepNights, 3);
+  assert.equal(summary.latestResponse.label, "Mild");
+  assert.equal(summary.insight.tone, "positive");
+});
+
+test("prioritizes due recovery context in the progress snapshot", () => {
+  const summary = summarizeProgressOverview(
+    {
+      recent: {
+        date: "2026-08-29",
+        exercises: { squat: { sets: [{}] } },
+      },
+    },
+    [
+      { date: "2026-08-28", hours: 7.5 },
+      { date: "2026-08-29", hours: 7.5 },
+      { date: "2026-08-30", hours: 7.5 },
+    ],
+    "2026-08-30",
+  );
+
+  assert.equal(summary.dueReviews, 1);
+  assert.equal(summary.insight.tone, "attention");
+  assert.match(summary.insight.title, /review is due/);
 });
 
 test("accepts time-and-calorie extra activities in encrypted backup data", () => {
