@@ -3443,6 +3443,10 @@ body[data-active-view="today"] .timer {
     padding: 30px 0 calc(160px + var(--safe-bottom));
   }
 
+  body[data-active-view="today"] main {
+    padding-bottom: calc(216px + var(--safe-bottom));
+  }
+
   .page-head {
     display: grid;
     align-items: start;
@@ -3993,7 +3997,10 @@ body[data-active-view="today"] .timer {
   }
 
   body[data-active-view="today"] .timer {
-    bottom: calc(158px + var(--safe-bottom));
+    right: 12px;
+    bottom: calc(142px + var(--safe-bottom));
+    left: 12px;
+    width: auto;
   }
 
   .timer-top {
@@ -4010,7 +4017,9 @@ body[data-active-view="today"] .timer {
   }
 
   .toast {
-    bottom: calc(144px + var(--safe-bottom));
+    top: 72px;
+    bottom: auto;
+    transform: translate(-50%, -12px);
   }
 }
 
