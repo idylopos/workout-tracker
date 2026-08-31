@@ -849,8 +849,11 @@ textarea {
 }
 
 .exercise-title-wrap small {
-  color: var(--ink-soft);
-  font-size: 12px;
+  margin-top: 2px;
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 650;
+  line-height: 1.35;
 }
 
 .exercise-tags {
@@ -2628,6 +2631,17 @@ textarea {
 .data-card-primary {
   border-color: var(--ink);
   background: var(--lime);
+}
+
+.data-card-privacy {
+  min-height: 270px;
+  grid-column: 1 / -1;
+  background: #eef4ff;
+}
+
+.data-card-privacy > div:not(.data-card-actions) {
+  max-width: 760px;
+  margin-top: 26px;
 }
 
 .data-card-danger {
