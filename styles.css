@@ -1788,7 +1788,7 @@ textarea {
 
 .save-bar strong {
   overflow: hidden;
-  font-size: 11px;
+  font-size: 13px;
   line-height: 1.2;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1799,11 +1799,11 @@ textarea {
 }
 
 .save-bar .button {
-  min-height: 34px;
-  padding: 6px 11px;
-  border-radius: 8px;
+  min-height: 44px;
+  padding: 8px 14px;
+  border-radius: 10px;
   box-shadow: 2px 2px 0 var(--ink);
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .save-bar[data-status="restored"] {
