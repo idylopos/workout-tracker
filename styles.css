@@ -359,7 +359,7 @@ textarea {
   border: 1px solid rgba(255, 255, 255, 0.34);
   border-radius: 999px;
   color: rgba(255, 255, 255, 0.78);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 850;
   letter-spacing: 0.1em;
 }
@@ -490,7 +490,7 @@ textarea {
 .phase-guide-label span {
   margin-bottom: 4px;
   color: var(--blue);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 900;
   letter-spacing: 0.12em;
 }
@@ -532,7 +532,7 @@ textarea {
 }
 
 .phase-guide-points strong {
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -693,7 +693,7 @@ textarea {
 
 .training-rules-card span {
   color: #3e6c58;
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 900;
   letter-spacing: 0.11em;
 }
@@ -863,7 +863,7 @@ textarea {
 
 .exercise-tags span {
   color: var(--blue);
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 900;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -1029,7 +1029,7 @@ textarea {
 .form-guide summary small {
   margin-top: 1px;
   color: var(--ink-soft);
-  font-size: 10px;
+  font-size: 11px;
 }
 
 .form-guide-toggle {
@@ -1063,13 +1063,13 @@ textarea {
   padding-top: 8px;
   border-top: 1px solid #e5dfd3;
   color: var(--ink-soft);
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1.45;
 }
 
 .form-guide-content p > strong {
   color: var(--ink);
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 900;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -1336,7 +1336,7 @@ textarea {
 
 .exercise-toolbar label > span {
   color: var(--ink-soft);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 850;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -1351,7 +1351,7 @@ textarea {
   border: 0;
   border-bottom: 1px solid currentColor;
   background: transparent;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 850;
 }
 
@@ -1498,7 +1498,7 @@ textarea {
   border-radius: 10px;
   background: transparent;
   color: var(--ink-soft);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 800;
 }
 
@@ -1577,7 +1577,7 @@ textarea {
 
 .extra-activity-card-head span {
   color: var(--blue);
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 900;
   letter-spacing: 0.1em;
 }
@@ -1612,7 +1612,7 @@ textarea {
 
 .extra-activity-card-body > label > span {
   color: var(--ink-soft);
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 850;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -1641,7 +1641,7 @@ textarea {
 
 .session-notes summary small {
   color: var(--ink-soft);
-  font-size: 10px;
+  font-size: 11px;
 }
 
 .response-scales {
@@ -2938,7 +2938,7 @@ body[data-active-view="today"] .timer {
 
 .daily-checkin-reminder small {
   color: var(--blue);
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 900;
   letter-spacing: 0.09em;
 }
@@ -3201,7 +3201,7 @@ body[data-active-view="today"] .timer {
 .activity-form > label > span,
 .activity-form-grid label > span {
   color: var(--ink-soft);
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 850;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -3286,7 +3286,7 @@ body[data-active-view="today"] .timer {
 
 .privacy-form label > span {
   color: var(--ink-soft);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 850;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -3327,7 +3327,7 @@ body[data-active-view="today"] .timer {
 
 .remember-unlock small {
   color: var(--ink-soft);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 500;
   line-height: 1.4;
 }
