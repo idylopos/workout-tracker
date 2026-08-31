@@ -3447,7 +3447,7 @@ body[data-active-view="today"] .timer {
   }
 
   body[data-active-view="today"] main {
-    padding-bottom: calc(216px + var(--safe-bottom));
+    padding-bottom: calc(78px + var(--safe-bottom));
   }
 
   .page-head {
@@ -3747,6 +3747,7 @@ body[data-active-view="today"] .timer {
 
   .save-bar {
     bottom: calc(78px + var(--safe-bottom));
+    margin-top: 84px;
   }
 
   .save-bar > div {
