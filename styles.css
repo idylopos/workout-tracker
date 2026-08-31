@@ -2381,7 +2381,7 @@ textarea {
 
 .progress-overview-panel .panel-head > small {
   color: var(--ink-soft);
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .progress-overview-grid {
@@ -2409,7 +2409,7 @@ textarea {
 .progress-signal span,
 .progress-insight > span {
   color: var(--ink-soft);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -2425,7 +2425,7 @@ textarea {
 
 .progress-signal small {
   color: var(--ink-soft);
-  font-size: 12px;
+  font-size: 11px;
   line-height: 1.45;
 }
 
@@ -2461,7 +2461,7 @@ textarea {
 .progress-insight p {
   margin: 0;
   color: var(--ink-soft);
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .metric-grid {
@@ -2487,7 +2487,7 @@ textarea {
 .metric-card span {
   margin-bottom: 10px;
   color: var(--ink-soft);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -2537,7 +2537,7 @@ textarea {
 
 .cardio-stats-panel .panel-head > small {
   color: var(--ink-soft);
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .inline-form {
@@ -3870,15 +3870,6 @@ body[data-active-view="today"] .timer {
   .panel-head select {
     min-width: 0;
     width: 100%;
-  }
-
-  .progress-signal {
-    min-height: 104px;
-    padding: 16px;
-  }
-
-  .progress-signal strong {
-    font-size: 24px;
   }
 
   .progress-overview-grid {
