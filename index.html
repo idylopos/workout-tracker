@@ -410,18 +410,16 @@
                 <input id="import-data" type="file" accept="application/json,.json" />
               </label>
             </article>
-            <article class="data-card data-card-danger">
+            <article class="data-card data-card-privacy">
               <span class="data-card-index">03</span>
               <div>
-                <p class="eyebrow">PRIVACY</p>
-                <h2>Erase this device.</h2>
-                <p>
-                  Permanently removes workouts, drafts, measurements, sleep records, and preferences from this browser only.
-                  Export first if you want to keep them.
-                </p>
+                <p class="eyebrow">OPTIONAL PROTECTION</p>
+                <h2 id="privacy-mode-title">Passphrase protection is optional.</h2>
+                <p id="privacy-mode-copy">Records are saved only in this browser without a login prompt. Enable a passphrase if this is a shared device or you want encrypted browser storage.</p>
               </div>
               <div class="data-card-actions">
-                <button class="button button-secondary" type="button" id="lock-app">Lock app</button>
+                <button class="button button-dark" type="button" id="toggle-passphrase">Enable passphrase</button>
+                <button class="button button-secondary is-hidden" type="button" id="lock-app">Lock app</button>
                 <button class="button button-danger" type="button" id="erase-data">Erase local data</button>
               </div>
             </article>
@@ -432,9 +430,9 @@
               <strong>Private by design</strong>
               <p>
                 This app has no analytics, accounts, or database. It only loads public plan files from this site. Workout
-                records and drafts are encrypted with your passphrase before browser storage and are never uploaded. The
-                optional two-hour unlock stores a non-exportable key, never the passphrase. Export a backup regularly,
-                and lock or erase the app before handing a shared device to someone else.
+                records and drafts stay in this browser and are never uploaded. Passphrase protection is optional; when
+                enabled, records are encrypted before browser storage and the temporary unlock stores a non-exportable
+                key, never the passphrase. Export a backup regularly and erase the app before handing off a shared device.
               </p>
             </div>
           </aside>
@@ -529,7 +527,7 @@
     <dialog class="privacy-dialog" id="privacy-dialog" aria-labelledby="privacy-dialog-title">
       <form class="privacy-form" id="privacy-form">
         <span class="privacy-lock" aria-hidden="true">FF</span>
-        <p class="eyebrow">LOCAL ENCRYPTED VAULT</p>
+        <p class="eyebrow">OPTIONAL LOCAL PROTECTION</p>
         <h2 id="privacy-dialog-title">Unlock your records</h2>
         <p id="privacy-dialog-copy">
           Enter your passphrase. It stays on this device for this browser session and is never stored or uploaded.
@@ -551,6 +549,7 @@
         </label>
         <p class="privacy-error" id="privacy-error" role="alert"></p>
         <button class="button button-primary" id="privacy-submit" type="submit">Unlock</button>
+        <button class="button button-secondary is-hidden" id="privacy-cancel" type="button">Not now</button>
         <button class="text-button privacy-reset" id="privacy-reset" type="button">Erase encrypted data and start over</button>
       </form>
     </dialog>
@@ -638,7 +637,7 @@
                 <span>Pull-up roadmap</span>
                 <strong class="progression-current-label">Step 1 of 6</strong>
               </div>
-              <small>Drag or tap to inspect a step. A separate confirmation changes your current step.</small>
+              <small>Tap a step to preview it. A separate confirmation changes your current step.</small>
             </div>
             <input class="progression-select" type="hidden" value="1" />
             <div class="progression-rail-wrap">
