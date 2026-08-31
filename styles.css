@@ -3361,10 +3361,10 @@ body[data-active-view="today"] .timer {
 
 @media (max-width: 900px) {
   .topbar {
-    grid-template-columns: 1fr auto;
+    padding: 0 20px;
   }
 
-  .desktop-nav {
+  .brand > span:last-child {
     display: none;
   }
 
@@ -3432,8 +3432,13 @@ body[data-active-view="today"] .timer {
 
 @media (max-width: 680px) {
   .topbar {
+    grid-template-columns: 1fr auto;
     min-height: 62px;
     padding: 0 16px;
+  }
+
+  .desktop-nav {
+    display: none;
   }
 
   .header-status span:last-child,
