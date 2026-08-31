@@ -104,6 +104,7 @@ let planCatalog = [];
 let vaultKey = null;
 let vaultSalt = null;
 let vaultIterations = PBKDF2_ITERATIONS;
+let storageMode = "local";
 let saveQueue = Promise.resolve();
 let workoutDirty = false;
 let draftSaveTimer = null;
@@ -153,18 +154,27 @@ const els = {
 };
 
 function persistState() {
-  if (!vaultKey || !vaultSalt) return Promise.resolve(false);
   const snapshot = structuredClone(state);
   saveQueue = saveQueue
     .catch(() => undefined)
     .then(async () => {
+      if (storageMode === "local") {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(snapshot));
+        return true;
+      }
+      if (!vaultKey || !vaultSalt) return false;
       const vault = await encryptState(snapshot, vaultKey, vaultSalt, vaultIterations);
       localStorage.setItem(VAULT_STORAGE_KEY, JSON.stringify(vault));
       localStorage.removeItem(STORAGE_KEY);
       return true;
     })
     .catch(() => {
-      showToast("Could not save the encrypted vault. Export a backup and check browser storage.", "error");
+      showToast(
+        storageMode === "encrypted"
+          ? "Could not save the encrypted vault. Export a backup and check browser storage."
+          : "Could not save on this device. Export a backup and check browser storage.",
+        "error",
+      );
       return false;
     });
   return saveQueue;
@@ -194,6 +204,10 @@ function legacyState() {
 
 function updateVaultSessionStatus() {
   if (!els.vaultSessionStatus) return;
+  if (storageMode === "local") {
+    els.vaultSessionStatus.textContent = "Saved on this device · no passphrase";
+    return;
+  }
   if (!unlockExpiresAt) {
     els.vaultSessionStatus.textContent = "Unlocked for this page";
     return;
@@ -209,7 +223,7 @@ function scheduleUnlockExpiry(expiresAt = null) {
   unlockExpiryTimer = null;
   unlockExpiresAt = Number(expiresAt) > Date.now() ? Number(expiresAt) : null;
   updateVaultSessionStatus();
-  if (!unlockExpiresAt) return;
+  if (storageMode !== "encrypted" || !unlockExpiresAt) return;
   unlockExpiryTimer = setTimeout(() => {
     void lockApp();
   }, Math.max(0, unlockExpiresAt - Date.now()));
@@ -255,23 +269,30 @@ function openVaultDialog(mode, storedVault = null, initialState = null) {
   const remember = $("#privacy-remember");
   const error = $("#privacy-error");
   const submit = $("#privacy-submit");
+  const cancel = $("#privacy-cancel");
   const reset = $("#privacy-reset");
   const creating = mode === "create";
 
-  title.textContent = creating ? "Create your privacy passphrase" : "Unlock your records";
+  title.textContent = creating ? "Protect with a passphrase" : "Unlock your records";
   copy.textContent = creating
-    ? "Your records will be encrypted before browser storage. Use at least 10 characters and keep this passphrase somewhere safe—it cannot be recovered."
+    ? "This is optional. Your existing records will be encrypted before browser storage. Use at least 10 characters and keep the passphrase somewhere safe—it cannot be recovered."
     : "Enter your passphrase. It is never stored or uploaded. This browser can retain a non-exportable unlock key for up to two hours.";
-  submit.textContent = creating ? "Create encrypted vault" : "Unlock";
+  submit.textContent = creating ? "Enable passphrase" : "Unlock";
   confirmWrap.classList.toggle("is-hidden", !creating);
   confirmPassphrase.required = creating;
+  cancel.classList.toggle("is-hidden", !creating);
   reset.classList.toggle("is-hidden", creating);
   passphrase.autocomplete = creating ? "new-password" : "current-password";
   error.textContent = "";
   form.reset();
-  dialog.oncancel = (event) => event.preventDefault();
 
   return new Promise((resolve) => {
+    dialog.oncancel = (event) => {
+      event.preventDefault();
+      if (!creating) return;
+      dialog.close();
+      resolve({ kind: "cancel" });
+    };
     form.onsubmit = async (event) => {
       event.preventDefault();
       const secret = passphrase.value;
@@ -309,6 +330,10 @@ function openVaultDialog(mode, storedVault = null, initialState = null) {
       dialog.close();
       resolve({ kind: "erase" });
     };
+    cancel.onclick = () => {
+      dialog.close();
+      resolve({ kind: "cancel" });
+    };
     dialog.showModal();
     requestAnimationFrame(() => passphrase.focus());
   });
@@ -318,6 +343,7 @@ async function initializeVault() {
   while (true) {
     const stored = localStorage.getItem(VAULT_STORAGE_KEY);
     if (stored) {
+      storageMode = "encrypted";
       let parsed;
       try {
         parsed = JSON.parse(stored);
@@ -329,6 +355,7 @@ async function initializeVault() {
         : await restoreRememberedUnlock(parsed);
       if (remembered) {
         state = normalizeState(remembered.state);
+        storageMode = "encrypted";
         vaultKey = remembered.key;
         vaultSalt = remembered.salt;
         vaultIterations = remembered.iterations;
@@ -344,6 +371,7 @@ async function initializeVault() {
         continue;
       }
       state = normalizeState(access.result.state);
+      storageMode = "encrypted";
       vaultKey = access.result.key;
       vaultSalt = access.result.salt;
       vaultIterations = access.result.iterations;
@@ -351,15 +379,12 @@ async function initializeVault() {
       return;
     }
 
-    const initialState = legacyState();
-    const access = await openVaultDialog("create", null, initialState);
-    state = normalizeState(access.result.state);
-    vaultKey = access.result.key;
-    vaultSalt = access.result.salt;
-    vaultIterations = access.result.iterations;
-    localStorage.setItem(VAULT_STORAGE_KEY, JSON.stringify(access.result.vault));
-    localStorage.removeItem(STORAGE_KEY);
-    await configureRememberedUnlock(access.result, access.remember);
+    state = legacyState();
+    storageMode = "local";
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    localStorage.removeItem(UNLOCK_BLOCK_STORAGE_KEY);
+    await clearRememberedUnlock();
+    scheduleUnlockExpiry();
     return;
   }
 }
@@ -708,7 +733,9 @@ function renderDailyCheckInStep() {
   if (dailyCheckInIndex >= dailyCheckInQueue.length) {
     const summary = dailyCheckInSummary();
     $("#daily-checkin-title").textContent = "You're checked in.";
-    $("#daily-checkin-copy").textContent = "Your answers were saved to your encrypted records.";
+    $("#daily-checkin-copy").textContent = storageMode === "encrypted"
+      ? "Your answers were saved to your encrypted records."
+      : "Your answers were saved on this device.";
     question.innerHTML = `
       <div class="daily-checkin-summary">
         <h3>${escapeHtml(summary.headline)}</h3>
@@ -855,7 +882,10 @@ async function saveDailyCheckInAnswer({ unknown = false } = {}) {
   };
   let savedSleep = null;
   let savedRecovery = null;
-  setDailyCheckInBusy(true, "Saving encrypted check-in…");
+  setDailyCheckInBusy(
+    true,
+    storageMode === "encrypted" ? "Saving encrypted check-in…" : "Saving check-in on this device…",
+  );
 
   if (unknown) {
     if (item.type === "sleep") record.sleepUnknown = true;
@@ -1275,7 +1305,7 @@ async function addExtraActivity(event) {
 function markWorkoutDirty() {
   workoutDirty = true;
   draftRevision += 1;
-  setSaveStatus("Saving encrypted draft…", "saving");
+  setSaveStatus(storageMode === "encrypted" ? "Saving encrypted draft…" : "Saving draft on this device…", "saving");
   clearTimeout(draftSaveTimer);
   draftSaveTimer = setTimeout(() => {
     saveWorkoutDraftNow();
@@ -1937,7 +1967,7 @@ function collectWorkoutRecord() {
 async function saveWorkoutDraftNow() {
   clearTimeout(draftSaveTimer);
   draftSaveTimer = null;
-  if (!workoutDirty || !vaultKey) return saveQueue;
+  if (!workoutDirty || (storageMode === "encrypted" && !vaultKey)) return saveQueue;
 
   const revision = draftRevision;
   const key = workoutLogKey(selectedDate);
@@ -1949,7 +1979,7 @@ async function saveWorkoutDraftNow() {
   const saved = await persistState();
   if (saved && revision === draftRevision) {
     workoutDirty = false;
-    setSaveStatus("Encrypted draft saved", "saved");
+    setSaveStatus(storageMode === "encrypted" ? "Encrypted draft saved" : "Draft saved on this device", "saved");
   } else if (!saved && revision === draftRevision) {
     setSaveStatus("Draft not saved · keep this page open", "error");
   }
@@ -2504,6 +2534,62 @@ async function importData(file) {
   }
 }
 
+function syncPrivacyUi() {
+  updateVaultSessionStatus();
+  const protectedMode = storageMode === "encrypted";
+  $("#privacy-mode-title").textContent = protectedMode
+    ? "Passphrase protection is on."
+    : "Passphrase protection is optional.";
+  $("#privacy-mode-copy").textContent = protectedMode
+    ? "Records are encrypted before browser storage. You will need the passphrase again after locking or when the temporary unlock expires."
+    : "Records are saved only in this browser without a login prompt. Enable a passphrase if this is a shared device or you want encrypted browser storage.";
+  $("#toggle-passphrase").textContent = protectedMode ? "Remove passphrase" : "Enable passphrase";
+  $("#lock-app").classList.toggle("is-hidden", !protectedMode);
+}
+
+async function enablePassphraseProtection() {
+  if (storageMode === "encrypted") return;
+  await saveWorkoutDraftNow();
+  await saveQueue;
+  const access = await openVaultDialog("create", null, structuredClone(state));
+  if (access.kind !== "success") return;
+  storageMode = "encrypted";
+  vaultKey = access.result.key;
+  vaultSalt = access.result.salt;
+  vaultIterations = access.result.iterations;
+  localStorage.setItem(VAULT_STORAGE_KEY, JSON.stringify(access.result.vault));
+  localStorage.removeItem(STORAGE_KEY);
+  await configureRememberedUnlock(access.result, access.remember);
+  syncPrivacyUi();
+  showToast("Passphrase protection enabled.");
+}
+
+async function removePassphraseProtection() {
+  if (storageMode !== "encrypted") return;
+  const approved = window.confirm(
+    "Remove the passphrase from this device? Your records will remain stored in this browser, but they will no longer be encrypted with a passphrase.",
+  );
+  if (!approved) return;
+  await saveWorkoutDraftNow();
+  await saveQueue;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  localStorage.removeItem(VAULT_STORAGE_KEY);
+  localStorage.removeItem(UNLOCK_BLOCK_STORAGE_KEY);
+  await clearRememberedUnlock();
+  storageMode = "local";
+  vaultKey = null;
+  vaultSalt = null;
+  vaultIterations = PBKDF2_ITERATIONS;
+  scheduleUnlockExpiry();
+  syncPrivacyUi();
+  showToast("Passphrase removed. Records remain saved on this device.");
+}
+
+async function togglePassphraseProtection() {
+  if (storageMode === "encrypted") await removePassphraseProtection();
+  else await enablePassphraseProtection();
+}
+
 async function eraseLocalData() {
   const approved = window.confirm(
     "Permanently erase every workout, body measurement, sleep record, and preference stored by this app in this browser?",
@@ -2516,10 +2602,12 @@ async function eraseLocalData() {
   scheduleUnlockExpiry();
   vaultKey = null;
   vaultSalt = null;
+  storageMode = "local";
   window.location.reload();
 }
 
 async function lockApp() {
+  if (storageMode !== "encrypted") return;
   await saveWorkoutDraftNow();
   await saveQueue;
   localStorage.setItem(UNLOCK_BLOCK_STORAGE_KEY, "1");
@@ -2777,6 +2865,7 @@ function bindEvents() {
 
   $("#export-data").addEventListener("click", exportData);
   $("#import-data").addEventListener("change", (event) => importData(event.target.files[0]));
+  $("#toggle-passphrase").addEventListener("click", () => void togglePassphraseProtection());
   $("#erase-data").addEventListener("click", eraseLocalData);
   $("#lock-app").addEventListener("click", lockApp);
 
@@ -2804,6 +2893,7 @@ function bindEvents() {
 
 async function init() {
   await initializeVault();
+  syncPrivacyUi();
   document.body.dataset.activeView = activeView;
   els.trainingDate.value = selectedDate;
   $("#body-date").value = selectedDate;

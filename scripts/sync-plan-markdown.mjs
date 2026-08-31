@@ -95,15 +95,15 @@ export function renderWorkoutPlanMarkdown() {
 # Form / Flow — Workout Tracker plan
 
 This document is the readable version of the built-in plan used by the public Workout Tracker. The app remains the
-place to log sets, cardio, body measurements, sleep, pain response, and encrypted drafts.
+place to log sets, cardio, body measurements, sleep, pain response, and local drafts.
 
-The tracker can remember a non-exportable browser unlock key for a fixed two-hour window. It never stores the
-passphrase, and **Lock app** clears the remembered key immediately.
+Passphrase protection is optional. When enabled, the tracker can remember a non-exportable browser unlock key for a
+fixed two-hour window. It never stores the passphrase, and **Lock app** clears the remembered key immediately.
 
 During logging, **Use Last** keeps today's planned set count and fills every set with reusable values from the final
 logged set of the prior workout. It clears all completion, effort, and pull-up qualification fields.
 Importing values never marks today's exercise complete.
-The lookup searches every earlier completed workout and encrypted draft, so skipped weeks do not hide the latest entry.
+The lookup searches every earlier completed workout and local draft, so skipped weeks do not hide the latest entry.
 
 ## Mobility placement and limits
 

@@ -29,23 +29,23 @@ elliptical, swimming, running, or a custom activity; then choose time, time plus
 distance-only logging. Every option includes RPE.
 
 Select **Save this setup as a reusable activity** to add the configuration to the activity picker. Reusable activities
-and completed extra-cardio records are stored inside the encrypted browser vault and included in JSON backups. The Week
+and completed extra-cardio records are stored in the browser and included in JSON backups. The Week
 view shows the selected week’s combined planned and extra cardio. Progress starts with a four-week training and
 recovery snapshot, then shows exercise detail and an eight-week cardio duration trend.
 
 ## During a workout
 
-Changes on the Today screen are automatically saved as an encrypted draft. If the browser reloads or discards the tab,
-the draft will be restored. With **Keep unlocked for two hours** selected, the browser retains a non-exportable
-decryption key until the fixed expiry time, so a reload does not require the passphrase again. The passphrase itself is
-never stored. **Save workout** confirms the draft as a completed workout log.
+Changes on the Today screen are automatically saved as a local draft. If the browser reloads or discards the tab,
+the draft will be restored. Passphrase protection is optional under **Data**. When enabled, drafts and records are
+encrypted and **Keep unlocked for two hours** retains a non-exportable decryption key until the fixed expiry time.
+The passphrase itself is never stored. **Save workout** confirms the draft as a completed workout log.
 
 For repeated working sets, enter the first set and choose **Fill empty sets from set 1**. The app copies load and reps
 (or the equivalent primary measurements) into blank fields while leaving RIR/RPE and any values already entered alone.
 **Use Last** keeps the number of sets currently planned for today and fills every set with the reusable values from the
 final logged set of the previous workout. It leaves every completion box and RIR/RPE field clear. It also clears
 pull-up performance/recovery qualification checks, so importing values
-cannot mark the current exercise complete. The lookup searches every earlier saved workout and encrypted draft, so
+cannot mark the current exercise complete. The lookup searches every earlier saved workout and local draft, so
 skipped weeks do not hide the most recent entry.
 
 Every built-in exercise includes a collapsible **Quick form guide** covering setup, execution, the main thing to watch,
@@ -61,9 +61,9 @@ and offers explicit repeat, step-back, and criteria-gated advance actions.
 The built-in plan uses a brief Monday lunge-twist warm-up and a separately logged, low-fatigue Wednesday Mobility A
 sequence. Each mobility movement is logged on its own rather than as one combined set.
 
-On the first unlocked visit each day, a non-blocking **Daily Check-in** asks only for inputs that are due: last night's
+On the first visit each day, a non-blocking **Daily Check-in** asks only for inputs that are due: last night's
 sleep and any missing following-morning workout response from the previous two days. Answers save immediately to the
-encrypted vault. Following-morning answers update the original workout record, while nightly sleep records calculate
+browser. Following-morning answers update the original workout record, while nightly sleep records calculate
 the current weekly average without replacing legacy weekly sleep logs. The check-in can be deferred or skipped.
 
 The current built-in plan is also available as [WORKOUT_PLAN.md](WORKOUT_PLAN.md). It is generated from `lib.js` during
@@ -82,14 +82,15 @@ The app works at both a user/organization Pages domain and a repository subpath 
 ## Data and backups
 
 Workout logs, in-progress workout drafts, body measurements, sleep records, reusable activities, and preferences are
-encrypted with AES-GCM before being stored in that browser. The encryption key is derived from a user-created passphrase
-and is normally kept in memory. When the two-hour option is selected, a non-exportable Web Crypto key is retained in
-that browser with a fixed expiry; it is not the passphrase and cannot be exported as raw key material. Existing
-unencrypted Form / Flow records are migrated into the encrypted vault after the user creates a passphrase.
+stored in the current browser without requiring a login. **Data → Enable passphrase** optionally moves those records
+into an AES-GCM encrypted vault. The encryption key is derived from the user-created passphrase and is normally kept in
+memory. When the two-hour option is selected, a non-exportable Web Crypto key is retained in that browser with a fixed
+expiry; it is not the passphrase and cannot be exported as raw key material.
 
 The passphrase is never stored or uploaded and cannot be recovered. If it is forgotten, the only in-app recovery is to
-erase the encrypted vault and start over. **Data → Lock app** immediately clears the remembered unlock key; use it before
-leaving a shared device.
+erase the encrypted vault and start over. While protection is enabled, **Data → Lock app** immediately clears the
+remembered unlock key. After unlocking, **Data → Remove passphrase** returns the records to passphrase-free browser
+storage without deleting them.
 
 Use **Data → Download backup** regularly. Importing a valid Form / Flow JSON backup replaces the records currently stored
 in that browser.
