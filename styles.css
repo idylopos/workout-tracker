@@ -1358,7 +1358,7 @@ textarea {
 .previous-line {
   margin: 10px 0 14px;
   color: var(--ink-soft);
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .set-list {
@@ -1448,9 +1448,10 @@ textarea {
 
 .set-field > span {
   color: var(--ink-soft);
-  font-size: 11px;
-  font-weight: 750;
-  letter-spacing: 0.01em;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 .set-field > div {
@@ -1469,7 +1470,7 @@ textarea {
   right: 9px;
   bottom: 13px;
   color: var(--ink-soft);
-  font-size: 11px;
+  font-size: 9px;
   pointer-events: none;
 }
 
@@ -3689,9 +3690,9 @@ body[data-active-view="today"] .timer {
 
   .set-row {
     grid-template-columns: 42px repeat(var(--field-count), minmax(68px, 1fr)) 44px;
-    gap: 5px;
-    min-width: calc(101px + (var(--field-count) * 73px));
-    padding: 7px 5px;
+    gap: 6px;
+    min-width: calc(104px + (var(--field-count) * 78px));
+    padding: 7px;
   }
 
   .remove-set {
