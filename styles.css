@@ -4004,7 +4004,7 @@ body[data-active-view="today"] .timer {
 
   body[data-active-view="today"] .timer {
     right: 12px;
-    bottom: calc(142px + var(--safe-bottom));
+    bottom: calc(132px + var(--safe-bottom));
     left: 12px;
     width: auto;
   }
