@@ -100,17 +100,20 @@
             </button>
           </div>
 
-          <article class="phase-guide" id="phase-guide" aria-live="polite">
-            <div class="phase-guide-label">
+          <details class="phase-guide" id="phase-guide">
+            <summary class="phase-guide-label">
               <span id="phase-guide-number">BLOCK 1</span>
               <strong id="phase-guide-title">Build to a comfortable 10 km</strong>
-            </div>
+              <span class="phase-guide-hint">Run targets and progression</span>
+            </summary>
+            <div class="phase-guide-content" aria-live="polite">
             <p id="phase-guide-copy">
               Use this phase until you can complete 10 km comfortably and recover normally by the following morning.
             </p>
             <div class="phase-guide-points" id="phase-guide-points"></div>
-            <small id="phase-guide-status">Changing blocks changes the running prescriptions only. Your strength plan stays the same.</small>
-          </article>
+            <small id="phase-guide-status">Block 2 adds quality running and starts with lighter Thursday lifting.</small>
+            </div>
+          </details>
 
           <div id="long-run-callout" class="callout is-hidden"></div>
 
