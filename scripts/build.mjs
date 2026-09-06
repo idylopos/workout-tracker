@@ -11,6 +11,7 @@ const files = [
   "styles.css",
   "app.js",
   "lib.js",
+  "progression.js",
   "crypto-vault.js",
   "unlock-session.js",
   "WORKOUT_PLAN.md",

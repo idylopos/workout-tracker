@@ -594,6 +594,16 @@ recovery check. Advance after two qualified sessions; stepping back does not del
 
 ## Session response
 
+Log what you know during the workout. The app asks about joints and usual energy when you return for the next daily
+check-in; an evening joint update is optional. Existing later-day and following-morning ratings remain in older records.
+Missing answers and “Not sure” stay unknown and never qualify an increase.
+
+After saving, use **What should I do next time?** for a guided decision. Confirm technique and, only if it is missing
+from your sets, reps in reserve on the hardest set. Easy runs use logged RPE or a conversational-effort question.
+Strength and pull-up increases require two successive qualifying sessions at the same difficulty; running stages use
+their own targets. Accept **Use this next time** to change a future target, or **Keep my current plan** to repeat.
+The app asks for an available load or assistance value when needed and preserves all past workout results.
+
 - **Comfortable:** no meaningful pain or at normal baseline.
 - **Mild:** noticeable but stable; movement and technique stayed normal.
 - **Adjust:** clearly rising or more noticeable; reduce load, range, or volume next time.

@@ -19,12 +19,14 @@ import {
   countQualifiedLongRuns,
   dateToDayKey,
   evaluateLongRunProgress,
+  eveningCheckInItems,
   findPreviousExerciseLog,
   findPreviousSession,
   formatDuration,
   getDailyCheckInItems,
   getAllExercises,
   normalizeResponseRating,
+  recoveryReadiness,
   normalizeState,
   preparePreviousSets,
   shouldCollapseExerciseByDefault,
@@ -38,6 +40,7 @@ import {
   toIsoDate,
   validateBackup,
 } from "./lib.js";
+import { recordedReserve, progressionAdvice, nextSessionTarget, isGuidedSessionQualified, guidedPerformanceQualified } from "./progression.js";
 import {
   PBKDF2_ITERATIONS,
   VAULT_STORAGE_KEY,
@@ -117,6 +120,11 @@ let dailyCheckInAutoShownDate = "";
 let dailyCheckInQueue = [];
 let dailyCheckInIndex = 0;
 let dailyCheckInAnswers = { sleep: null, recoveries: [] };
+let coachingKey = null;
+let coachingIndex = 0;
+let coachingIds = [];
+let coachingBusy = false;
+const savedThisVisit = new Set();
 
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
@@ -127,6 +135,51 @@ const escapeHtml = (value) =>
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
+
+const PROGRESSION_HIGHLIGHTS = [
+  "2–3 RIR", "1–3 RIR", "at least 1 rep in reserve", "at least 1 RIR",
+  "about 2 reps in reserve", "Stop earlier or reduce load", "do not chase failure",
+  "End jumps and swings before speed or landing quality deteriorates",
+  "every planned working set", "top of its rep range", "in two sessions",
+  "add the smallest available load", "Do not add volume", "2 sets on the first two exposures",
+  "off by default", "at least 7 hours", "two stable weeks", "only one optional item at a time",
+  "Monday HIIT remains planned", "at least 6 hours after lifting", "take an easier week",
+  "one-third to one-half", "keep runs easy", "pause progression",
+  "two 10 km runs", "two qualified 10 km runs", "RPE 4 or below",
+  "Comfortable or Mild following-morning response", "Keep most running easy",
+  "3 × 5", "3 × 6–8", "3 × 8", "3 × 5–8", "1–3 unassisted singles",
+  "2 × 5–8 assisted back-off reps", "3 clean unassisted singles", "both assisted back-off sets",
+  "4 × 2 unassisted", "4 × 2", "0 assistance", "log 0 only for unassisted sets",
+  "2 successful sessions", "2 qualified sessions", "2 qualified unassisted sessions",
+  "stay assisted", "use assistance for doubles", "do not qualify for advancement",
+  "3–5 clean reps", "five continuous, clean repetitions", "add total reps gradually",
+];
+
+function setProgressionGuidance(element, text, label = "") {
+  // Build emphasis with text nodes so guidance can never become executable markup.
+  const pattern = new RegExp(`(${[...PROGRESSION_HIGHLIGHTS]
+    .sort((a, b) => b.length - a.length)
+    .map((phrase) => phrase.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+    .join("|")})`, "gi");
+  element.replaceChildren();
+  element.classList.add("progression-copy");
+  if (label) {
+    const heading = document.createElement("span");
+    heading.className = "guidance-label";
+    heading.textContent = label;
+    element.append(heading);
+  }
+  String(text).split(pattern).forEach((part, index) => {
+    if (index % 2) {
+      const emphasis = document.createElement("strong");
+      emphasis.className = "guidance-emphasis";
+      emphasis.textContent = part;
+      element.append(emphasis);
+    } else {
+      element.append(document.createTextNode(part));
+    }
+  });
+}
 
 const els = {
   trainingDate: $("#training-date"),
@@ -653,12 +706,12 @@ function dailyCheckInRecord(date = toIsoDate()) {
 }
 
 function dueDailyCheckInItems(date = toIsoDate()) {
-  return getDailyCheckInItems(
+  return [...getDailyCheckInItems(
     state.workoutLogs,
     state.dailySleepLogs,
     state.dailyCheckIns,
     date,
-  );
+  ), ...eveningCheckInItems(state.workoutLogs, date, new Date().getHours(), state.dailyCheckIns[date], [...savedThisVisit])];
 }
 
 function updateDailyCheckInReminder() {
@@ -674,6 +727,7 @@ function updateDailyCheckInReminder() {
 }
 
 function setDailyCheckInBusy(busy, message = "") {
+  $$("#daily-checkin-question input, #daily-checkin-question button").forEach((input) => { input.disabled = busy; });
   $("#daily-checkin-save").disabled = busy;
   $("#daily-checkin-unknown").disabled = busy;
   $("#daily-checkin-later").disabled = busy;
@@ -729,6 +783,7 @@ function renderDailyCheckInStep() {
   const skip = $("#daily-checkin-skip");
   const progress = $("#daily-checkin-progress-bar");
   $("#daily-checkin-status").textContent = "";
+  save.classList.remove("is-hidden");
 
   if (dailyCheckInIndex >= dailyCheckInQueue.length) {
     const summary = dailyCheckInSummary();
@@ -742,6 +797,16 @@ function renderDailyCheckInStep() {
         <p>${escapeHtml(summary.guidance)}</p>
       </div>
     `;
+    const reviewed = [...new Set(dailyCheckInAnswers.recoveries.map((answer) => answer.key).filter(Boolean))];
+    reviewed.forEach((key) => {
+      if (!Object.values(state.workoutLogs[key]?.exercises || {}).some((exercise) => exercise.coachingPlan)) return;
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "button button-secondary";
+      button.textContent = `Next-session advice · ${formatDate(state.workoutLogs[key].date)}`;
+      button.addEventListener("click", () => { closeDailyCheckIn(); openCoaching(key); });
+      question.append(button);
+    });
     progress.style.width = "100%";
     unknown.classList.add("is-hidden");
     later.classList.add("is-hidden");
@@ -752,7 +817,7 @@ function renderDailyCheckInStep() {
   }
 
   const item = dailyCheckInQueue[dailyCheckInIndex];
-  $("#daily-checkin-title").textContent = dailyCheckInIndex ? "One more thing." : "Good morning.";
+  $("#daily-checkin-title").textContent = dailyCheckInIndex ? "One more thing." : "Quick check-in";
   $("#daily-checkin-copy").textContent = `${dailyCheckInQueue.length} quick check-in${dailyCheckInQueue.length === 1 ? "" : "s"} · about 10 seconds`;
   progress.style.width = `${(dailyCheckInIndex / dailyCheckInQueue.length) * 100}%`;
   unknown.classList.remove("is-hidden");
@@ -787,10 +852,19 @@ function renderDailyCheckInStep() {
     return;
   }
 
+  if (item.type === "recovery") {
+    question.innerHTML = `<h3>Have your joints and usual energy returned to normal after ${escapeHtml(formatDate(item.date, { weekday: "long" }))}'s workout?</h3>
+      <p>Tap one answer to save. Not sure keeps recovery unknown.</p>
+      ${coachingChoices("daily-recovery-ready", "Recovery", [["yes", "Yes"], ["no", "Not yet"], ["unknown", "Not sure"]])}`;
+    $$('input[name="daily-recovery-ready"]', question).forEach((input) => input.addEventListener("change", () => void saveDailyCheckInAnswer()));
+    save.classList.add("is-hidden");
+    unknown.classList.add("is-hidden");
+    return;
+  }
   question.innerHTML = `
     <h3>How do your joints feel after ${escapeHtml(formatDate(item.date, { weekday: "long" }))}'s workout?</h3>
-    <p>Your answer will be added to that workout's Following morning review.</p>
-    <div class="checkin-rating-grid" role="radiogroup" aria-label="Following-morning joint response">
+    <p>Optional evening update. Skip it if you’re not sure.</p>
+    <div class="checkin-rating-grid" role="radiogroup" aria-label="Later-that-day joint response">
       ${RESPONSE_SCALE.map(
         (rating) => `
           <label>
@@ -878,7 +952,8 @@ async function saveDailyCheckInAnswer({ unknown = false } = {}) {
   const before = {
     dailySleepLogs: structuredClone(state.dailySleepLogs),
     dailyCheckIns: structuredClone(state.dailyCheckIns),
-    workout: item.type === "recovery" ? structuredClone(state.workoutLogs[item.key]) : null,
+    workout: item.type !== "sleep" ? structuredClone(state.workoutLogs[item.key]) : null,
+    draft: item.type !== "sleep" && state.workoutDrafts[item.key] ? structuredClone(state.workoutDrafts[item.key]) : null,
   };
   let savedSleep = null;
   let savedRecovery = null;
@@ -889,7 +964,11 @@ async function saveDailyCheckInAnswer({ unknown = false } = {}) {
 
   if (unknown) {
     if (item.type === "sleep") record.sleepUnknown = true;
-    else record.recoveryUnknown = [...new Set([...(record.recoveryUnknown || []), item.key])];
+    else if (item.type === "later") record.laterUnknown = [...new Set([...(record.laterUnknown || []), item.key])];
+    else {
+      record.recoveryUnknown = [...new Set([...(record.recoveryUnknown || []), item.key])];
+      if (state.workoutLogs[item.key]) state.workoutLogs[item.key].response = { ...state.workoutLogs[item.key].response, readiness: "unknown" };
+    }
   } else if (item.type === "sleep") {
     const hours = Number($("#daily-sleep-hours")?.value);
     if (!Number.isFinite(hours) || hours < 0 || hours > 24 || $("#daily-sleep-hours").value === "") {
@@ -901,6 +980,16 @@ async function saveDailyCheckInAnswer({ unknown = false } = {}) {
     }
     upsertByDate(state.dailySleepLogs, { date: item.date, hours });
     savedSleep = hours;
+  } else if (item.type === "recovery") {
+    const value = $('input[name="daily-recovery-ready"]:checked')?.value;
+    if (!value) { setDailyCheckInBusy(false, "Choose a response or Not sure."); return; }
+    const workout = state.workoutLogs[item.key];
+    if (!workout) { setDailyCheckInBusy(false, "This workout is no longer available."); return; }
+    workout.response = { ...workout.response, readiness: value, readinessCheckedOn: toIsoDate() };
+    if (value === "unknown") record.recoveryUnknown = [...new Set([...(record.recoveryUnknown || []), item.key])];
+    workout.updatedAt = new Date().toISOString();
+    for (const id of Object.keys(workout.exercises)) refreshGuidedQualification(workout, id);
+    if (value !== "unknown") savedRecovery = { key: item.key, value: value === "yes" ? 0 : 2, label: value === "yes" ? "Back to normal" : "Not back to normal" };
   } else {
     const selected = $('input[name="daily-recovery-rating"]:checked');
     if (!selected) {
@@ -921,19 +1010,27 @@ async function saveDailyCheckInAnswer({ unknown = false } = {}) {
     }
     state.workoutLogs[item.key] = {
       ...workout,
-      response: { ...(workout.response || {}), scaleVersion: 2, painNext: rating },
+      response: { ...(workout.response || {}), scaleVersion: 2, painLater: rating },
       updatedAt: new Date().toISOString(),
     };
-    savedRecovery = RESPONSE_SCALE.find((entry) => entry.value === rating);
+    // Evening symptoms are stored separately and never qualify next-morning recovery.
   }
 
+  if (item.type !== "sleep" && state.workoutLogs[item.key]) {
+    for (const id of Object.keys(state.workoutLogs[item.key].exercises)) refreshGuidedQualification(state.workoutLogs[item.key], id);
+  }
+  if (item.type !== "sleep" && state.workoutDrafts[item.key] && state.workoutLogs[item.key]) {
+    state.workoutDrafts[item.key].response = { ...state.workoutDrafts[item.key].response, ...state.workoutLogs[item.key].response };
+    for (const id of Object.keys(state.workoutDrafts[item.key].exercises)) refreshGuidedQualification(state.workoutDrafts[item.key], id);
+  }
   const lastItem = dailyCheckInIndex + 1 >= dailyCheckInQueue.length;
   record.status = lastItem ? "completed" : "open";
   const saved = await persistState();
   if (!saved) {
     state.dailySleepLogs = before.dailySleepLogs;
     state.dailyCheckIns = before.dailyCheckIns;
-    if (item.type === "recovery" && before.workout) state.workoutLogs[item.key] = before.workout;
+    if (item.type !== "sleep" && before.workout) state.workoutLogs[item.key] = before.workout;
+    if (before.draft) state.workoutDrafts[item.key] = before.draft;
     setDailyCheckInBusy(false);
     const status = $("#daily-checkin-status");
     status.textContent = "Couldn't save yet. Keep this open and try again.";
@@ -966,9 +1063,9 @@ function renderTrainingRules(day) {
   card.classList.toggle("is-hidden", !hasStrength);
   if (!hasStrength) return;
 
-  $("#strength-rule-effort").textContent = STRENGTH_PROGRESSION.effort;
-  $("#strength-rule-load").textContent = STRENGTH_PROGRESSION.load;
-  $("#strength-rule-volume").textContent = STRENGTH_PROGRESSION.volume;
+  setProgressionGuidance($("#strength-rule-effort"), STRENGTH_PROGRESSION.effort, "During each set");
+  setProgressionGuidance($("#strength-rule-load"), STRENGTH_PROGRESSION.load, "When to add weight");
+  setProgressionGuidance($("#strength-rule-volume"), STRENGTH_PROGRESSION.volume, "Before adding sets");
 
   const sleep = latestSleepLog();
   const gate = $("#recovery-gate");
@@ -980,9 +1077,171 @@ function renderTrainingRules(day) {
     : sleep
       ? `${numberFormatter.format(hours)} h/night · keep optional work off`
       : "No weekly sleep logged · default to recovery";
-  $("#recovery-gate-copy").textContent = sleepReady
+  setProgressionGuidance($("#recovery-gate-copy"), sleepReady
     ? "Sleep meets the first gate. Add only one optional session when joints, legs, and usual energy have also been stable the following morning for two weeks."
-    : OPTIONAL_RECOVERY_RULE.copy;
+    : OPTIONAL_RECOVERY_RULE.copy
+      .replace(" Monday HIIT", "\n\nMonday HIIT")
+      .replace(" If performance", "\n\nIf performance"));
+}
+
+function coachingPlanFor(card, exerciseLog) {
+  if (activePlan.id !== BUILT_IN_PLAN.id) return null;
+  const id = card.dataset.exerciseId;
+  const exercise = activePlan.days[dateToDayKey(selectedDate)].exercises.find((entry) => entry.id === id);
+  if (!exercise) return null;
+  if (["long-run", "easy-run", "run-2"].includes(id)) {
+    if (id === "run-2" && Number(state.settings.block) === 2) return null;
+    const stage = Number(card.dataset.longRunStage) || null;
+    return { kind: "run", stage, distance: stage ? Number(targetLongRun(stage).match(/[\d.]+/)?.[0]) : null,
+      totalStages: activePlan.longRuns.length };
+  }
+  if (id === "pull-up-progression") {
+    if (exercise.optional) return null;
+    const step = exerciseLog.progressionStep;
+    return { kind: "pullup", sets: getPullupStep(step).sets,
+      minReps: [0, 5, 6, 5, 1, 2, 3][step], maxReps: [0, 5, 8, 8, 1, 2, 5][step], minRir: step === 1 ? 2 : 1 };
+  }
+  if (exerciseLog.measurement !== "weight_reps" || exercise.category !== "Strength" || id === "kettlebell-swing") return null;
+  const variant = EXERCISE_ALTERNATIVES[id]?.find((entry) => entry.id === exerciseLog.variantId);
+  const range = (variant?.prescription || exercise.prescription).match(/×\s*(\d+)\s*[–-]\s*(\d+)/);
+  if (!range) return null;
+  const compound = ["box-squat", "bulgarian-split-squat", "trap-bar-deadlift", "barbell-hip-thrust",
+    "half-kneeling-landmine-press", "neutral-db-bench", "neutral-incline-db-press", "one-arm-landmine-press",
+    "chest-supported-row", "one-arm-cable-row", "controlled-step-down"].includes(id);
+  return { kind: "strength", sets: Number(card.dataset.defaultSets), minReps: Number(range[1]), maxReps: Number(range[2]), minRir: compound ? 2 : 1 };
+}
+
+function refreshGuidedQualification(log, id) {
+  const exercise = log.exercises[id];
+  if (exercise.coachingPlan?.kind !== "pullup") return;
+  exercise.progressionPerformanceQualified = guidedPerformanceQualified(exercise);
+  exercise.progressionRecoveryQualified = log.date < toIsoDate() && recoveryReadiness(log.response) === "yes";
+  exercise.progressionQualified = isGuidedSessionQualified(log, id, toIsoDate());
+}
+
+function openCoaching(key = workoutLogKey(selectedDate), onlyExercise = "") {
+  const log = state.workoutLogs[key];
+  if (!log) { showToast("Save the workout first so we can use your logged sets."); return; }
+  coachingIds = Object.keys(log.exercises).filter((id) => log.exercises[id].coachingPlan &&
+    log.exercises[id].sets.some((set) => set.completed) && (!onlyExercise || onlyExercise === id));
+  if (!coachingIds.length) { showToast("No completed progression exercises to review yet."); return; }
+  coachingKey = key;
+  coachingIndex = 0;
+  $("#coaching-dialog").showModal();
+  renderCoachingQuestions();
+}
+
+function coachingChoices(name, title, choices, value = "") {
+  return `<fieldset class="coaching-question"><legend>${escapeHtml(title)}</legend><div class="coaching-choices">${choices.map(([key, label]) =>
+    `<label><input type="radio" name="${name}" value="${key}" ${String(value) === key ? "checked" : ""} /><span>${escapeHtml(label)}</span></label>`).join("")}</div></fieldset>`;
+}
+
+function coachingButton(label, callback, primary = false) {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = `button ${primary ? "button-primary" : "button-secondary"}`;
+  button.textContent = label;
+  button.addEventListener("click", async () => {
+    if (coachingBusy) return;
+    coachingBusy = true;
+    const controls = $$("#coaching-dialog button, #coaching-dialog input");
+    controls.forEach((control) => { control.disabled = true; });
+    try { await callback(); }
+    catch { $("#coaching-status").textContent = "Couldn’t finish that change. Your saved workout is still available; try again."; }
+    finally { controls.forEach((control) => { control.disabled = false; }); coachingBusy = false; }
+  });
+  $("#coaching-actions").append(button);
+}
+
+function nextCoachingExercise() {
+  coachingIndex += 1;
+  if (coachingIndex >= coachingIds.length) {
+    $("#coaching-dialog").close();
+    showToast("Review saved. Recovery questions will appear when you return.");
+    renderToday();
+    return;
+  }
+  renderCoachingQuestions();
+}
+
+function renderCoachingQuestions(edit = false) {
+  const log = state.workoutLogs[coachingKey];
+  const exercise = log.exercises[coachingIds[coachingIndex]];
+  const answer = exercise.coaching || {};
+  $("#coaching-position").textContent = `NEXT SESSION · ${coachingIndex + 1} OF ${coachingIds.length}`;
+  $("#coaching-exercise").textContent = `${exercise.name} · ${formatDate(log.date)}`;
+  $("#coaching-title").textContent = "How did it feel?";
+  $("#coaching-status").textContent = "";
+  $("#coaching-actions").replaceChildren();
+  const run = exercise.coachingPlan.kind === "run";
+  const reserve = recordedReserve(exercise);
+  const rpeKnown = run && exercise.sets.filter((set) => set.completed).every((set) =>
+    set.rpe !== "" && set.rpe !== null && set.rpe !== undefined && Number.isFinite(Number(set.rpe)));
+  const answered = run ? rpeKnown || ["yes", "no"].includes(answer.conversational) :
+    ["yes", "difficult", "no"].includes(answer.technique) && (reserve !== null || ["0", "1", "2", "4"].includes(String(answer.reserve))) &&
+    (exercise.progressionStep !== 3 || ["yes", "no"].includes(answer.readySingle));
+  if (answered && !edit) { renderCoachingAdvice(); return; }
+  let html = run ? (rpeKnown ? "<p>We’ll use the effort you already logged for this run.</p>" : coachingChoices("coach-conversational", "Was the run conversational?",
+    [["yes", "Yes"], ["no", "No"], ["unknown", "Not sure"]], answer.conversational)) :
+    coachingChoices("coach-technique", "Did you finish with clean technique?", [["yes", "Yes"], ["difficult", "Some reps were difficult"], ["no", "No"], ["unknown", "Not sure"]], answer.technique);
+  if (!run) html += reserve === null ? coachingChoices("coach-reserve", "How many more clean reps could you have done on your hardest set?",
+    [["0", "0"], ["1", "1"], ["2", "2–3"], ["4", "4+"], ["unknown", "Not sure"]], answer.reserve) :
+    `<p>Using your logged reserve: <strong>${reserve} ${reserve === 1 ? "rep" : "reps"}</strong> on the hardest set.</p>`;
+  if (exercise.progressionStep === 3) html += coachingChoices("coach-single", "At your lowest practical assistance, can you also do one clean unassisted rep with another in reserve?",
+    [["yes", "Yes"], ["no", "Not yet"], ["unknown", "Not sure"]], answer.readySingle);
+  $("#coaching-content").innerHTML = html;
+  coachingButton("Save answers", async () => {
+    const read = (name) => $(`input[name="${name}"]:checked`)?.value || "unknown";
+    const previous = structuredClone(exercise);
+    exercise.coaching = { ...answer, ...(run ? { conversational: rpeKnown ? undefined : read("coach-conversational") } :
+      { technique: read("coach-technique"), reserve: reserve === null ? read("coach-reserve") : reserve }),
+      ...(exercise.progressionStep === 3 ? { readySingle: read("coach-single") } : {}) };
+    refreshGuidedQualification(log, coachingIds[coachingIndex]);
+    if (!(await persistState())) {
+      log.exercises[coachingIds[coachingIndex]] = previous;
+      $("#coaching-status").textContent = "Answers could not be saved. Try again.";
+      return;
+    }
+    renderCoachingAdvice();
+  }, true);
+  coachingButton("Skip this exercise", nextCoachingExercise);
+}
+
+function renderCoachingAdvice() {
+  const log = state.workoutLogs[coachingKey];
+  const id = coachingIds[coachingIndex];
+  const exercise = log.exercises[id];
+  const advice = progressionAdvice(log, id, state.workoutLogs, toIsoDate());
+  $("#coaching-title").textContent = "Next time";
+  $("#coaching-actions").replaceChildren();
+  const needsLoad = (["increase", "reduce"].includes(advice.action) || advice.nextStep === 3) && exercise.coachingPlan.kind !== "run";
+  const field = exercise.coachingPlan.kind === "pullup" ? "assistance" : "weight";
+  $("#coaching-content").innerHTML = `<h3>${escapeHtml(advice.title)}</h3><p>${escapeHtml(advice.detail)}</p>${needsLoad ?
+    `<label class="wide-label"><span>Next ${field === "assistance" ? "assistance" : "load"} (kg)</span><input id="coach-load" type="number" min="0" step="any" inputmode="decimal" /><small>Choose a value available on your equipment. Nothing changes until you accept.</small></label>` : ""}`;
+  if (advice.action !== "pending") coachingButton("Use this next time", async () => {
+    const target = nextSessionTarget(log, id, advice, $("#coach-load")?.value ?? "");
+    if (!target) { $("#coaching-status").textContent = `Enter ${field === "assistance" ? advice.nextStep === 3 ? "less assistance" : "more assistance" : advice.action === "increase" ? "a higher load" : "a lower load"} than the logged working sets.`; return; }
+    // Do not apply a stale review to a different plan, step, or run stage.
+    if ((log.planId || "form-flow") !== activePlan.id ||
+      (advice.nextStep && Number(state.settings.pullupStep) !== Number(exercise.progressionStep)) ||
+      (advice.nextStage && Number(state.settings.longRunWeek) !== Number(exercise.coachingPlan.stage))) {
+      $("#coaching-status").textContent = "The current plan or progression has changed. Review a session from the current step instead.";
+      return;
+    }
+    const newer = Object.values(state.workoutLogs).some((entry) => entry.date > log.date &&
+      (entry.planId || "form-flow") === (log.planId || "form-flow") && entry.exercises?.[id]?.sets?.some((set) => set.completed));
+    if (newer) { $("#coaching-status").textContent = "A newer session is available. Review its result before changing the next target."; return; }
+    const previous = structuredClone(state.settings);
+    const key = `${log.planId || "form-flow"}:${id}`;
+    state.settings.nextSessionTargets = { ...state.settings.nextSessionTargets, [key]: target };
+    if (advice.nextStep) state.settings.pullupStep = advice.nextStep;
+    if (advice.nextStage) state.settings.longRunWeek = advice.nextStage;
+    if (!(await persistState())) { state.settings = previous; $("#coaching-status").textContent = "Target not saved. Try again."; return; }
+    showToast("Next-session target saved. Past workouts stay unchanged.");
+    nextCoachingExercise();
+  }, true);
+  coachingButton("Keep my current plan", nextCoachingExercise);
+  coachingButton("Edit answers", () => renderCoachingQuestions(true));
 }
 
 function longRunStatusCopy(evaluation) {
@@ -1012,7 +1271,7 @@ function renderPhaseGuide() {
   const phase = RUNNING_PHASES[Number(state.settings.block) === 2 ? 2 : 1];
   $("#phase-guide-number").textContent = phase.number;
   $("#phase-guide-title").textContent = phase.title;
-  $("#phase-guide-copy").textContent = phase.copy;
+  setProgressionGuidance($("#phase-guide-copy"), phase.copy);
   $("#phase-guide-points").innerHTML = phase.points
     .map(([day, task]) => `<span><strong>${escapeHtml(day)}</strong>${escapeHtml(task)}</span>`)
     .join("");
@@ -1107,6 +1366,7 @@ function renderToday() {
 
   const saved = state.workoutLogs[workoutLogKey(selectedDate)];
   const savedDraft = state.workoutDrafts[workoutLogKey(selectedDate)];
+  $("#next-session-entry").classList.toggle("is-hidden", !Object.values(saved?.exercises || {}).some((exercise) => exercise.coachingPlan));
   if (draftSession) {
     setSaveStatus("Session loaded · review & save", "restored");
   } else if (savedDraft) {
@@ -1387,9 +1647,9 @@ function renderPullupRoadmap(card, previewStepId) {
   $(".progression-title", card).textContent = `${preview.label}: ${preview.title}`;
   $(".progression-preview-status", card).textContent = previewStatus.label;
   $(".progression-preview-status", card).dataset.status = previewStatus.key;
-  $(".progression-prescription", card).innerHTML = `<strong>Prescription:</strong> ${escapeHtml(preview.prescription)}`;
-  $(".progression-target", card).innerHTML = `<strong>Criteria:</strong> ${escapeHtml(preview.target)}`;
-  $(".progression-next", card).innerHTML = `<strong>Next:</strong> ${escapeHtml(preview.next)}`;
+  setProgressionGuidance($(".progression-prescription", card), preview.prescription, "Do now");
+  setProgressionGuidance($(".progression-target", card), preview.target, "Advance when");
+  setProgressionGuidance($(".progression-next", card), preview.next, "Then");
   const apply = $(".progression-apply", card);
   apply.classList.toggle("is-hidden", preview.id === currentStepId);
   apply.textContent =
@@ -1451,9 +1711,8 @@ function setupPullupGuide(card, exercise, savedExercise) {
   performance.checked = qualification.performance;
   recovery.checked = qualification.recovery;
   recovery.disabled = selectedDate >= toIsoDate() && !qualification.recovery;
-  $(".progression-check-help", card).textContent = recovery.disabled
-    ? "The following-morning check becomes available tomorrow. Save today’s performance now."
-    : "Confirm the following-morning response, then save this date again.";
+  $(".progression-check-help", card).textContent = "Save your workout, answer a few short questions, and check recovery when you return. Recommendations use your actual sets.";
+  $(".progression-coach", card).addEventListener("click", () => openCoaching(workoutLogKey(selectedDate), exercise.id));
   applyPullupStep(card, exercise, selectedStep);
   renderPullupRoadmap(card, selectedStep.id);
   updatePullupProgressStatus(card);
@@ -1690,6 +1949,18 @@ function createExerciseCard(exercise, index, savedExercise) {
   const sets = savedExercise?.sets?.length
     ? savedExercise.sets
     : Array.from({ length: Number(card.dataset.defaultSets) }, () => ({}));
+  const nextTarget = state.settings.nextSessionTargets?.[`${activePlan.id}:${exercise.id}`];
+  if (!savedExercise && nextTarget && selectedDate > nextTarget.sourceDate &&
+    nextTarget.measurement === measurement && (nextTarget.variantId || "") === (card.dataset.variantId === exercise.id ? "" : card.dataset.variantId || "") &&
+    (!pullupStep || !nextTarget.progressionStep || Number(nextTarget.progressionStep) === pullupStep.id)) {
+    if (["weight", "assistance"].includes(nextTarget.field) && Number.isFinite(nextTarget.value) && nextTarget.value >= 0) {
+      sets.forEach((set) => { set[nextTarget.field] = nextTarget.value; if (nextTarget.reps) set.reps = nextTarget.reps; });
+    }
+    const note = document.createElement("p");
+    note.className = "next-session-note";
+    note.textContent = `Next-session plan: ${nextTarget.title}. ${nextTarget.detail}`;
+    $(".previous-line", card).after(note);
+  }
   renderSetRows(card, measurement, sets);
   if (exercise.progression === "pullup") setupPullupGuide(card, exercise, savedExercise);
 
@@ -1945,6 +2216,16 @@ function collectWorkoutRecord() {
           exerciseLog.progressionPerformanceQualified && exerciseLog.progressionRecoveryQualified;
       }
       if (card.dataset.longRunStage) exerciseLog.progressionStage = Number(card.dataset.longRunStage);
+      exerciseLog.coachingPlan = coachingPlanFor(card, exerciseLog);
+      const previous = state.workoutLogs[workoutLogKey(selectedDate)]?.exercises?.[card.dataset.exerciseId];
+      if (previous?.coaching && JSON.stringify(previous.sets) === JSON.stringify(sets) &&
+        previous.measurement === exerciseLog.measurement && previous.variantId === exerciseLog.variantId &&
+        previous.progressionStep === exerciseLog.progressionStep) exerciseLog.coaching = previous.coaching;
+      if (exerciseLog.coachingPlan?.kind === "pullup") {
+        exerciseLog.progressionPerformanceQualified = guidedPerformanceQualified(exerciseLog);
+        exerciseLog.progressionRecoveryQualified = selectedDate < toIsoDate() && recoveryReadiness(state.workoutLogs[workoutLogKey(selectedDate)]?.response) === "yes";
+        exerciseLog.progressionQualified = exerciseLog.progressionPerformanceQualified && exerciseLog.progressionRecoveryQualified;
+      }
       exercises[card.dataset.exerciseId] = exerciseLog;
     }
   });
@@ -1958,10 +2239,13 @@ function collectWorkoutRecord() {
     exercises,
     extraActivities,
     response: {
+      ...(state.workoutLogs[workoutLogKey(selectedDate)]?.response || currentLog()?.response || {}),
       scaleVersion: 2,
       painDuring: selectedResponseRating("painDuring"),
-      painLater: selectedResponseRating("painLater"),
-      painNext: selectedResponseRating("painNext"),
+      painLater: $('[data-response-question="painLater"]').classList.contains("is-hidden")
+        ? (state.workoutLogs[workoutLogKey(selectedDate)]?.response?.painLater ?? currentLog()?.response?.painLater ?? "") : selectedResponseRating("painLater"),
+      painNext: $('[data-response-question="painNext"]').classList.contains("is-hidden")
+        ? (state.workoutLogs[workoutLogKey(selectedDate)]?.response?.painNext ?? currentLog()?.response?.painNext ?? "") : selectedResponseRating("painNext"),
       notes: els.sessionNotes.value.trim(),
     },
     updatedAt: new Date().toISOString(),
@@ -1997,11 +2281,14 @@ async function saveWorkout() {
   workoutDirty = false;
   const key = workoutLogKey(selectedDate);
   state.workoutLogs[key] = collectWorkoutRecord();
+  state.workoutLogs[key].savedAt = new Date().toISOString();
   delete state.workoutDrafts[key];
   draftSession = null;
   if (await persistState()) {
+    savedThisVisit.add(key);
     showToast("Workout saved on this device.");
     renderToday();
+    if (Object.values(state.workoutLogs[key].exercises).some((exercise) => exercise.coachingPlan && exercise.sets.some((set) => set.completed))) openCoaching(key);
   }
 }
 
@@ -2049,6 +2336,13 @@ function loadResponseFields(log) {
     updateResponseDescription(key);
   });
   els.sessionNotes.value = log?.response?.notes ?? "";
+  ["painLater", "painNext"].forEach((key) => {
+    const existing = normalizeResponseRating(log?.response?.[key], log?.response?.scaleVersion) !== "";
+    $(`[data-response-question="${key}"]`).classList.toggle("is-hidden", !existing);
+  });
+  $(".recovery-return-note").textContent = log?.response?.readiness === "yes" ? "Recovery check saved: joints and usual energy are back to normal." :
+    log?.response?.readiness === "no" ? "Recovery check saved: not back to normal yet. Keep the next session easier." :
+    "Log what you know now. We’ll ask about recovery at your next check-in. An evening update is optional.";
 }
 
 function updateWarmupCount() {
@@ -2720,6 +3014,8 @@ function timerFinished() {
 }
 
 function bindEvents() {
+  $("#open-coaching").addEventListener("click", () => openCoaching());
+  $("#coaching-close").addEventListener("click", () => $("#coaching-dialog").close());
   $$("[data-nav]").forEach((button) => button.addEventListener("click", async () => {
     if (button.dataset.nav === "today") {
       await saveWorkoutDraftNow();
@@ -2889,6 +3185,11 @@ function bindEvents() {
   });
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "hidden") saveWorkoutDraftNow();
+    else if (!$("#coaching-dialog").open && !(storageMode === "encrypted" && !vaultKey)) {
+      savedThisVisit.clear();
+      updateDailyCheckInReminder();
+      maybeOpenDailyCheckIn();
+    }
   });
   window.addEventListener("pagehide", () => {
     saveWorkoutDraftNow();

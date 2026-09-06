@@ -178,22 +178,28 @@
                 <div class="response-options" data-response-options="painDuring"></div>
                 <p class="response-description" data-response-description="painDuring">No response selected.</p>
               </fieldset>
-              <fieldset class="response-question" data-response-question="painLater">
+              <fieldset class="response-question is-hidden" data-response-question="painLater">
                 <legend>Later that day</legend>
                 <div class="response-options" data-response-options="painLater"></div>
                 <p class="response-description" data-response-description="painLater">No response selected.</p>
               </fieldset>
-              <fieldset class="response-question" data-response-question="painNext">
+              <fieldset class="response-question is-hidden" data-response-question="painNext">
                 <legend>Following morning</legend>
                 <div class="response-options" data-response-options="painNext"></div>
                 <p class="response-description" data-response-description="painNext">No response selected.</p>
               </fieldset>
             </div>
+            <p class="recovery-return-note">Log what you know now. We’ll ask about recovery at your next check-in. An evening update is optional.</p>
             <label class="wide-label">
               <span>Optional note</span>
               <textarea id="session-notes" rows="2" placeholder="Where did you feel it? What did you change?"></textarea>
             </label>
           </details>
+
+          <aside id="next-session-entry" class="next-session-entry is-hidden">
+            <div><strong>What should I do next time?</strong><p>A few short answers, using the sets you’ve already logged.</p></div>
+            <button type="button" class="button button-secondary" id="open-coaching">Review next session</button>
+          </aside>
 
           <div class="save-bar">
             <div>
@@ -557,6 +563,17 @@
       </form>
     </dialog>
 
+    <dialog class="coaching-dialog" id="coaching-dialog" aria-labelledby="coaching-title">
+      <div class="activity-dialog-head">
+        <div><p class="eyebrow" id="coaching-position">NEXT SESSION</p><h2 id="coaching-title">What should I do next time?</h2></div>
+        <button class="dialog-close" type="button" id="coaching-close" aria-label="Close next-session review">×</button>
+      </div>
+      <p id="coaching-exercise"></p>
+      <div id="coaching-content"></div>
+      <p id="coaching-status" role="status" aria-live="polite"></p>
+      <div class="coaching-actions" id="coaching-actions"></div>
+    </dialog>
+
     <dialog class="daily-checkin-dialog" id="daily-checkin-dialog" aria-labelledby="daily-checkin-title">
       <div class="daily-checkin-shell">
         <header class="daily-checkin-head">
@@ -674,19 +691,20 @@
                 <span>Advancement check</span>
                 <strong class="progression-status">0 of 2 successful sessions</strong>
               </div>
-              <label>
+              <label class="is-hidden">
                 <input class="progression-performance-qualified" type="checkbox" />
                 <span>
                   Performance completed: stage target met with clean technique, full intended range, and at least 1 RIR.
                 </span>
               </label>
-              <label>
+              <label class="is-hidden">
                 <input class="progression-recovery-qualified" type="checkbox" />
                 <span>Following-morning response: joints and usual function are at baseline or no worse.</span>
               </label>
               <small class="progression-check-help">
-                Save the performance today. Reopen this date the following morning, confirm recovery, and save again.
+                Save your workout, answer a few short questions, and check recovery when you return.
               </small>
+              <button type="button" class="button button-secondary progression-coach">What should I do next time?</button>
             </div>
           </section>
         </div>

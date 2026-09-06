@@ -528,6 +528,13 @@ export function longRunTargetDistance(target) {
   return match ? Number(match[0]) : 0;
 }
 
+export function recoveryReadiness(response = {}) {
+  const rating = normalizeResponseRating(response.painNext, response.scaleVersion);
+  if (rating !== "" && rating > 1) return "no";
+  if (["yes", "no", "unknown"].includes(response.readiness)) return response.readiness;
+  return rating === "" ? "unknown" : "yes";
+}
+
 export function evaluateLongRunProgress(log, target, exerciseId = "long-run") {
   const exercise = log?.exercises?.[exerciseId];
   const sets = Array.isArray(exercise?.sets) ? exercise.sets : [];
@@ -564,7 +571,7 @@ export function evaluateLongRunProgress(log, target, exerciseId = "long-run") {
       rpe,
     };
   }
-  if (!Number.isFinite(rpe)) {
+  if ((!Number.isFinite(rpe) && exercise.coaching?.conversational !== "yes") || exercise.coaching?.conversational === "unknown") {
     return {
       status: "pending",
       label: "RPE needed",
@@ -573,27 +580,27 @@ export function evaluateLongRunProgress(log, target, exerciseId = "long-run") {
       rpe: null,
     };
   }
-  if (rpe > 4) {
+  if (rpe > 4 || exercise.coaching?.conversational === "no") {
     return {
       status: "repeat",
       label: "Repeat recommended",
-      reason: `The run was RPE ${rpe}; repeat until the prescribed distance feels easy and conversational.`,
+      reason: `The run ${rpe !== null ? `was RPE ${rpe}` : "was not conversational"}; repeat until the prescribed distance feels easy and conversational.`,
       distance,
       rpe,
     };
   }
 
-  const nextMorning = normalizeResponseRating(log?.response?.painNext, log?.response?.scaleVersion);
-  if (nextMorning === "") {
+  const nextMorning = recoveryReadiness(log?.response);
+  if (nextMorning === "unknown") {
     return {
       status: "pending",
       label: "Morning check pending",
-      reason: "Reopen this workout the following morning and record your response.",
+      reason: "Answer the recovery question at your next daily check-in.",
       distance,
       rpe,
     };
   }
-  if (Number(nextMorning) > 1) {
+  if (nextMorning === "no") {
     return {
       status: "repeat",
       label: "Repeat recommended",
@@ -1165,7 +1172,8 @@ export function findOutstandingRecoveryLogs(workoutLogs, today = toIsoDate(), lo
       if (!log?.date || log.date >= today || log.date < earliest) return false;
       const response = log.response || {};
       const hasFollowingMorning =
-        response.painNext !== undefined && response.painNext !== null && response.painNext !== "";
+        ["yes", "no"].includes(response.readiness) ||
+        (response.readiness !== "unknown" && response.painNext !== undefined && response.painNext !== null && response.painNext !== "");
       return !hasFollowingMorning && Object.keys(log.exercises || {}).length > 0;
     })
     .sort(([, a], [, b]) => b.date.localeCompare(a.date))
@@ -1197,6 +1205,16 @@ export function shouldAutoOpenDailyCheckIn(lastShownDate, date, items, status = 
     items.length > 0 &&
     !["deferred", "skipped", "completed"].includes(status)
   );
+}
+
+export function eveningCheckInItems(workoutLogs, date, hour, dailyRecord = {}, savedThisVisit = [], nowMs = Date.now()) {
+  if (hour < 18) return [];
+  return Object.entries(workoutLogs || {}).filter(([key, log]) => log.date === date &&
+    !savedThisVisit.includes(key) && !(dailyRecord.laterUnknown || []).includes(key) &&
+    (!log.savedAt || nowMs - Date.parse(log.savedAt) >= 60 * 60 * 1000) &&
+    normalizeResponseRating(log.response?.painLater, log.response?.scaleVersion) === "" &&
+    Object.values(log.exercises || {}).some((exercise) => exercise.sets?.some((set) => set.completed)))
+    .map(([key, log]) => ({ type: "later", key, date: log.date, dayKey: log.dayKey }));
 }
 
 export function summarizeWeeklySleep(weeklySleepLogs = [], dailySleepLogs = []) {
@@ -1256,12 +1274,15 @@ export function summarizeProgressOverview(workoutLogs = {}, dailySleepLogs = [],
 
   const reviewedLogs = currentLogs.filter((log) => {
     const value = normalizeResponseRating(log.response?.painNext, log.response?.scaleVersion);
-    return value !== "";
+    return value !== "" || ["yes", "no"].includes(log.response?.readiness);
   });
   const latestResponseValue = reviewedLogs.length
     ? Number(normalizeResponseRating(reviewedLogs.at(-1).response?.painNext, reviewedLogs.at(-1).response?.scaleVersion))
     : null;
-  const latestResponse = Number.isInteger(latestResponseValue)
+  const readiness = reviewedLogs.at(-1)?.response?.readiness;
+  const latestResponse = ["yes", "no"].includes(readiness) && !(latestResponseValue > 1)
+    ? { value: readiness === "yes" ? 0 : 2, label: readiness === "yes" ? "Back to normal" : "Not yet recovered" }
+    : Number.isInteger(latestResponseValue)
     ? RESPONSE_SCALE.find((option) => option.value === latestResponseValue) || null
     : null;
   const dueReviews = findOutstandingRecoveryLogs(workoutLogs, today).length;

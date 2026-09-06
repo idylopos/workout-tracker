@@ -62,9 +62,22 @@ The built-in plan uses a brief Monday lunge-twist warm-up and a separately logge
 sequence. Each mobility movement is logged on its own rather than as one combined set.
 
 On the first visit each day, a non-blocking **Daily Check-in** asks only for inputs that are due: last night's
-sleep and any missing following-morning workout response from the previous two days. Answers save immediately to the
-browser. Following-morning answers update the original workout record, while nightly sleep records calculate
+sleep and recovery from workouts in the previous two days. Recovery is one tap: **Yes / Not yet / Not sure** to whether
+joints and usual energy are back to normal. Answers save immediately to the browser and update the original workout
+and any matching draft. Nightly sleep records calculate
 the current weekly average without replacing legacy weekly sleep logs. The check-in can be deferred or skipped.
+Review asks only about the workout itself. Existing later-day and morning ratings remain available when viewing old
+records. An optional evening joint check appears when returning after 6 pm, at least an hour after saving a workout; it never
+counts as next-morning recovery. Missing or uncertain answers stay unknown.
+
+After saving a built-in workout, **What should I do next time?** walks through completed progression exercises. It asks
+about technique and asks about the hardest set's reserve only when set-level RIR is incomplete. Easy runs use logged
+RPE or a conversational-effort question. Already answered questions are skipped, with **Edit answers** available.
+Recommendations use the actual set targets and recovery; load and pull-up increases require two successive qualifying
+sessions at the same difficulty. The running stages keep their own advancement rules. **Use this next time** explicitly
+accepts a future target; **Keep my current plan** changes nothing. Load changes require an equipment-appropriate value
+from the user, and future rows are never marked complete. Past results are preserved. These suggestions do not automate
+Block 2 quality-run programming or custom folder plans.
 
 The current built-in plan is also available as [WORKOUT_PLAN.md](WORKOUT_PLAN.md). It is generated from `lib.js` during
 `npm run build`; after changing the built-in plan, run `npm run sync-plan` and commit the updated Markdown together with
