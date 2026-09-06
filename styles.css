@@ -3726,12 +3726,17 @@ body[data-active-view="today"] .timer {
   }
 
   .response-options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 4px;
   }
 
   .response-choice {
-    min-height: 74px;
-    padding-inline: 2px;
+    grid-template-columns: 24px minmax(0, 1fr);
+    min-height: 48px;
+    gap: 6px;
+    padding: 8px;
+    text-align: left;
+    justify-items: start;
   }
 
   .response-face {
@@ -3739,11 +3744,11 @@ body[data-active-view="today"] .timer {
   }
 
   .response-choice strong {
-    font-size: 11px;
+    font-size: 12px;
     line-height: 1.15;
     white-space: normal;
-    overflow-wrap: anywhere;
-    hyphens: auto;
+    overflow-wrap: normal;
+    hyphens: none;
   }
 
   .save-bar {
