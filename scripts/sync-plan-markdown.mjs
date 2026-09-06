@@ -128,7 +128,7 @@ Evidence: [acute stretching review](https://pubmed.ncbi.nlm.nih.gov/26642915/),
 - **Running:** Tuesday is fixed; Thursday is the second run; Saturday is the long run.
 - **Cycling:** Monday bicycle HIIT is a later session, separated from lifting by at least 6 hours. Wednesday Zone 2
   cycling is optional and only for a well-recovered day.
-- **Swimming:** Saturday technique-focused swimming at easy effort.
+- **Swimming:** Saturday technique-focused swimming is optional, at easy effort, after the recovery gate is met and only with comfortable shoulders and normal energy.
 - **Shoulder:** use comfortable paths. Do not force clicking, pinching, or the Friday raise if it remains uncomfortable.
 - **Knee:** track the response during training, later that day, and the following morning. Reduce load, range, or volume
   when symptoms clearly rise.
@@ -168,7 +168,7 @@ stalls. The first progression should be more repetitions or load at the target R
 ${OPTIONAL_RECOVERY_RULE.copy}
 
 The sleep threshold is a readiness rule, not a guarantee. Sunday remains complete rest. When recovery is limited, skip
-Wednesday Zone 2 cycling first, then Saturday face pulls and curls; the three-exercise Pull B base remains planned.
+Wednesday Zone 2 cycling and Saturday swimming, then Saturday face pulls and curls; the three-exercise Pull B base remains planned.
 Do not replace skipped work with hard extra cardio.
 
 ## Block 1 and Block 2

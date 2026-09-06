@@ -1019,7 +1019,7 @@ function renderPhaseGuide() {
   const qualified = qualifiedTenKmRuns();
   $("#phase-guide-status").textContent =
     Number(state.settings.block) === 1
-      ? `${Math.min(qualified, 2)} of 2 qualified 10 km runs completed. Changing blocks changes only the running prescriptions.`
+      ? `${Math.min(qualified, 2)} of 2 qualified 10 km runs completed. Block 2 adds quality running and starts with lighter Thursday lifting.`
       : `${qualified} qualified 10 km run${qualified === 1 ? "" : "s"} logged. Keep most running easy while adding one Thursday quality session.`;
   els.phaseGuide.dataset.block = state.settings.block;
 }
@@ -1621,6 +1621,10 @@ function updatePreviousExerciseState(card, exercise) {
 }
 
 function createExerciseCard(exercise, index, savedExercise) {
+  if (activePlan.id === BUILT_IN_PLAN.id && Number(state.settings.block) === 2) {
+    if (exercise.id === "barbell-hip-thrust") exercise = { ...exercise, sets: 2 };
+    if (exercise.id === "kettlebell-swing") exercise = { ...exercise, optional: true };
+  }
   const card = $("#exercise-template").content.firstElementChild.cloneNode(true);
   const pullupStep =
     exercise.progression === "pullup"

@@ -5,14 +5,14 @@ export const EXTRA_ACTIVITY_TYPES = ["walking", "cycling", "elliptical", "swimmi
 export const EXTRA_ACTIVITY_MEASUREMENTS = ["duration", "duration_calories", "distance_time", "distance"];
 
 export const STRENGTH_PROGRESSION = {
-  effort: "Finish compound working sets with 2–3 RIR and isolation working sets with 1–3 RIR. Power, mobility, cardio, and pull-up work follow their own prescriptions.",
+  effort: "Finish compound working sets with 2–3 RIR and isolation working sets with 1–3 RIR. Stop earlier or reduce load when sets reach 0–1 RIR instead of the compound target; do not chase failure. Power, mobility, cardio, and pull-up work follow their own prescriptions. End jumps and swings before speed or landing quality deteriorates.",
   load: "When every planned working set reaches the top of its rep range at the target RIR with stable technique and symptoms in two sessions, add the smallest available load and restart near the lower end of the range.",
-  volume: "Full weekly targets are about 12–13 fractional chest sets, 12 direct lat/mid-back sets plus rear-delt work, and 6 direct dynamic rectus-abdominis sets. For newly added work, perform 2 sets on the first two exposures before using the full prescription.",
+  volume: "Full weekly targets are about 12–13 fractional chest sets, 12 direct lat/mid-back sets plus rear-delt work, and 6 direct dynamic rectus-abdominis sets. Do not add volume while establishing consistent effort and recovery. For newly added work, perform 2 sets on the first two exposures before using the full prescription.",
 };
 
 export const OPTIONAL_RECOVERY_RULE = {
   sleepHours: 7,
-  copy: "Keep optional Zone 2 cycling and Saturday accessory add-ons off by default until weekly average sleep is at least 7 hours and joints, legs, and usual energy have returned to baseline the following morning for two stable weeks. Then add only one optional item at a time.",
+  copy: "Keep optional Zone 2 cycling, Saturday swimming, and Saturday accessory add-ons off by default until weekly average sleep is at least 7 hours and joints, legs, and usual energy have returned to baseline the following morning for two stable weeks. Then add only one optional item at a time. Monday HIIT remains planned, at least 6 hours after lifting. Record sleep, run RPE, and following-morning response; missing entries do not establish recovery. If performance repeatedly falls or recovery remains worse than usual, take an easier week: reduce strength working sets by roughly one-third to one-half, keep runs easy, pause progression, and temporarily ease or skip HIIT if needed. These are practical adjustment rules, not fixed medical thresholds.",
 };
 
 export const RUN_QUALITY_PROGRESSION = {
@@ -162,29 +162,29 @@ export const PULL_UP_STEPS = [
     sets: 3,
     measurement: "assisted_reps",
     target: "Rebuild from 3 × 5 toward 3 × 8 each time assistance is reduced.",
-    next: "Move on after 2 successful 3 × 8 sessions at the lowest machine assistance or thinnest stable band.",
+    next: "After 2 successful 3 × 8 sessions with low assistance, move to Step 4 only when a clean unassisted single is available with at least 1 rep in reserve. The lowest machine setting does not guarantee readiness; otherwise stay assisted.",
   },
   {
     id: 4,
     short: "Singles",
     label: "Step 4 · Clean singles",
-    title: "Unassisted pull-up singles",
-    prescription: "5 × 1 · rest 2–3 min · no grinding or kipping",
+    title: "Pull-up singles + assisted back-off sets",
+    prescription: "1–3 unassisted singles, then 2 × 5–8 assisted back-off reps · at least 1 RIR throughout · rest 2–3 min · log 0 assistance for unassisted reps; remove unused single rows",
     sets: 5,
-    measurement: "reps",
-    target: "Complete five clean singles, each starting from control.",
-    next: "After 2 successful sessions, move to Step 5.",
+    measurement: "assisted_reps",
+    target: "Complete 3 clean unassisted singles and both assisted back-off sets with at least 1 RIR and stable technique. An all-out single is 0 RIR; stay assisted if that is your only available rep.",
+    next: "After 2 qualified sessions, move to Step 5 and use assistance for doubles until unassisted doubles meet the reserve target.",
   },
   {
     id: 5,
     short: "Doubles",
     label: "Step 5 · Repeatable doubles",
-    title: "Unassisted pull-up",
-    prescription: "4 × 2 · keep at least 1 rep in reserve",
+    title: "Pull-up doubles · assisted as needed",
+    prescription: "4 × 2 · use enough assistance to keep at least 1 RIR · gradually reduce assistance; log 0 only for unassisted sets",
     sets: 4,
-    measurement: "reps",
-    target: "Complete all four doubles with the same range and tempo.",
-    next: "After 2 successful sessions, move to Step 6.",
+    measurement: "assisted_reps",
+    target: "Complete all 4 × 2 unassisted with at least 1 RIR and the same controlled range and tempo. Assisted doubles build capacity but do not qualify for advancement.",
+    next: "After 2 qualified unassisted sessions, move to Step 6. Keep using assistance until every double meets the target.",
   },
   {
     id: 6,
@@ -776,7 +776,7 @@ export const WEEK_PLAN = {
     kicker: "Posterior chain · run quality",
     estimate: "75–100 min total",
     tone: "pink",
-    sequenceNote: "Block 1: lift first. Block 2: quality run first. Separate sessions by about 6 hours.",
+    sequenceNote: "Block 1: lift first. Block 2: quality run first; omit swings initially and use 2 hip-thrust sets while adapting. Separate sessions by about 6 hours. Keep Monday HIIT; do not progress Thursday running and lower-body lifting together. Use an easy Thursday when fatigue is above normal.",
     warmup: [
       "Easy bicycle · 3–5 min",
       "Ankle rocks · 8/side",
@@ -788,9 +788,9 @@ export const WEEK_PLAN = {
       "Trap-bar ramp · 40% × 6, 60% × 4, 75% × 2, optional 85% × 1",
     ],
     exercises: [
-      lift("kettlebell-swing", "Kettlebell swing", "2–3 × 8–12", 3, 90),
+      lift("kettlebell-swing", "Kettlebell swing", "Block 1: 2–3 × 8–12 · Block 2: omit initially; optional only after recovery is stable", 3, 90),
       lift("trap-bar-deadlift", "Trap-bar deadlift", "3 × 4–6", 3, 180),
-      lift("barbell-hip-thrust", "Barbell hip thrust", "3 × 8–12", 3, 150),
+      lift("barbell-hip-thrust", "Barbell hip thrust", "Block 1: 3 × 8–12 · Block 2: 2 × 8–12 while adapting to quality running", 3, 150),
       lift("controlled-step-down", "Controlled step-down", "2 × 6–10 / leg · 3-sec lowering", 2, 90),
       lift("hip-abduction", "Machine or cable hip abduction", "2 × 12–20", 2, 75),
       lift("seated-calf-raise", "Seated calf raise", "2 × 10–15", 2, 75),
@@ -862,7 +862,7 @@ export const WEEK_PLAN = {
     kicker: "Endurance · technique",
     estimate: "105–155 min total",
     tone: "teal",
-    sequenceNote: "Long run and the three-exercise Pull B base are planned. Separate them by at least 4 hours when practical. Keep swimming easy; optional face pulls and curls are the first strength work to skip when recovery is limited.",
+    sequenceNote: "Long run and the three-exercise Pull B base are planned. Separate them by at least 4 hours when practical. Swimming is optional after the recovery gate is met and only with comfortable shoulders and normal energy. Skip optional face pulls and curls when recovery is limited.",
     warmup: [
       "Long run · start with 5–10 min very easy",
       "Swim · begin with relaxed technique lengths",
@@ -873,7 +873,7 @@ export const WEEK_PLAN = {
     ],
     exercises: [
       activity("long-run", "Long run", "Block 1: use the 18-stage progression · Block 2: 8–10 km easy", "distance_time"),
-      activity("easy-swim", "Technique-focused swim", "25–40 min at RPE 2–3 · no paddles, hard butterfly, or fatigued overhead work", "duration"),
+      activity("easy-swim", "Optional technique-focused swim", "25–40 min at RPE 2–3 · only after the recovery gate is met, with comfortable shoulders and normal energy · no paddles or hard butterfly", "duration", { optional: true }),
       lift(
         "pull-up-progression",
         "Pull-up progression",
