@@ -21,6 +21,7 @@ const files = [
 await rm(destination, { recursive: true, force: true });
 await mkdir(destination, { recursive: true });
 await Promise.all(files.map((file) => cp(resolve(root, file), resolve(destination, file))));
+await cp(resolve(root, "assets"), resolve(destination, "assets"), { recursive: true });
 
 const plansSource = resolve(root, "plans");
 const plansDestination = resolve(destination, "plans");
