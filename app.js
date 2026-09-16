@@ -2830,6 +2830,18 @@ function syncProgressDisclosure(name, hasData, status) {
   $(`#${name}-details-status`).textContent = status;
 }
 
+function setBodyFormEntry(entry = null) {
+  const form = $("#body-form");
+  form.dataset.editing = entry ? "true" : "false";
+  $("#body-date").value = entry?.date ?? toIsoDate();
+  $("#body-date").disabled = Boolean(entry);
+  $("#body-weight").value = entry?.weight ?? "";
+  $("#body-waist").value = entry?.waist ?? "";
+  $("button[type=submit]", form).textContent = entry ? "Update measurements" : "Save measurements";
+  $("#body-cancel-edit").hidden = !entry;
+  $("#body-form-error").hidden = true;
+}
+
 function renderBody() {
   const entries = [...state.bodyLogs].sort((a, b) => a.date.localeCompare(b.date));
   const formatMeasurement = (value, unit) => bodyMeasurementValue(value) === null
@@ -2845,12 +2857,23 @@ function renderBody() {
   list.replaceChildren();
   entries.slice(-5).reverse().forEach((entry) => {
     const row = document.createElement("div");
-    row.className = "log-row";
+    row.className = "log-row body-log-row";
     row.innerHTML = `
       <span>${formatDate(entry.date)}</span>
       <strong aria-label="Weight: ${formatMeasurement(entry.weight, "kg")}">${formatMeasurement(entry.weight, "kg")}</strong>
       <strong aria-label="Waist: ${formatMeasurement(entry.waist, "cm")}">${formatMeasurement(entry.waist, "cm")}</strong>
     `;
+    const edit = document.createElement("button");
+    edit.type = "button";
+    edit.className = "button button-secondary";
+    edit.textContent = "Edit";
+    edit.setAttribute("aria-label", `Edit measurements for ${formatDate(entry.date)}`);
+    edit.addEventListener("click", () => {
+      setBodyFormEntry(entry);
+      $("#body-form").scrollIntoView({ block: "center" });
+      $("#body-weight").focus();
+    });
+    row.append(edit);
     list.append(row);
   });
   if (!entries.length) list.innerHTML = `<p class="empty-copy">Your latest measurements will appear here.</p>`;
@@ -3344,6 +3367,7 @@ function bindEvents() {
   $("#progress-insight-action").addEventListener("click", followProgressInsight);
   $("#body-form").addEventListener("submit", async (event) => {
     event.preventDefault();
+    const editing = event.target.dataset.editing === "true";
     const date = $("#body-date").value;
     const entry = mergeBodyMeasurement(state.bodyLogs.find((log) => log.date === date), {
       date,
@@ -3360,10 +3384,13 @@ function bindEvents() {
     const saved = await persistState();
     renderBody();
     if (saved) {
-      event.target.reset();
-      $("#body-date").value = toIsoDate();
-      showToast("Body measurements saved.");
+      setBodyFormEntry();
+      showToast(editing ? "Body measurements updated." : "Body measurements saved.");
     }
+  });
+  $("#body-cancel-edit").addEventListener("click", () => {
+    setBodyFormEntry();
+    $("#body-weight").focus();
   });
   $("#body-form").addEventListener("input", () => { $("#body-form-error").hidden = true; });
   $("#sleep-form").addEventListener("submit", async (event) => {

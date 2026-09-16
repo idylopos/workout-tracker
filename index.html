@@ -390,7 +390,10 @@
                 <label><span>Date</span><input id="body-date" type="date" required /></label>
                 <label><span>Weight</span><div class="unit-input"><input id="body-weight" type="number" min="0" step="0.1" inputmode="decimal" aria-describedby="body-form-help body-form-error" /><span>kg</span></div></label>
                 <label><span>Waist</span><div class="unit-input"><input id="body-waist" type="number" min="0" step="0.1" inputmode="decimal" aria-describedby="body-form-help body-form-error" /><span>cm</span></div></label>
-                <button class="button button-primary" type="submit">Save measurements</button>
+                <div class="body-form-actions">
+                  <button class="button button-primary" type="submit">Save measurements</button>
+                  <button class="button button-secondary" id="body-cancel-edit" type="button" hidden>Cancel</button>
+                </div>
               </form>
               <p class="progress-detail-copy" id="body-form-error" role="alert" hidden>Enter weight or waist before saving.</p>
               <div class="mini-chart-wrap"><canvas id="body-chart" aria-label="Body measurement chart"></canvas></div>

@@ -43,7 +43,8 @@ recovery snapshot, then shows exercise detail and an eight-week cardio duration 
 
 Under **Progress → Weight or waist**, save either measurement independently or enter both. Adding a measurement
 for an existing date keeps any value left blank. Missing measurements appear as a dash in history and are omitted
-from the chart; partial entries are included in JSON backups.
+from the chart; partial entries are included in JSON backups. Choose **Edit** beside a recent entry to correct its
+weight or waist, then **Update measurements**. **Cancel** leaves the saved entry as it was.
 
 Changes on the Today screen are automatically saved as a local draft. If the browser reloads or discards the tab,
 the draft will be restored. Passphrase protection is optional under **Data**. When enabled, drafts and records are

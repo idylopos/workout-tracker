@@ -4462,6 +4462,20 @@ body[data-active-view="today"] .timer {
   padding-inline: 0;
 }
 
+#view-progress .body-log-row {
+  grid-template-columns: minmax(0, 1fr) auto auto auto;
+}
+
+.body-form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+#body-cancel-edit[hidden] {
+  display: none;
+}
+
 @media (max-width: 680px) {
   #view-progress .page-head {
     margin-bottom: 16px;
@@ -4489,6 +4503,18 @@ body[data-active-view="today"] .timer {
 
   #view-progress .log-row > span {
     grid-column: 1 / -1;
+  }
+
+  #view-progress .body-log-row {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  }
+
+  .body-form-actions {
+    grid-column: 1 / -1;
+  }
+
+  .body-form-actions .button-primary {
+    flex: 1;
   }
 
   #view-progress .button {
