@@ -29,6 +29,7 @@ import {
   recoveryReadiness,
   normalizeState,
   preparePreviousSets,
+  progressExerciseOptions,
   shouldCollapseExerciseByDefault,
   shouldAutoOpenDailyCheckIn,
   shouldShowRestTimer,
@@ -36,6 +37,8 @@ import {
   summarizeCardioRange,
   summarizeExercise,
   summarizeProgressOverview,
+  progressOverviewAction,
+  progressDisclosureOpen,
   summarizeWeeklySleep,
   toIsoDate,
   validateBackup,
@@ -125,6 +128,7 @@ let coachingIndex = 0;
 let coachingIds = [];
 let coachingBusy = false;
 const savedThisVisit = new Set();
+const progressSelections = new Map();
 
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
@@ -881,11 +885,12 @@ function renderDailyCheckInStep() {
   requestAnimationFrame(() => $('input[name="daily-recovery-rating"]', question)?.focus());
 }
 
-function openDailyCheckIn({ automatic = false } = {}) {
+function openDailyCheckIn({ automatic = false, focusType } = {}) {
   const date = toIsoDate();
   const record = state.dailyCheckIns[date] || {};
   if (automatic && ["deferred", "skipped", "completed"].includes(record.status)) return;
   dailyCheckInQueue = dueDailyCheckInItems(date);
+  if (focusType) dailyCheckInQueue.sort((a, b) => Number(b.type === focusType) - Number(a.type === focusType));
   if (!dailyCheckInQueue.length) {
     updateDailyCheckInReminder();
     return;
@@ -1043,7 +1048,10 @@ async function saveDailyCheckInAnswer({ unknown = false } = {}) {
   setDailyCheckInBusy(false);
   renderDailyCheckInStep();
   updateDailyCheckInReminder();
-  if (activeView === "progress") renderSleep();
+  if (activeView === "progress") {
+    renderSleep();
+    renderProgressOverview();
+  }
   renderTrainingRules(activePlan.days[dateToDayKey(selectedDate)]);
 }
 
@@ -2593,15 +2601,23 @@ function renderLongRunRoadmap() {
 
 function renderProgress() {
   const select = $("#stats-exercise");
-  const previousSelection = select.value;
+  const choices = progressExerciseOptions(
+    getAllExercises(activePlan.days), activeWorkoutLogs(), progressSelections.get(activePlan.id),
+  );
   select.replaceChildren();
-  getAllExercises(activePlan.days).forEach((exercise) => {
-    const option = document.createElement("option");
-    option.value = exercise.id;
-    option.textContent = exercise.name;
-    option.selected = exercise.id === previousSelection;
-    select.append(option);
+  [["With recorded results", choices.logged], ["Not yet logged", choices.unlogged]].forEach(([label, exercises]) => {
+    if (!exercises.length) return;
+    const group = document.createElement("optgroup");
+    group.label = label;
+    exercises.forEach((exercise) => {
+      const option = document.createElement("option");
+      option.value = exercise.id;
+      option.textContent = exercise.name;
+      group.append(option);
+    });
+    select.append(group);
   });
+  select.value = choices.selectedId;
   renderProgressOverview();
   renderExerciseStats();
   renderCardioStats();
@@ -2611,6 +2627,7 @@ function renderProgress() {
 
 function renderProgressOverview() {
   const summary = summarizeProgressOverview(activeWorkoutLogs(), state.dailySleepLogs);
+  $(".progress-overview-panel").classList.toggle("is-empty", !summary.workouts && !summary.sleepNights && !summary.latestResponse);
   $("#progress-stat-workouts").textContent = summary.workouts;
   $("#progress-stat-workout-delta").textContent = summary.workoutDelta === 0
     ? "Same as prior 4 weeks"
@@ -2630,6 +2647,29 @@ function renderProgressOverview() {
   insight.dataset.tone = summary.insight.tone;
   $("#progress-insight-title").textContent = summary.insight.title;
   $("#progress-insight-body").textContent = summary.insight.body;
+  const action = progressOverviewAction(summary, dueDailyCheckInItems());
+  $("#progress-insight-action").textContent = action.label;
+  $("#progress-insight-action").dataset.target = action.target;
+}
+
+function followProgressInsight() {
+  const target = progressOverviewAction(
+    summarizeProgressOverview(activeWorkoutLogs(), state.dailySleepLogs), dueDailyCheckInItems(),
+  ).target;
+  if (target === "today" || target === "week") {
+    switchView(target);
+    const heading = $(`#${target}-heading`);
+    heading?.setAttribute("tabindex", "-1");
+    heading?.focus({ preventScroll: true });
+  } else if (target === "sleep" || target === "recovery") {
+    openDailyCheckIn({ focusType: target });
+  } else {
+    const input = target === "sleep-history" ? $("#sleep-hours") : $("#stats-exercise");
+    const details = input.closest("details");
+    if (details) details.open = true;
+    input.scrollIntoView({ block: "center", behavior: "instant" });
+    input.focus({ preventScroll: true });
+  }
 }
 
 function renderExerciseStats() {
@@ -2639,9 +2679,47 @@ function renderExerciseStats() {
   $("#stat-latest").textContent = stats.latest;
   $("#stat-best").textContent = stats.best;
   $("#stat-volume").textContent = stats.volume;
+  $("#stat-volume-label").textContent = stats.metric?.totalLabel || "Total work";
+  const hasResults = stats.points.length > 0;
+  $(".exercise-stats-panel").classList.toggle("is-empty", !hasResults);
+  const title = stats.metric ? `${stats.metric.title} (${stats.metric.unit})` : "Exercise history";
+  $("#exercise-trend-title").textContent = title;
+  $("#exercise-chart-value-label").textContent = title;
+  $("#exercise-trend-context").classList.toggle("is-hidden", !hasResults);
+  $("#exercise-chart-data").classList.toggle("is-hidden", !hasResults);
+  $("#exercise-chart").setAttribute("aria-hidden", String(!hasResults));
+  const latest = stats.points.at(-1);
+  const previous = stats.points.at(-2);
+  const datedResult = (point) => `${formatDate(point.date, { month: "short", day: "numeric", year: "numeric" })}: ${point.label}`;
+  $("#exercise-trend-summary").textContent = previous
+    ? `${datedResult(previous)} → ${datedResult(latest)}`
+    : latest ? `${datedResult(latest)}. Log another session to compare.` : "";
+  $("#exercise-trend-note").textContent = [
+    stats.metric?.note,
+    hasResults ? "One point per recorded session, equally spaced." : "",
+    stats.sessions > stats.points.length ? `Showing ${stats.points.length} of ${stats.sessions} sessions with the latest measurement type.` : "",
+  ].filter(Boolean).join(" ");
+  renderChartValues($("#exercise-chart-values"), stats.points.map((point) => [
+    formatDate(point.date, { month: "short", day: "numeric", year: "numeric" }),
+    point.label,
+    numberFormatter.format(point.value),
+  ]));
   const empty = $("#exercise-chart-empty");
-  empty.classList.toggle("is-hidden", stats.points.length >= 2);
-  drawLineChart($("#exercise-chart"), [{ points: stats.points, color: "#d8ff52" }]);
+  empty.classList.toggle("is-hidden", hasResults);
+  drawLineChart($("#exercise-chart"), [{ points: stats.points, color: "#386b45" }], { axes: true });
+}
+
+function renderChartValues(body, rows) {
+  body.replaceChildren(...rows.map((values) => {
+    const row = document.createElement("tr");
+    values.forEach((value, index) => {
+      const cell = document.createElement(index === 0 ? "th" : "td");
+      if (index === 0) cell.scope = "row";
+      cell.textContent = value;
+      row.append(cell);
+    });
+    return row;
+  }));
 }
 
 function renderCardioStats() {
@@ -2657,7 +2735,19 @@ function renderCardioStats() {
   $("#cardio-stat-rpe").textContent =
     current.averageRpe === null ? "—" : numberFormatter.format(current.averageRpe);
   const hasCardio = summaries.some(({ summary }) => summary.sessions > 0);
+  const activityCount = summaries.reduce((sum, { summary }) => sum + summary.sessions, 0);
+  syncProgressDisclosure("cardio", hasCardio, hasCardio
+    ? `${activityCount} activit${activityCount === 1 ? "y" : "ies"} in the last eight weeks`
+    : "No activities in the last eight weeks");
+  $("#cardio-details").classList.toggle("is-empty", !hasCardio);
   $("#cardio-chart-empty").classList.toggle("is-hidden", hasCardio);
+  $("#cardio-chart-data").classList.toggle("is-hidden", !hasCardio);
+  $("#cardio-chart").setAttribute("aria-hidden", String(!hasCardio));
+  renderChartValues($("#cardio-chart-values"), summaries.map(({ week, summary }) => [
+    formatDate(toIsoDate(week), { month: "short", day: "numeric", year: "numeric" }),
+    summary.sessions,
+    numberFormatter.format(summary.minutes),
+  ]));
   drawLineChart($("#cardio-chart"), [
     {
       points: summaries.map(({ week, summary }) => ({
@@ -2666,7 +2756,7 @@ function renderCardioStats() {
       })),
       color: "#2f6bff",
     },
-  ]);
+  ], { axes: true });
 }
 
 function upsertByDate(array, entry, key = "date") {
@@ -2676,8 +2766,26 @@ function upsertByDate(array, entry, key = "date") {
   array.sort((a, b) => a[key].localeCompare(b[key]));
 }
 
+function syncProgressDisclosure(name, hasData, status) {
+  const details = $(`#${name}-details`);
+  const scope = name === "cardio" ? activePlan.id : "all-plans";
+  details.open = progressDisclosureOpen({
+    open: details.open,
+    hasData,
+    previousHasData: details.dataset.hasData === "true",
+    scopeChanged: details.dataset.scope !== scope,
+  });
+  details.dataset.scope = scope;
+  details.dataset.hasData = String(hasData);
+  $(`#${name}-details-status`).textContent = status;
+}
+
 function renderBody() {
   const entries = [...state.bodyLogs].sort((a, b) => a.date.localeCompare(b.date));
+  syncProgressDisclosure("body", entries.length > 0, entries.length
+    ? `Latest: ${formatDate(entries.at(-1).date)} · ${numberFormatter.format(entries.at(-1).weight)} kg`
+    : "Optional · add a measurement");
+  $("#body-chart").closest(".mini-chart-wrap").classList.toggle("is-hidden", !entries.length);
   const list = $("#body-log-list");
   list.replaceChildren();
   entries.slice(-5).reverse().forEach((entry) => {
@@ -2699,6 +2807,10 @@ function renderBody() {
 
 function renderSleep() {
   const entries = summarizeWeeklySleep(state.sleepLogs, state.dailySleepLogs);
+  syncProgressDisclosure("sleep", entries.length > 0, entries.length
+    ? `Latest average: ${numberFormatter.format(entries.at(-1).hours)} hr / night`
+    : "Add nightly sleep or a weekly average");
+  $("#sleep-chart").closest(".mini-chart-wrap").classList.toggle("is-hidden", !entries.length);
   const list = $("#sleep-log-list");
   list.replaceChildren();
   entries.slice(-5).reverse().forEach((entry) => {
@@ -2722,7 +2834,7 @@ function drawLineChart(canvas, datasets, options = {}) {
   const rect = canvas.getBoundingClientRect();
   if (!rect.width) return;
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
-  const width = Math.max(300, rect.width);
+  const width = rect.width;
   const height = rect.height || 220;
   canvas.width = width * dpr;
   canvas.height = height * dpr;
@@ -2730,7 +2842,7 @@ function drawLineChart(canvas, datasets, options = {}) {
   context.scale(dpr, dpr);
   context.clearRect(0, 0, width, height);
 
-  const padding = { top: 22, right: 18, bottom: 30, left: 18 };
+  const padding = { top: 22, right: 18, bottom: 30, left: options.axes ? 62 : 18 };
   const plotWidth = width - padding.left - padding.right;
   const plotHeight = height - padding.top - padding.bottom;
   context.strokeStyle = "rgba(23, 33, 27, 0.10)";
@@ -2755,6 +2867,26 @@ function drawLineChart(canvas, datasets, options = {}) {
     const range = max - min || Math.max(max * 0.1, 1);
     min -= range * 0.12;
     max += range * 0.12;
+    if (options.axes) min = Math.max(0, min);
+
+    if (options.axes) {
+      context.fillStyle = "#48534d";
+      context.font = `12px ${getComputedStyle(canvas).fontFamily}`;
+      context.textAlign = "right";
+      context.textBaseline = "middle";
+      const tickFormatter = new Intl.NumberFormat(undefined, { maximumFractionDigits: 1, notation: "compact" });
+      for (let line = 0; line < 4; line += 1) {
+        context.fillText(tickFormatter.format(max - (max - min) * line / 3), padding.left - 10, padding.top + plotHeight * line / 3);
+      }
+      const shortDate = (point) => formatDate(point.date, { month: "short", day: "numeric" });
+      context.textBaseline = "bottom";
+      context.textAlign = dataset.points.length === 1 ? "center" : "left";
+      context.fillText(shortDate(dataset.points[0]), padding.left + (dataset.points.length === 1 ? plotWidth / 2 : 0), height - 2);
+      if (dataset.points.length > 1) {
+        context.textAlign = "right";
+        context.fillText(shortDate(dataset.points.at(-1)), width - padding.right, height - 2);
+      }
+    }
 
     if (options.baseline) {
       const y = padding.top + plotHeight - ((options.baseline - min) / (max - min)) * plotHeight;
@@ -3014,6 +3146,20 @@ function timerFinished() {
 }
 
 function bindEvents() {
+  document.fonts.addEventListener("loadingdone", () => {
+    if (activeView === "progress") {
+      renderExerciseStats();
+      renderCardioStats();
+    }
+  });
+  $$(".progress-disclosure").forEach((details) => {
+    details.addEventListener("toggle", () => {
+      if (!details.open || activeView !== "progress") return;
+      if (details.id === "cardio-details") renderCardioStats();
+      if (details.id === "body-details") renderBody();
+      if (details.id === "sleep-details") renderSleep();
+    });
+  });
   $("#open-coaching").addEventListener("click", () => openCoaching());
   $("#coaching-close").addEventListener("click", () => $("#coaching-dialog").close());
   $$("[data-nav]").forEach((button) => button.addEventListener("click", async () => {
@@ -3136,7 +3282,11 @@ function bindEvents() {
     renderLongRunRoadmap();
   });
 
-  $("#stats-exercise").addEventListener("change", renderExerciseStats);
+  $("#stats-exercise").addEventListener("change", (event) => {
+    progressSelections.set(activePlan.id, event.target.value);
+    renderExerciseStats();
+  });
+  $("#progress-insight-action").addEventListener("click", followProgressInsight);
   $("#body-form").addEventListener("submit", async (event) => {
     event.preventDefault();
     upsertByDate(state.bodyLogs, {

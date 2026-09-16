@@ -1302,7 +1302,7 @@ export function summarizeProgressOverview(workoutLogs = {}, dailySleepLogs = [],
     insight = {
       tone: "attention",
       title: `${dueReviews} following-morning review${dueReviews === 1 ? " is" : "s are"} due`,
-      body: "Add the response from Today so the training trend has recovery context.",
+      body: "Add your following-morning response so the training trend has recovery context.",
     };
   } else if (latestResponse && latestResponse.value >= 2) {
     insight = {
@@ -1353,6 +1353,27 @@ export function getAllExercises(weekPlan = WEEK_PLAN) {
     });
   });
   return [...unique.values()].sort((a, b) => a.name.localeCompare(b.name));
+}
+
+export function progressOverviewAction(summary, checkInItems = []) {
+  if (!summary.workouts) return { target: "today", label: "Log a workout" };
+  if (summary.dueReviews && checkInItems.some((item) => item.type === "recovery")) {
+    return { target: "recovery", label: "Review recovery" };
+  }
+  if (summary.latestResponse?.value >= 2) return { target: "week", label: "Review training plan" };
+  if (summary.averageSleep === null || summary.sleepNights < 3) {
+    return checkInItems.some((item) => item.type === "sleep")
+      ? { target: "sleep", label: "Record last night’s sleep" }
+      : { target: "sleep-history", label: "Review sleep history" };
+  }
+  if (summary.averageSleep < OPTIONAL_RECOVERY_RULE.sleepHours) {
+    return { target: "sleep-history", label: "Review sleep history" };
+  }
+  return { target: "exercise", label: "Explore training trend" };
+}
+
+export function progressDisclosureOpen({ open, hasData, previousHasData, scopeChanged }) {
+  return scopeChanged || (hasData && previousHasData === false) ? hasData : open;
 }
 
 export function findPreviousExerciseLog(
@@ -1531,9 +1552,34 @@ function bestSetMetric(measurement, sets = []) {
   return { value: distance, label: `${distance || 0} km`, volume: distance };
 }
 
+function hasExerciseResults(exercise) {
+  return (exercise?.sets || []).some((set) => {
+    if (exercise.measurement === "completion") return set.completed === true;
+    return ["reps", "distance", "minutes", "seconds"].some((key) => numeric(set[key]) > 0);
+  });
+}
+
+export function progressExerciseOptions(exercises, workoutLogs, preferredId) {
+  const choices = exercises.map((exercise) => {
+    const dates = Object.values(workoutLogs)
+      .filter((log) => hasExerciseResults(log.exercises?.[exercise.id]))
+      .map((log) => log.date)
+      .sort();
+    return { ...exercise, sessions: dates.length, latestDate: dates.at(-1) || "" };
+  });
+  const logged = choices.filter((exercise) => exercise.sessions)
+    .sort((a, b) => b.latestDate.localeCompare(a.latestDate) || a.name.localeCompare(b.name));
+  const unlogged = choices.filter((exercise) => !exercise.sessions)
+    .sort((a, b) => a.name.localeCompare(b.name));
+  const selectedId = choices.some((exercise) => exercise.id === preferredId)
+    ? preferredId
+    : (logged[0] || unlogged[0])?.id || "";
+  return { logged, unlogged, selectedId };
+}
+
 export function summarizeExercise(workoutLogs, exerciseId) {
   const allEntries = Object.values(workoutLogs)
-    .filter((log) => log.exercises?.[exerciseId]?.sets?.length)
+    .filter((log) => hasExerciseResults(log.exercises?.[exerciseId]))
     .sort((a, b) => a.date.localeCompare(b.date))
     .map((log) => {
       const exercise = log.exercises[exerciseId];
@@ -1545,7 +1591,7 @@ export function summarizeExercise(workoutLogs, exerciseId) {
       };
     });
   if (!allEntries.length) {
-    return { sessions: 0, latest: "—", best: "—", volume: "—", points: [] };
+    return { sessions: 0, latest: "—", best: "—", volume: "—", metric: null, points: [] };
   }
   const latestMeasurement = allEntries.at(-1).measurement;
   const entries = allEntries.filter((entry) => entry.measurement === latestMeasurement);
@@ -1556,8 +1602,30 @@ export function summarizeExercise(workoutLogs, exerciseId) {
     latest: entries.at(-1).label,
     best: best.label,
     volume: Number.isInteger(totalVolume) ? totalVolume.toLocaleString() : totalVolume.toFixed(1),
-    points: entries.map((entry) => ({ date: entry.date, value: entry.value })),
+    metric: exerciseTrendMetric(latestMeasurement),
+    points: entries.map((entry) => ({ date: entry.date, value: entry.value, label: entry.label })),
   };
+}
+
+function exerciseTrendMetric(measurement) {
+  const metrics = {
+    completion: { title: "Completed rounds", unit: "rounds", totalLabel: "Total rounds" },
+    weight_reps: {
+      title: "Estimated max", unit: "kg", totalLabel: "Total work (kg × reps)",
+      note: "Estimated from load × (1 + reps ÷ 30), not a tested maximum. Compare sets with similar technique and effort.",
+    },
+    weight_distance: { title: "Best set work", unit: "kg × m", totalLabel: "Total work (kg × m)" },
+    assisted_reps: {
+      title: "Most reps in one set", unit: "reps", totalLabel: "Total reps",
+      note: "This reps-only trend does not account for changes in assistance.",
+    },
+    reps: { title: "Most reps in one set", unit: "reps", totalLabel: "Total reps" },
+    duration: { title: "Recorded time", unit: "min", totalLabel: "Total time (sec)" },
+    duration_calories: { title: "Recorded time", unit: "min", totalLabel: "Total time (sec)" },
+    distance_time: { title: "Recorded distance", unit: "km", totalLabel: "Total distance (km)" },
+    distance: { title: "Best distance", unit: "km", totalLabel: "Sum of best distances (km)" },
+  };
+  return metrics[measurement] || metrics.distance;
 }
 
 export function formatDuration(totalSeconds) {
