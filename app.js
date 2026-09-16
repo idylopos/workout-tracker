@@ -15,6 +15,8 @@ import {
   STORAGE_KEY,
   WEEK_PLAN,
   addDays,
+  bodyMeasurementPoints,
+  bodyMeasurementValue,
   createDefaultState,
   countQualifiedLongRuns,
   dateToDayKey,
@@ -28,6 +30,9 @@ import {
   normalizeResponseRating,
   recoveryReadiness,
   normalizeState,
+  measurementFields,
+  mergeBodyMeasurement,
+  optionalCardioFields,
   preparePreviousSets,
   progressExerciseOptions,
   shouldCollapseExerciseByDefault,
@@ -35,6 +40,7 @@ import {
   shouldShowRestTimer,
   startOfWeek,
   summarizeCardioRange,
+  summarizeCardioSet,
   summarizeExercise,
   summarizeProgressOverview,
   progressOverviewAction,
@@ -67,6 +73,7 @@ const ACTIVITY_TYPE_LABELS = {
   elliptical: "Elliptical",
   swimming: "Swimming",
   running: "Running",
+  hiit: "HIIT",
   custom: "Custom",
 };
 const numberFormatter = new Intl.NumberFormat(undefined, { maximumFractionDigits: 1 });
@@ -1451,7 +1458,8 @@ function createExtraActivityCard(activity) {
   renderSetRows(card, measurement, sets, { rowLabel: "Done", removable: false });
 
   measurementSelect.addEventListener("change", () => {
-    renderSetRows(card, measurementSelect.value, [{}], { rowLabel: "Done", removable: false });
+    const sets = collectSetRows(card, card.dataset.measurement);
+    renderSetRows(card, measurementSelect.value, sets, { rowLabel: "Done", removable: false });
     markWorkoutDirty();
     updateSessionProgress();
   });
@@ -1918,6 +1926,7 @@ function createExerciseCard(exercise, index, savedExercise) {
     : exercise.sets;
   card.dataset.rest = exercise.rest;
   card.dataset.exerciseName = exercise.name;
+  card.dataset.category = exercise.category;
   if (longRunStage) card.dataset.longRunStage = longRunStage;
 
   $(".exercise-number", card).textContent = String(index + 1).padStart(2, "0");
@@ -1983,9 +1992,14 @@ function createExerciseCard(exercise, index, savedExercise) {
     button.setAttribute("aria-expanded", String(!collapsed));
   });
   select.addEventListener("change", () => {
+    const keepCardioMetrics = EXTRA_ACTIVITY_MEASUREMENTS.includes(card.dataset.measurement) &&
+      EXTRA_ACTIVITY_MEASUREMENTS.includes(select.value);
+    const sets = keepCardioMetrics
+      ? collectSetRows(card, card.dataset.measurement)
+      : Array.from({ length: Number(card.dataset.defaultSets) }, () => ({}));
     state.exerciseConfigs[exerciseConfigKey(exercise.id)] = select.value;
     persistState();
-    renderSetRows(card, select.value, Array.from({ length: Number(card.dataset.defaultSets) }, () => ({})));
+    renderSetRows(card, select.value, sets);
     markWorkoutDirty();
     updateSessionProgress();
   });
@@ -2012,7 +2026,9 @@ function createExerciseCard(exercise, index, savedExercise) {
   $(".copy-first-set", card).addEventListener("click", () => copyFirstSetIntoEmpty(card, select.value));
   $(".add-set", card).addEventListener("click", () => {
     const setList = $(".set-list", card);
-    setList.append(createSetRow(select.value, setList.children.length, {}, Number(card.dataset.rest)));
+    setList.append(createSetRow(select.value, setList.children.length, {}, Number(card.dataset.rest), {
+      cardioMetrics: card.dataset.category === "Cardio",
+    }));
     updateCopyFirstSetButton(card, select.value);
     markWorkoutDirty();
   });
@@ -2020,10 +2036,15 @@ function createExerciseCard(exercise, index, savedExercise) {
 }
 
 function renderSetRows(card, measurement, sets, options = {}) {
+  card.dataset.measurement = measurement;
   const setList = $(".set-list", card);
   setList.replaceChildren();
+  const rowOptions = {
+    cardioMetrics: card.dataset.category === "Cardio" || card.classList.contains("extra-activity-card"),
+    ...options,
+  };
   sets.forEach((set, index) =>
-    setList.append(createSetRow(measurement, index, set, Number(card.dataset.rest), options)),
+    setList.append(createSetRow(measurement, index, set, Number(card.dataset.rest), rowOptions)),
   );
   updateCopyFirstSetButton(card, measurement);
 }
@@ -2081,6 +2102,22 @@ function copyFirstSetIntoEmpty(card, measurement) {
   showToast("Set 1 values filled into empty sets.");
 }
 
+function createSetField(field, index, values) {
+  const label = document.createElement("label");
+  label.className = "set-field";
+  label.innerHTML = `
+    <span>${field.label}</span>
+    <div>
+      <input type="number" data-field="${field.key}"
+        min="${field.min ?? ""}" max="${field.max ?? ""}" step="${field.step ?? "any"}"
+        inputmode="decimal" aria-label="${field.label}, set ${index + 1}" />
+      ${field.unit ? `<small>${field.unit}</small>` : ""}
+    </div>
+  `;
+  $("input", label).value = values[field.key] ?? "";
+  return label;
+}
+
 function createSetRow(measurement, index, values, restSeconds, options = {}) {
   const row = document.createElement("div");
   row.className = "set-row";
@@ -2104,27 +2141,25 @@ function createSetRow(measurement, index, values, restSeconds, options = {}) {
   row.classList.toggle("is-done", Boolean(values.completed));
   row.append(done);
 
-  MEASUREMENT_TYPES[measurement].fields.forEach((field) => {
-    const label = document.createElement("label");
-    label.className = "set-field";
-    label.innerHTML = `
-      <span>${field.label}</span>
-      <div>
-        <input
-          type="number"
-          data-field="${field.key}"
-          min="${field.min ?? ""}"
-          max="${field.max ?? ""}"
-          step="${field.step ?? "any"}"
-          inputmode="decimal"
-          value="${values[field.key] ?? ""}"
-          aria-label="${field.label}, set ${index + 1}"
-        />
-        ${field.unit ? `<small>${field.unit}</small>` : ""}
-      </div>
-    `;
-    row.append(label);
-  });
+  MEASUREMENT_TYPES[measurement].fields.forEach((field) => row.append(createSetField(field, index, values)));
+
+  const optionalFields = optionalCardioFields(measurement);
+  const hasSavedMetrics = optionalFields.some((field) => values[field.key] !== undefined && values[field.key] !== null && values[field.key] !== "");
+  if (optionalFields.length && (options.cardioMetrics || hasSavedMetrics)) {
+    row.classList.add("has-cardio-metrics");
+    const details = document.createElement("details");
+    details.className = "cardio-metrics";
+    details.open = hasSavedMetrics;
+    const summary = document.createElement("summary");
+    summary.textContent = "Machine & wearable metrics";
+    const hint = document.createElement("p");
+    hint.textContent = "Optional · enter the readings for this set or session. Leave anything you don’t track blank.";
+    const fields = document.createElement("div");
+    fields.className = "cardio-metrics-grid";
+    optionalFields.forEach((field) => fields.append(createSetField(field, index, values)));
+    details.append(summary, hint, fields);
+    row.append(details);
+  }
 
   if (options.removable === false) return row;
 
@@ -2165,30 +2200,30 @@ function summarizeSetPreview(measurement, sets = []) {
   const reusableFields = MEASUREMENT_TYPES[measurement].fields
     .map((field) => field.key)
     .filter((key) => key !== "rir" && key !== "rpe");
+  const previewFields = EXTRA_ACTIVITY_MEASUREMENTS.includes(measurement)
+    ? measurementFields(measurement).map((field) => field.key)
+    : reusableFields;
   const set = sets.findLast((candidate) =>
-    reusableFields.some(
+    previewFields.some(
       (key) => candidate?.[key] !== undefined && candidate[key] !== null && candidate[key] !== "",
     ),
   ) || {};
+  if (EXTRA_ACTIVITY_MEASUREMENTS.includes(measurement)) return summarizeCardioSet(set);
   if (measurement === "weight_reps") return `${set.weight || "—"} kg × ${set.reps || "—"}`;
   if (measurement === "weight_distance") return `${set.weight || "—"} kg × ${set.distance || "—"} m`;
   if (measurement === "assisted_reps") return `${set.assistance || "—"} kg assist × ${set.reps || "—"}`;
   if (measurement === "reps") return `${set.reps || "—"} reps`;
-  if (measurement === "duration") return formatDuration(Number(set.minutes || 0) * 60 + Number(set.seconds || 0));
-  if (measurement === "duration_calories") {
-    return `${formatDuration(Number(set.minutes || 0) * 60 + Number(set.seconds || 0))} · ${set.calories || "—"} kcal`;
-  }
-  if (measurement === "distance_time") return `${set.distance || "—"} km · ${set.minutes || 0} min`;
   return `${set.distance || "—"} km`;
 }
 
 function collectSetRows(card, measurementOverride = "") {
   const measurement = measurementOverride || $(".measurement-select", card).value;
-  const fields = MEASUREMENT_TYPES[measurement].fields;
+  const fields = measurementFields(measurement);
   return $$(".set-row", card).map((row) => {
     const set = { completed: $(".set-done input", row).checked };
     fields.forEach((field) => {
       const input = $(`[data-field="${field.key}"]`, row);
+      if (!input) return;
       set[field.key] = input.value === "" ? "" : Number(input.value);
     });
     return set;
@@ -2283,6 +2318,17 @@ async function saveWorkoutDraftNow() {
 }
 
 async function saveWorkout() {
+  const invalidMetric = $$(".has-cardio-metrics input[type=number]").find((input) =>
+    input.validity.badInput || input.validity.rangeUnderflow || input.validity.rangeOverflow,
+  );
+  if (invalidMetric) {
+    const details = invalidMetric.closest("details");
+    if (details) details.open = true;
+    invalidMetric.reportValidity();
+    invalidMetric.focus();
+    showToast("Check the highlighted cardio reading before saving.", "error");
+    return;
+  }
   clearTimeout(draftSaveTimer);
   draftSaveTimer = null;
   draftRevision += 1;
@@ -2382,6 +2428,10 @@ function loadLastSession() {
     planId: activePlan.id,
     updatedAt: null,
   };
+  [...Object.values(draftSession.exercises || {}), ...(draftSession.extraActivities || [])].forEach((entry) => {
+    const optionalFields = optionalCardioFields(entry.measurement);
+    (entry.sets || []).forEach((set) => optionalFields.forEach((field) => { delete set[field.key]; }));
+  });
   renderToday();
   markWorkoutDirty();
   showToast(`Loaded ${formatDate(previous.date)}. Review before saving.`);
@@ -2782,8 +2832,13 @@ function syncProgressDisclosure(name, hasData, status) {
 
 function renderBody() {
   const entries = [...state.bodyLogs].sort((a, b) => a.date.localeCompare(b.date));
+  const formatMeasurement = (value, unit) => bodyMeasurementValue(value) === null
+    ? "—" : `${numberFormatter.format(bodyMeasurementValue(value))} ${unit}`;
+  const latest = entries.at(-1);
+  const latestValues = latest ? [formatMeasurement(latest.weight, "kg"), formatMeasurement(latest.waist, "cm")]
+    .filter((value) => value !== "—").join(" · ") : "";
   syncProgressDisclosure("body", entries.length > 0, entries.length
-    ? `Latest: ${formatDate(entries.at(-1).date)} · ${numberFormatter.format(entries.at(-1).weight)} kg`
+    ? `Latest: ${formatDate(latest.date)}${latestValues ? ` · ${latestValues}` : ""}`
     : "Optional · add a measurement");
   $("#body-chart").closest(".mini-chart-wrap").classList.toggle("is-hidden", !entries.length);
   const list = $("#body-log-list");
@@ -2793,15 +2848,15 @@ function renderBody() {
     row.className = "log-row";
     row.innerHTML = `
       <span>${formatDate(entry.date)}</span>
-      <strong>${numberFormatter.format(entry.weight)} kg</strong>
-      <strong>${numberFormatter.format(entry.waist)} cm</strong>
+      <strong aria-label="Weight: ${formatMeasurement(entry.weight, "kg")}">${formatMeasurement(entry.weight, "kg")}</strong>
+      <strong aria-label="Waist: ${formatMeasurement(entry.waist, "cm")}">${formatMeasurement(entry.waist, "cm")}</strong>
     `;
     list.append(row);
   });
   if (!entries.length) list.innerHTML = `<p class="empty-copy">Your latest measurements will appear here.</p>`;
   drawLineChart($("#body-chart"), [
-    { points: entries.map((entry) => ({ date: entry.date, value: Number(entry.weight) })), color: "#2f6bff" },
-    { points: entries.map((entry) => ({ date: entry.date, value: Number(entry.waist) })), color: "#ff705d" },
+    { points: bodyMeasurementPoints(entries, "weight"), color: "#2f6bff" },
+    { points: bodyMeasurementPoints(entries, "waist"), color: "#ff705d" },
   ]);
 }
 
@@ -2901,7 +2956,7 @@ function drawLineChart(canvas, datasets, options = {}) {
     }
 
     const coords = dataset.points.map((point, index) => ({
-      x: padding.left + (dataset.points.length === 1 ? plotWidth / 2 : (index / (dataset.points.length - 1)) * plotWidth),
+      x: padding.left + (point.position ?? (dataset.points.length === 1 ? 0.5 : index / (dataset.points.length - 1))) * plotWidth,
       y: padding.top + plotHeight - ((Number(point.value) - min) / (max - min)) * plotHeight,
     }));
     context.strokeStyle = dataset.color;
@@ -3289,17 +3344,28 @@ function bindEvents() {
   $("#progress-insight-action").addEventListener("click", followProgressInsight);
   $("#body-form").addEventListener("submit", async (event) => {
     event.preventDefault();
-    upsertByDate(state.bodyLogs, {
-      date: $("#body-date").value,
-      weight: Number($("#body-weight").value),
-      waist: Number($("#body-waist").value),
+    const date = $("#body-date").value;
+    const entry = mergeBodyMeasurement(state.bodyLogs.find((log) => log.date === date), {
+      date,
+      weight: $("#body-weight").value,
+      waist: $("#body-waist").value,
     });
+    if (!entry) {
+      $("#body-form-error").hidden = false;
+      $("#body-weight").focus();
+      return;
+    }
+    $("#body-form-error").hidden = true;
+    upsertByDate(state.bodyLogs, entry);
     const saved = await persistState();
     renderBody();
-    event.target.reset();
-    $("#body-date").value = toIsoDate();
-    if (saved) showToast("Body measurements saved.");
+    if (saved) {
+      event.target.reset();
+      $("#body-date").value = toIsoDate();
+      showToast("Body measurements saved.");
+    }
   });
+  $("#body-form").addEventListener("input", () => { $("#body-form-error").hidden = true; });
   $("#sleep-form").addEventListener("submit", async (event) => {
     event.preventDefault();
     upsertByDate(state.sleepLogs, {

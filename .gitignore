@@ -12,3 +12,4 @@ evidence-based-weekly-workout-plan.md
 *.health-data.json
 exports/
 
+.gstack/

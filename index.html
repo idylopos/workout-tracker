@@ -381,16 +381,18 @@
           <div class="tracking-grid">
             <details class="progress-disclosure" id="body-details">
               <summary>
-                <h2>Weight & waist</h2>
+                <h2>Weight or waist</h2>
                 <span id="body-details-status">Optional · add a measurement</span>
               </summary>
               <div class="progress-detail-content">
+              <p class="progress-detail-copy" id="body-form-help">Log either measurement, or both. A blank field keeps any measurement already saved for that date.</p>
               <form class="inline-form" id="body-form">
                 <label><span>Date</span><input id="body-date" type="date" required /></label>
-                <label><span>Weight</span><div class="unit-input"><input id="body-weight" type="number" min="0" step="0.1" inputmode="decimal" required /><span>kg</span></div></label>
-                <label><span>Waist</span><div class="unit-input"><input id="body-waist" type="number" min="0" step="0.1" inputmode="decimal" required /><span>cm</span></div></label>
+                <label><span>Weight</span><div class="unit-input"><input id="body-weight" type="number" min="0" step="0.1" inputmode="decimal" aria-describedby="body-form-help body-form-error" /><span>kg</span></div></label>
+                <label><span>Waist</span><div class="unit-input"><input id="body-waist" type="number" min="0" step="0.1" inputmode="decimal" aria-describedby="body-form-help body-form-error" /><span>cm</span></div></label>
                 <button class="button button-primary" type="submit">Save measurements</button>
               </form>
+              <p class="progress-detail-copy" id="body-form-error" role="alert" hidden>Enter weight or waist before saving.</p>
               <div class="mini-chart-wrap"><canvas id="body-chart" aria-label="Body measurement chart"></canvas></div>
               <div class="log-list" id="body-log-list"></div>
               </div>
@@ -529,6 +531,7 @@
               <option value="elliptical">Elliptical</option>
               <option value="swimming">Swimming</option>
               <option value="running">Running</option>
+              <option value="hiit">HIIT</option>
               <option value="custom">Custom</option>
             </select>
           </label>
@@ -538,19 +541,19 @@
           </label>
         </div>
         <label>
-          <span>Measurement</span>
+          <span>Primary measurements</span>
           <select id="extra-activity-measurement" required>
-            <option value="duration">Time only + RPE</option>
+            <option value="duration">Time + RPE</option>
             <option value="duration_calories">Time + Cal + RPE</option>
             <option value="distance_time">Distance + time + RPE</option>
-            <option value="distance">Distance only + RPE</option>
+            <option value="distance">Distance + RPE</option>
           </select>
         </label>
         <label class="reusable-check">
           <input id="save-extra-activity" type="checkbox" />
           <span>Save this setup as a reusable activity</span>
         </label>
-        <p class="activity-form-note">The activity is added to this workout. Press <strong>Save workout</strong> when your entries are complete.</p>
+        <p class="activity-form-note">You can add distance, calories, time, average RPM, and average heart rate under <strong>Machine &amp; wearable metrics</strong>. Press <strong>Save workout</strong> when your entries are complete.</p>
         <div class="activity-form-actions">
           <button class="button button-secondary" id="extra-activity-cancel" type="button">Cancel</button>
           <button class="button button-primary" type="submit">Add activity</button>
@@ -749,10 +752,10 @@
           <label>
             <span>Measure</span>
             <select class="extra-measurement-select">
-              <option value="duration">Time only + RPE</option>
+              <option value="duration">Time + RPE</option>
               <option value="duration_calories">Time + Cal + RPE</option>
               <option value="distance_time">Distance + time + RPE</option>
-              <option value="distance">Distance only + RPE</option>
+              <option value="distance">Distance + RPE</option>
             </select>
           </label>
           <div class="set-list"></div>

@@ -160,13 +160,13 @@ work after each completed quality session; Saturday stays at 8–10 km easy. Beg
    - **Watch:** Keep the heels planted and shorten the stance if the front of the shin cramps.
 
 8. **Short-lever Copenhagen plank** — 2 × 15–25 sec / side · rest 1 min
-   - Log as: Time only.
+   - Log as: Time.
    - **Setup:** Lie side-on with the top knee supported on a bench and the lower knee bent beneath you.
    - **Do:** Lift the hips into a straight shoulder-to-knee line and breathe normally.
    - **Watch:** Stop if you feel groin pain rather than muscular effort. Use more bench support to make it easier.
 
 9. **Bicycle HIIT** — 10-min warm-up; 6 × 1 min at RPE 8–9 with 2 min easy; 8–10-min cooldown
-   - Log as: Time only.
+   - Log as: Time.
    - **Setup:** Adjust the saddle so the knee remains slightly bent at the bottom of the pedal stroke.
    - **Do:** Warm up fully, ride each hard minute at RPE 8–9, and make every recovery genuinely easy.
    - **Watch:** Hard does not mean all-out. Keep cadence controlled and stop for chest pain, dizziness, or unusual breathlessness.
@@ -235,7 +235,7 @@ work after each completed quality session; Saturday stays at 8–10 km easy. Beg
    - **Watch:** Reduce duration or pace if knee symptoms rise during the run or are worse the following morning.
 
 9. **Pelvic-floor routine** — 5 breaths; 8 × 5-sec holds with full relaxation; 8 quick contractions
-   - Log as: Time only.
+   - Log as: Time.
    - **Setup:** Breathe normally and imagine gently lifting around the urethra and anus without moving the pelvis.
    - **Do:** Use a submaximal contraction, then fully release for at least as long as each hold.
    - **Watch:** Do not hold your breath, bear down, or keep the muscles clenched between reps.
@@ -285,7 +285,7 @@ work after each completed quality session; Saturday stays at 8–10 km easy. Beg
    - **Watch:** Keep the hips and shoulders square. Do not let the cable rotate the torso. Reduce the load if the ribs flare or you hold your breath.
 
 6. **Optional Zone 2 cycling** — 25–40 min at RPE 2–3 · only after the optional-session recovery gate is met · optional
-   - Log as: Time only.
+   - Log as: Time.
    - **Setup:** Use a comfortable saddle height and begin with several easy minutes.
    - **Do:** Ride steadily at RPE 2–3, where full sentences remain easy.
    - **Watch:** This is optional recovery volume; skip it when sleep, legs, running, or joints are not normal.
@@ -385,7 +385,7 @@ work after each completed quality session; Saturday stays at 8–10 km easy. Beg
    - **Watch:** End the quality portion if form deteriorates or knee symptoms rise, and monitor the following morning.
 
 9. **Pelvic-floor routine** — 5 breaths; 8 × 5-sec holds; 8 quick contractions
-   - Log as: Time only.
+   - Log as: Time.
    - **Setup:** Breathe normally and imagine gently lifting around the urethra and anus without moving the pelvis.
    - **Do:** Use a submaximal contraction, then fully release for at least as long as each hold.
    - **Watch:** Do not hold your breath, bear down, or keep the muscles clenched between reps.
@@ -493,7 +493,7 @@ work after each completed quality session; Saturday stays at 8–10 km easy. Beg
    - **Watch:** Repeat rather than advance the progression if joint symptoms or usual energy are not back to baseline the next morning.
 
 2. **Optional technique-focused swim** — 25–40 min at RPE 2–3 · only after the recovery gate is met, with comfortable shoulders and normal energy · no paddles or hard butterfly · optional
-   - Log as: Time only.
+   - Log as: Time.
    - **Setup:** Begin with relaxed technique lengths and choose strokes that feel comfortable at the shoulder.
    - **Do:** Keep the effort at RPE 2–3 with generous rest as needed.
    - **Watch:** Avoid paddles, hard butterfly, or fatigued overhead work; stop any stroke that provokes shoulder discomfort.
@@ -529,7 +529,7 @@ work after each completed quality session; Saturday stays at 8–10 km easy. Beg
    - **Watch:** Avoid swinging, leaning back, or allowing the shoulders to roll forward.
 
 8. **Pelvic-floor routine** — 5 breaths; 8 × 5-sec holds; 8 quick contractions
-   - Log as: Time only.
+   - Log as: Time.
    - **Setup:** Breathe normally and imagine gently lifting around the urethra and anus without moving the pelvis.
    - **Do:** Use a submaximal contraction, then fully release for at least as long as each hold.
    - **Watch:** Do not hold your breath, bear down, or keep the muscles clenched between reps.

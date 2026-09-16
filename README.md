@@ -25,8 +25,14 @@ Then open `http://localhost:8080`.
 ## Log extra cardio
 
 On any scheduled training day, choose **+ Add extra activity** below the planned exercises. Select walking, cycling,
-elliptical, swimming, running, or a custom activity; then choose time, time plus calories, distance plus time, or
-distance-only logging. Every option includes RPE.
+elliptical, swimming, running, HIIT, or a custom activity; then choose time, time plus calories, distance plus time, or
+distance as the primary measurements. Every option includes RPE.
+
+For planned cardio and extra activities, expand **Machine & wearable metrics** to record distance (km), duration
+(minutes and seconds), calories (kcal), average RPM, and average heart rate (bpm). All readings are optional; values
+already shown in the main row are not repeated. Switching between cardio measurement options preserves entered
+readings. Saved readings reopen when you revisit the workout and are included in drafts and JSON backups.
+Optional machine readings are not copied by **Use Last**, **Fill empty sets from set 1**, or **Load last session**.
 
 Select **Save this setup as a reusable activity** to add the configuration to the activity picker. Reusable activities
 and completed extra-cardio records are stored in the browser and included in JSON backups. The Week
@@ -34,6 +40,10 @@ view shows the selected week’s combined planned and extra cardio. Progress sta
 recovery snapshot, then shows exercise detail and an eight-week cardio duration trend.
 
 ## During a workout
+
+Under **Progress → Weight or waist**, save either measurement independently or enter both. Adding a measurement
+for an existing date keeps any value left blank. Missing measurements appear as a dash in history and are omitted
+from the chart; partial entries are included in JSON backups.
 
 Changes on the Today screen are automatically saved as a local draft. If the browser reloads or discards the tab,
 the draft will be restored. Passphrase protection is optional under **Data**. When enabled, drafts and records are

@@ -1570,6 +1570,76 @@ dialog.coaching-dialog {
   pointer-events: none;
 }
 
+.cardio-metrics {
+  grid-column: 1 / -1;
+  min-width: 0;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+
+.cardio-metrics summary {
+  padding-block: 8px;
+  color: var(--ink-soft);
+  font-size: 12px;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.cardio-metrics p {
+  margin: 4px 0 12px;
+  color: var(--ink-soft);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.cardio-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+}
+
+.cardio-metrics .set-field input {
+  padding-right: 40px;
+}
+
+.has-cardio-metrics > .remove-set {
+  grid-column: -2 / -1;
+  grid-row: 1;
+}
+
+@media (max-width: 680px) {
+  .set-list .set-row.has-cardio-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    min-width: 0;
+  }
+
+  .has-cardio-metrics > .set-done {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .has-cardio-metrics > .set-field {
+    min-width: 0;
+  }
+
+  .has-cardio-metrics > .set-done + .set-field {
+    grid-column: 1;
+  }
+
+  .has-cardio-metrics > .remove-set {
+    justify-self: end;
+  }
+
+  .cardio-metrics-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .cardio-metrics summary {
+    min-height: 44px;
+    padding-block: 12px;
+  }
+}
+
 .remove-set {
   width: 32px;
   height: 42px;

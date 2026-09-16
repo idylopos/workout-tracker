@@ -1,7 +1,7 @@
 export const APP_VERSION = 1;
 export const STORAGE_KEY = "formflow.training.v1";
 
-export const EXTRA_ACTIVITY_TYPES = ["walking", "cycling", "elliptical", "swimming", "running", "custom"];
+export const EXTRA_ACTIVITY_TYPES = ["walking", "cycling", "elliptical", "swimming", "running", "hiit", "custom"];
 export const EXTRA_ACTIVITY_MEASUREMENTS = ["duration", "duration_calories", "distance_time", "distance"];
 
 export const STRENGTH_PROGRESSION = {
@@ -62,7 +62,7 @@ export const MEASUREMENT_TYPES = {
     ],
   },
   duration: {
-    label: "Time only",
+    label: "Time",
     short: "Time",
     fields: [
       { key: "minutes", label: "Minutes", unit: "min", min: 0, step: 1 },
@@ -91,7 +91,7 @@ export const MEASUREMENT_TYPES = {
     ],
   },
   distance: {
-    label: "Distance only",
+    label: "Distance",
     short: "Distance",
     fields: [
       { key: "distance", label: "Distance", unit: "km", min: 0, step: 0.1 },
@@ -99,6 +99,37 @@ export const MEASUREMENT_TYPES = {
     ],
   },
 };
+
+const CARDIO_METRIC_FIELDS = [
+  { key: "distance", label: "Distance", unit: "km", min: 0, step: 0.01 },
+  { key: "minutes", label: "Minutes", unit: "min", min: 0, step: 1 },
+  { key: "seconds", label: "Seconds", unit: "sec", min: 0, max: 59, step: 1 },
+  { key: "calories", label: "Calories", unit: "kcal", min: 0, step: 1 },
+  { key: "averageRpm", label: "Avg RPM", unit: "rpm", min: 0, step: 0.1 },
+  { key: "averageHeartRate", label: "Avg heart rate", unit: "bpm", min: 0, step: 1 },
+];
+
+export function optionalCardioFields(measurement) {
+  if (!EXTRA_ACTIVITY_MEASUREMENTS.includes(measurement)) return [];
+  const primaryKeys = new Set(MEASUREMENT_TYPES[measurement].fields.map((field) => field.key));
+  return CARDIO_METRIC_FIELDS.filter((field) => !primaryKeys.has(field.key));
+}
+
+export function measurementFields(measurement) {
+  return [...(MEASUREMENT_TYPES[measurement]?.fields || []), ...optionalCardioFields(measurement)];
+}
+
+export function summarizeCardioSet(set) {
+  const recorded = (key) => set[key] !== "" && set[key] !== null && set[key] !== undefined && Number.isFinite(Number(set[key]));
+  const parts = [];
+  if (recorded("minutes") || recorded("seconds")) parts.push(formatDuration(numeric(set.minutes) * 60 + numeric(set.seconds)));
+  if (recorded("distance")) parts.push(`${set.distance} km`);
+  if (recorded("calories")) parts.push(`${set.calories} kcal`);
+  if (recorded("averageRpm")) parts.push(`${set.averageRpm} rpm avg`);
+  if (recorded("averageHeartRate")) parts.push(`${set.averageHeartRate} bpm avg`);
+  if (recorded("rpe")) parts.push(`RPE ${set.rpe}`);
+  return parts.join(" · ") || "No metrics recorded";
+}
 
 export function preparePreviousSets(previousSets, targetCount, measurement) {
   const sources = Array.isArray(previousSets) ? previousSets : [];
@@ -1056,6 +1087,36 @@ export function normalizeState(value) {
   };
 }
 
+function missingBodyMeasurement(value) {
+  return value === undefined || value === null || (typeof value === "string" && value.trim() === "");
+}
+
+export function bodyMeasurementValue(value) {
+  if (missingBodyMeasurement(value) || !["number", "string"].includes(typeof value)) return null;
+  const number = Number(value);
+  return Number.isFinite(number) && number >= 0 ? number : null;
+}
+
+export function mergeBodyMeasurement(existing, entry) {
+  const provided = ["weight", "waist"].filter((field) => !missingBodyMeasurement(entry[field]));
+  if (!provided.length || provided.some((field) => bodyMeasurementValue(entry[field]) === null)) return null;
+  const merged = existing?.date === entry.date ? { ...existing } : { date: entry.date };
+  provided.forEach((field) => { merged[field] = bodyMeasurementValue(entry[field]); });
+  return merged;
+}
+
+export function bodyMeasurementPoints(entries, field) {
+  const sorted = [...entries].sort((a, b) => a.date.localeCompare(b.date));
+  return sorted.flatMap((entry, index) => {
+    const value = bodyMeasurementValue(entry[field]);
+    return value === null ? [] : [{
+      date: entry.date,
+      value,
+      position: sorted.length === 1 ? 0.5 : index / (sorted.length - 1),
+    }];
+  });
+}
+
 export function validateBackup(value) {
   if (!value || typeof value !== "object") return { valid: false, reason: "The file does not contain a JSON object." };
   if (Number(value.version) !== APP_VERSION) {
@@ -1093,7 +1154,9 @@ export function validateBackup(value) {
   const validDate = (date) => typeof date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(date) && !Number.isNaN(Date.parse(`${date}T12:00:00`));
   const validNumber = (number) => Number.isFinite(Number(number)) && Number(number) >= 0;
   const bodyValid = value.bodyLogs.every(
-    (entry) => entry && validDate(entry.date) && validNumber(entry.weight) && validNumber(entry.waist),
+    (entry) => entry && validDate(entry.date) &&
+      ["weight", "waist"].every((field) => missingBodyMeasurement(entry[field]) || bodyMeasurementValue(entry[field]) !== null) &&
+      ["weight", "waist"].some((field) => bodyMeasurementValue(entry[field]) !== null),
   );
   const sleepValid = value.sleepLogs.every(
     (entry) => entry && validDate(entry.week) && validNumber(entry.hours) && Number(entry.hours) <= 24,
@@ -1423,15 +1486,9 @@ function cardioEntryMetrics(entry) {
   }
   return entry.sets.reduce(
     (summary, set) => {
-      const seconds =
-        entry.measurement === "duration" ||
-        entry.measurement === "duration_calories" ||
-        entry.measurement === "distance_time"
-          ? numeric(set.minutes) * 60 + numeric(set.seconds)
-          : 0;
-      const distance =
-        entry.measurement === "distance" || entry.measurement === "distance_time" ? numeric(set.distance) : 0;
-      const calories = entry.measurement === "duration_calories" ? numeric(set.calories) : 0;
+      const seconds = numeric(set.minutes) * 60 + numeric(set.seconds);
+      const distance = numeric(set.distance);
+      const calories = numeric(set.calories);
       const hasRpe = set.rpe !== "" && set.rpe !== null && set.rpe !== undefined && Number.isFinite(Number(set.rpe));
       summary.seconds += seconds;
       summary.distance += distance;
@@ -1440,7 +1497,8 @@ function cardioEntryMetrics(entry) {
         summary.rpeTotal += numeric(set.rpe);
         summary.rpeCount += 1;
       }
-      summary.hasActivity ||= Boolean(set.completed || seconds > 0 || distance > 0 || calories > 0 || hasRpe);
+      summary.hasActivity ||= Boolean(set.completed || seconds > 0 || distance > 0 || calories > 0 || hasRpe ||
+        numeric(set.averageRpm) > 0 || numeric(set.averageHeartRate) > 0);
       return summary;
     },
     { seconds: 0, distance: 0, calories: 0, rpeTotal: 0, rpeCount: 0, hasActivity: false },
