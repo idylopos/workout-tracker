@@ -22,7 +22,7 @@ import {
   dateToDayKey,
   evaluateLongRunProgress,
   eveningCheckInItems,
-  findPreviousExerciseLog,
+  findExerciseHistory,
   findPreviousSession,
   formatDuration,
   getDailyCheckInItems,
@@ -1874,25 +1874,92 @@ function setupExerciseAlternatives(card, exercise, savedExercise) {
   return variants.find((variant) => variant.id === savedExercise?.variantId) || variants[0];
 }
 
-function updatePreviousExerciseState(card, exercise) {
-  const previous = findPreviousExerciseLog(
-    state.workoutLogs,
-    exercise.id,
-    selectedDate,
-    activePlan.id,
-    state.workoutDrafts,
-    card.dataset.variantId,
+function exerciseHistory(card, exercise) {
+  return findExerciseHistory(
+    state.workoutLogs, exercise.id, selectedDate, activePlan.id,
+    state.workoutDrafts, card.dataset.variantId,
   );
+}
+
+function closeExerciseHistory(card, { focus = false } = {}) {
+  $(".exercise-history-picker", card).classList.add("is-hidden");
+  $(".load-previous", card).setAttribute("aria-expanded", "false");
+  if (focus) $(".load-previous", card).focus();
+}
+
+function updatePreviousExerciseState(card, exercise) {
+  const previous = exerciseHistory(card, exercise)[0];
   const previousLine = $(".previous-line", card);
   const loadPrevious = $(".load-previous", card);
-  if (previous) {
-    previousLine.textContent = `Last: ${formatDate(previous.date)} · ${summarizeSetPreview(previous.measurement, previous.sets)}`;
-    loadPrevious.disabled = false;
-  } else {
-    previousLine.textContent = "No earlier log for this exercise variation.";
-    loadPrevious.disabled = true;
-  }
+  delete card.dataset.previousImportSnapshot;
+  delete card.dataset.previousImportDate;
+  loadPrevious.textContent = "Use last";
+  closeExerciseHistory(card);
+  previousLine.textContent = previous
+    ? `Last: ${formatDate(previous.date)} · ${summarizeSetPreview(previous.measurement, previous.sets)}`
+    : "No earlier log for this exercise variation.";
+  loadPrevious.disabled = !previous;
   return previous;
+}
+
+function previousImportSnapshot(card) {
+  return JSON.stringify({
+    measurement: $(".measurement-select", card).value,
+    sets: collectSetRows(card),
+    performance: $(".progression-performance-qualified", card)?.checked || false,
+    recovery: $(".progression-recovery-qualified", card)?.checked || false,
+  });
+}
+
+function loadExerciseHistoryEntry(card, exercise, earlier) {
+  const snapshot = previousImportSnapshot(card);
+  const changed = card.dataset.previousImportSnapshot
+    ? snapshot !== card.dataset.previousImportSnapshot
+    : collectSetRows(card).some(hasSetContent) ||
+      $(".progression-performance-qualified", card)?.checked ||
+      $(".progression-recovery-qualified", card)?.checked;
+  if (changed && !window.confirm("Replace the values entered for this exercise with this workout’s last set? Completion and RIR/RPE will be cleared.")) {
+    return false;
+  }
+  const todaySetCount = $(".set-list", card).children.length || Number(card.dataset.defaultSets);
+  $(".measurement-select", card).value = earlier.measurement;
+  state.exerciseConfigs[exerciseConfigKey(exercise.id)] = earlier.measurement;
+  persistState();
+  renderSetRows(card, earlier.measurement, preparePreviousSets(earlier.sets, todaySetCount, earlier.measurement));
+  clearImportedCompletion(card);
+  card.dataset.previousImportSnapshot = previousImportSnapshot(card);
+  card.dataset.previousImportDate = earlier.date;
+  $(".load-previous", card).textContent = "Load more";
+  $(".previous-line", card).textContent = `Loaded: ${formatDate(earlier.date)} · ${summarizeSetPreview(earlier.measurement, preparePreviousSets(earlier.sets, 1, earlier.measurement))}`;
+  closeExerciseHistory(card, { focus: true });
+  markWorkoutDirty();
+  showToast(`${exercise.name}: ${formatDate(earlier.date)} last set loaded into all ${todaySetCount} sets; today remains not done.`);
+  updateSessionProgress();
+  return true;
+}
+
+function openExerciseHistory(card, exercise) {
+  const picker = $(".exercise-history-picker", card);
+  const choices = $(".exercise-history-choices", card);
+  choices.replaceChildren();
+  const older = exerciseHistory(card, exercise).slice(1);
+  $(".exercise-history-empty", card).classList.toggle("is-hidden", older.length > 0);
+  older.forEach((entry) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "exercise-history-choice";
+    button.setAttribute("aria-pressed", String(entry.date === card.dataset.previousImportDate));
+    const date = document.createElement("strong");
+    date.textContent = formatDate(entry.date, { year: "numeric", month: "short", day: "numeric" });
+    const summary = document.createElement("span");
+    summary.textContent = `Last set: ${summarizeSetPreview(entry.measurement, preparePreviousSets(entry.sets, 1, entry.measurement))}`;
+    button.append(date, summary);
+    button.addEventListener("click", () => loadExerciseHistoryEntry(card, exercise, entry));
+    choices.append(button);
+  });
+  picker.classList.remove("is-hidden");
+  $(".load-previous", card).setAttribute("aria-expanded", "true");
+  (choices.firstElementChild || $(".exercise-history-cancel", card)).focus();
 }
 
 function createExerciseCard(exercise, index, savedExercise) {
@@ -2000,28 +2067,26 @@ function createExerciseCard(exercise, index, savedExercise) {
     state.exerciseConfigs[exerciseConfigKey(exercise.id)] = select.value;
     persistState();
     renderSetRows(card, select.value, sets);
+    updatePreviousExerciseState(card, exercise);
     markWorkoutDirty();
     updateSessionProgress();
   });
   $(".load-previous", card).addEventListener("click", () => {
-    const earlier = findPreviousExerciseLog(
-      state.workoutLogs,
-      exercise.id,
-      selectedDate,
-      activePlan.id,
-      state.workoutDrafts,
-      card.dataset.variantId,
-    );
-    if (!earlier) return;
-    const todaySetCount = $(".set-list", card).children.length || Number(card.dataset.defaultSets);
-    select.value = earlier.measurement;
-    state.exerciseConfigs[exerciseConfigKey(exercise.id)] = earlier.measurement;
-    persistState();
-    renderSetRows(card, earlier.measurement, preparePreviousSets(earlier.sets, todaySetCount, earlier.measurement));
-    clearImportedCompletion(card);
-    markWorkoutDirty();
-    showToast(`${exercise.name}: last set loaded into all ${todaySetCount} sets; today remains not done.`);
-    updateSessionProgress();
+    if (card.dataset.previousImportSnapshot) {
+      if ($(".exercise-history-picker", card).classList.contains("is-hidden")) openExerciseHistory(card, exercise);
+      else closeExerciseHistory(card);
+      return;
+    }
+    const earlier = exerciseHistory(card, exercise)[0];
+    if (earlier) loadExerciseHistoryEntry(card, exercise, earlier);
+  });
+  $(".exercise-history-cancel", card).addEventListener("click", () => closeExerciseHistory(card, { focus: true }));
+  $(".exercise-history-picker", card).addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      event.stopPropagation();
+      closeExerciseHistory(card, { focus: true });
+    }
   });
   $(".copy-first-set", card).addEventListener("click", () => copyFirstSetIntoEmpty(card, select.value));
   $(".add-set", card).addEventListener("click", () => {
@@ -2209,11 +2274,12 @@ function summarizeSetPreview(measurement, sets = []) {
     ),
   ) || {};
   if (EXTRA_ACTIVITY_MEASUREMENTS.includes(measurement)) return summarizeCardioSet(set);
-  if (measurement === "weight_reps") return `${set.weight || "—"} kg × ${set.reps || "—"}`;
-  if (measurement === "weight_distance") return `${set.weight || "—"} kg × ${set.distance || "—"} m`;
-  if (measurement === "assisted_reps") return `${set.assistance || "—"} kg assist × ${set.reps || "—"}`;
-  if (measurement === "reps") return `${set.reps || "—"} reps`;
-  return `${set.distance || "—"} km`;
+  const value = (key) => set[key] === "" || set[key] == null ? "—" : set[key];
+  if (measurement === "weight_reps") return `${value("weight")} kg × ${value("reps")}`;
+  if (measurement === "weight_distance") return `${value("weight")} kg × ${value("distance")} m`;
+  if (measurement === "assisted_reps") return `${value("assistance")} kg assist × ${value("reps")}`;
+  if (measurement === "reps") return `${value("reps")} reps`;
+  return `${value("distance")} km`;
 }
 
 function collectSetRows(card, measurementOverride = "") {

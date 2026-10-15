@@ -4522,3 +4522,52 @@ body[data-active-view="today"] .timer {
     white-space: normal;
   }
 }
+
+/* Earlier workout selection stays local to its exercise card. */
+.exercise-history-picker {
+  margin: 12px 0;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--paper);
+}
+.exercise-history-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.exercise-history-picker p {
+  font-size: 13px;
+  line-height: 1.5;
+}
+.exercise-history-choices {
+  display: grid;
+  gap: 8px;
+  max-height: 280px;
+  overflow-y: auto;
+}
+.exercise-history-choice {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 6px 16px;
+  padding: 12px;
+  min-height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.exercise-history-choice:hover,
+.exercise-history-choice[aria-pressed="true"] {
+  background: var(--paper);
+  border-color: currentColor;
+}
+.exercise-history-choice:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: -3px;
+}

@@ -654,7 +654,7 @@
                 type="button"
                 aria-expanded="false"
               >Alternatives</button>
-              <button class="text-button load-previous" type="button">Use last</button>
+              <button class="text-button load-previous" type="button" aria-expanded="false">Use last</button>
             </div>
           </div>
           <section class="alternative-picker is-hidden" aria-label="Exercise alternatives">
@@ -682,7 +682,16 @@
               <p class="form-guide-option is-hidden"><strong>Alternative</strong><span data-guidance="option"></span></p>
             </div>
           </details>
-          <div class="previous-line"></div>
+          <section class="exercise-history-picker is-hidden" aria-label="Earlier workouts">
+            <div class="exercise-history-head">
+              <strong>Choose an earlier workout</strong>
+              <button class="text-button exercise-history-cancel" type="button">Cancel</button>
+            </div>
+            <p>Load its last set into today’s sets. Completion and RIR/RPE stay clear.</p>
+            <p class="exercise-history-empty is-hidden" role="status">No older workouts for this exercise variation.</p>
+            <div class="exercise-history-choices"></div>
+          </section>
+          <div class="previous-line" aria-live="polite"></div>
           <div class="set-list"></div>
           <div class="set-actions">
             <button class="copy-first-set" type="button">Fill empty sets from set 1</button>
