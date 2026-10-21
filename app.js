@@ -2102,7 +2102,73 @@ function copyFirstSetIntoEmpty(card, measurement) {
   showToast("Set 1 values filled into empty sets.");
 }
 
+const EFFORT_CHOICES = [
+  { value: 2, face: "🙂", label: "Very easy" },
+  { value: 4, face: "😐", label: "Comfortable" },
+  { value: 6, face: "😮‍💨", label: "Hard but manageable" },
+  { value: 8, face: "😣", label: "Very hard" },
+  { value: 10, face: "🥵", label: "Maximum effort" },
+];
+
+function effortFace(value) {
+  return value === "" ? "—" : (EFFORT_CHOICES.find((choice) => Number(value) <= choice.value)?.face ?? "🥵");
+}
+
+function createEffortField(index, values) {
+  const field = document.createElement("div");
+  field.className = "set-field effort-field";
+  field.innerHTML = `<span>Effort</span><input type="hidden" data-field="rpe">
+    <button type="button" class="effort-trigger" aria-haspopup="dialog"></button>`;
+  const input = $("input", field);
+  const trigger = $("button", field);
+  input.value = values.rpe ?? "";
+  const refresh = () => {
+    trigger.textContent = input.value === "" ? "＋" : `${effortFace(input.value)} ${input.value}`;
+    trigger.setAttribute("aria-label", `Effort, set ${index + 1}: ${input.value === "" ? "not recorded" : `RPE ${input.value}`}`);
+  };
+  input.addEventListener("input", refresh);
+  trigger.addEventListener("click", () => {
+    const dialog = document.createElement("dialog");
+    dialog.className = "effort-dialog";
+    dialog.setAttribute("aria-label", `Effort, set ${index + 1}`);
+    dialog.innerHTML = `<button type="button" class="effort-close" aria-label="Close effort picker">×</button>
+      <h2>How hard did it feel?</h2>
+      <div class="effort-face" aria-hidden="true"></div>
+      <p class="effort-status" aria-live="polite"></p>
+      <div class="effort-options">${EFFORT_CHOICES.map((choice) => `<button type="button" data-effort="${choice.value}" aria-pressed="false"><span aria-hidden="true">${choice.face}</span><span>${choice.label}</span><small>RPE ${choice.value}</small></button>`).join("")}</div>
+      <details><summary>Enter an exact RPE</summary><label>RPE (0–10)<select class="effort-exact"><option value="">Not recorded</option>${Array.from({ length: 11 }, (_, i) => `<option value="${i}">${i}</option>`).join("")}</select></label></details>
+      <button type="button" class="effort-clear">Clear effort</button>`;
+    const render = () => {
+      $(".effort-face", dialog).textContent = effortFace(input.value);
+      $(".effort-status", dialog).textContent = input.value === "" ? "Not recorded" : `RPE ${input.value} · applied`;
+      $(".effort-exact", dialog).value = input.value;
+      $$("[data-effort]", dialog).forEach((button) => button.setAttribute("aria-pressed", String(button.dataset.effort === input.value)));
+      $(".effort-clear", dialog).disabled = input.value === "";
+    };
+    const apply = (value) => {
+      input.value = value;
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+      render();
+      const face = $(".effort-face", dialog);
+      if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        face.animate([{ transform: "scale(.8)" }, { transform: "scale(1)" }], { duration: 180 });
+      }
+    };
+    $$("[data-effort]", dialog).forEach((button) => button.addEventListener("click", () => apply(button.dataset.effort)));
+    $(".effort-exact", dialog).addEventListener("change", (event) => apply(event.target.value));
+    $(".effort-clear", dialog).addEventListener("click", () => apply(""));
+    $(".effort-close", dialog).addEventListener("click", () => dialog.close());
+    dialog.addEventListener("close", () => { dialog.remove(); trigger.focus(); });
+    document.body.append(dialog);
+    render();
+    dialog.showModal();
+  });
+  refresh();
+  return field;
+}
+
 function createSetField(field, index, values) {
+  if (field.key === "rpe") return createEffortField(index, values);
   const label = document.createElement("label");
   label.className = "set-field";
   label.innerHTML = `
@@ -2173,7 +2239,10 @@ function createSetRow(measurement, index, values, restSeconds, options = {}) {
     if (list.children.length <= 1) {
       $$("input", row).forEach((input) => {
         if (input.type === "checkbox") input.checked = false;
-        else input.value = "";
+        else {
+          input.value = "";
+          if (input.dataset.field === "rpe") input.dispatchEvent(new Event("input"));
+        }
       });
       row.classList.remove("is-done");
     } else {

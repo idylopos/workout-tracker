@@ -4522,3 +4522,49 @@ body[data-active-view="today"] .timer {
     white-space: normal;
   }
 }
+
+/* Effort is applied immediately; completion still uses the existing set control. */
+.effort-trigger {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--card);
+  padding: 6px;
+  white-space: nowrap;
+}
+.effort-dialog {
+  width: min(420px, calc(100% - 24px));
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  padding: 24px;
+  background: var(--card);
+  color: var(--ink);
+}
+.effort-dialog::backdrop { background: rgb(23 33 27 / 45%); }
+.effort-dialog h2 { font-size: 22px; margin: 12px 32px 12px 0; }
+.effort-close { float: right; min-width: 44px; min-height: 44px; border: 0; background: transparent; font-size: 24px; }
+.effort-face { text-align: center; font-size: 56px; }
+.effort-status { text-align: center; color: var(--ink-soft); }
+.effort-options { display: grid; gap: 8px; }
+.effort-options button {
+  display: grid;
+  grid-template-columns: 30px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+  min-height: 52px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--card);
+}
+.effort-options button > span:first-child { font-size: 24px; }
+.effort-options button[aria-pressed="true"] { background: var(--lime); border-color: var(--ink); }
+.effort-options small { white-space: nowrap; }
+.effort-dialog details { margin-top: 18px; }
+.effort-dialog summary { min-height: 44px; cursor: pointer; }
+.effort-dialog select { display: block; width: 100%; min-height: 44px; margin-top: 8px; }
+.effort-clear { width: 100%; min-height: 44px; margin-top: 12px; border: 0; background: transparent; }
