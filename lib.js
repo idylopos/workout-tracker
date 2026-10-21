@@ -1439,7 +1439,7 @@ export function progressDisclosureOpen({ open, hasData, previousHasData, scopeCh
   return scopeChanged || (hasData && previousHasData === false) ? hasData : open;
 }
 
-export function findPreviousExerciseLog(
+export function findExerciseHistory(
   workoutLogs,
   exerciseId,
   beforeDate,
@@ -1466,7 +1466,11 @@ export function findPreviousExerciseLog(
       },
     )
     .sort((a, b) => b.date.localeCompare(a.date))
-    .map((log) => ({ date: log.date, ...log.exercises[exerciseId] }))[0] || null;
+    .map((log) => ({ ...log.exercises[exerciseId], date: log.date }));
+}
+
+export function findPreviousExerciseLog(...args) {
+  return findExerciseHistory(...args)[0] || null;
 }
 
 export function findPreviousSession(workoutLogs, dayKey, beforeDate, planId = "form-flow") {

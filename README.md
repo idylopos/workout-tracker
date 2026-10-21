@@ -57,7 +57,11 @@ For repeated working sets, enter the first set and choose **Fill empty sets from
 final logged set of the previous workout. It leaves every completion box and RIR/RPE field clear. It also clears
 pull-up performance/recovery qualification checks, so importing values
 cannot mark the current exercise complete. The lookup searches every earlier saved workout and local draft, so
-skipped weeks do not hide the most recent entry.
+skipped weeks do not hide the most recent entry, including a lighter deload workout.
+After importing once, **Use last** becomes **Load more**. Choose an earlier workout by date and last-set values
+to import it using the same rules, or **Cancel** (or Escape) to keep your inputs. Edited values require confirmation
+before replacement. History stays within the selected plan and exercise variation; switching workout, variation,
+or measurement resets the button to **Use last**.
 
 Every built-in exercise includes a collapsible **Quick form guide** covering setup, execution, the main thing to watch,
 and a substitute when appropriate. Folder-based plans can provide the same guidance in `plan.json`.
