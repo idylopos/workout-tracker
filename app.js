@@ -3268,12 +3268,9 @@ const timer = {
   running: false,
   interval: null,
   endsAt: null,
-  finishedTimeout: null,
 };
 
 function clearTimerFinishedState() {
-  clearTimeout(timer.finishedTimeout);
-  timer.finishedTimeout = null;
   $("#rest-timer").classList.remove("is-finished");
   $("#timer-label").textContent = "REST";
   syncTimerVisibility();
@@ -3304,7 +3301,8 @@ function startTimer() {
     timer.remaining = Math.max(0, Math.ceil((timer.endsAt - Date.now()) / 1000));
     timer.running = false;
     clearInterval(timer.interval);
-    updateTimerUi();
+    if (timer.remaining <= 0) timerFinished();
+    else updateTimerUi();
     return;
   }
   if (timer.remaining <= 0) timer.remaining = timer.total;
@@ -3323,10 +3321,15 @@ function startTimer() {
 }
 
 function updateTimerUi() {
+  const restTimer = $("#rest-timer");
+  const ending = timer.remaining > 0 && timer.remaining <= 10;
+  const progress = timer.total > 0 ? Math.min(1, Math.max(0, timer.remaining / timer.total)) : 0;
   $("#timer-time").textContent = formatTimer(timer.remaining);
   $("#timer-play").textContent = timer.running ? "Ⅱ" : "▶";
   $("#timer-play").setAttribute("aria-label", timer.running ? "Pause rest timer" : "Start rest timer");
-  $("#rest-timer").style.setProperty("--timer-progress", `${timer.total ? (timer.remaining / timer.total) * 360 : 0}deg`);
+  restTimer.style.setProperty("--timer-progress", String(progress));
+  restTimer.classList.toggle("is-ending", ending);
+  $("#timer-label").textContent = restTimer.classList.contains("is-finished") ? "REST DONE" : ending ? "FINAL 10s" : "REST";
   $$("[data-timer]").forEach((button) => button.classList.toggle("is-active", Number(button.dataset.timer) === timer.total));
   syncTimerVisibility();
 }
@@ -3336,11 +3339,8 @@ function formatTimer(seconds) {
 }
 
 function timerFinished() {
-  updateTimerUi();
   $("#rest-timer").classList.add("is-finished");
-  $("#timer-label").textContent = "REST DONE";
-  syncTimerVisibility();
-  timer.finishedTimeout = setTimeout(clearTimerFinishedState, 5000);
+  updateTimerUi();
   try {
     const audio = new AudioContext();
     const oscillator = audio.createOscillator();
