@@ -86,6 +86,12 @@
             </div>
           </article>
 
+          <nav class="workout-steps" aria-label="Workout steps">
+            <a href="#warmup-step">1 · Warm up</a>
+            <a href="#training-step">2 · Train</a>
+            <a href="#review-step">3 · Review &amp; save</a>
+          </nav>
+
           <div class="today-toolbar">
             <div class="segmented phase-selector" role="group" aria-label="Running phase">
               <button type="button" data-block="1" class="is-active">
@@ -119,7 +125,7 @@
 
           <div id="long-run-callout" class="callout is-hidden"></div>
 
-          <details class="warmup-card" open>
+          <details class="warmup-card" id="warmup-step" open>
             <summary>
               <span>
                 <span class="eyebrow">01 · PREP</span>
@@ -134,23 +140,34 @@
             <div>
               <span>STRENGTH PROGRESSION</span>
               <strong>Leave productive reps in reserve</strong>
-              <p id="strength-rule-effort"></p>
-              <small id="strength-rule-load"></small>
-              <small id="strength-rule-volume"></small>
+              <details class="context-help">
+                <summary>Effort, load &amp; progression guide</summary>
+                <div class="context-help-content">
+                  <p id="strength-rule-effort"></p>
+                  <small id="strength-rule-load"></small>
+                  <small id="strength-rule-volume"></small>
+                </div>
+              </details>
             </div>
             <div class="recovery-gate" id="recovery-gate">
               <span>OPTIONAL-SESSION GATE</span>
               <strong id="recovery-gate-title">Recovery check</strong>
-              <p id="recovery-gate-copy"></p>
+              <details class="context-help">
+                <summary>When to add optional work</summary>
+                <div class="context-help-content"><p id="recovery-gate-copy"></p></div>
+              </details>
             </div>
           </aside>
 
-          <div class="exercise-section-head">
+          <div class="exercise-section-head" id="training-step" tabindex="-1">
             <div>
               <p class="eyebrow">02 · TRAIN</p>
               <h2>Working sets</h2>
             </div>
-            <p>Tap a set when it is done. Rest starts automatically.</p>
+            <details class="context-help">
+              <summary>How to log sets</summary>
+              <div class="context-help-content"><p>Tap a set when it is done. Rest starts automatically.</p></div>
+            </details>
           </div>
           <div class="exercise-list" id="exercise-list"></div>
 
@@ -159,14 +176,17 @@
               <div>
                 <p class="eyebrow">OPTIONAL · EXTRA CARDIO</p>
                 <h2>Anything beyond the plan</h2>
-                <p>Log only what you actually perform. RPE is included with every measurement.</p>
+                <details class="context-help">
+                  <summary>About extra activities</summary>
+                  <div class="context-help-content"><p>Log only what you actually perform. RPE is included with every measurement.</p></div>
+                </details>
               </div>
               <button class="button button-secondary" id="add-extra-activity" type="button">+ Add extra activity</button>
             </div>
             <div class="extra-activity-list" id="extra-activity-list"></div>
           </section>
 
-          <details class="session-notes" open>
+          <details class="session-notes" id="review-step" open>
             <summary>
               <span>
                 <span class="eyebrow">03 · REVIEW</span>
@@ -697,7 +717,8 @@
             <button class="copy-first-set" type="button">Fill empty sets from set 1</button>
             <button class="add-set" type="button">+ Add set</button>
           </div>
-          <section class="exercise-guide is-hidden" aria-label="Pull-up progression guide">
+          <details class="exercise-guide is-hidden">
+            <summary class="roadmap-summary">Pull-up progression &amp; next steps</summary>
             <div class="progression-roadmap-head">
               <div>
                 <span>Pull-up roadmap</span>
@@ -746,7 +767,7 @@
               </small>
               <button type="button" class="button button-secondary progression-coach">What should I do next time?</button>
             </div>
-          </section>
+          </details>
         </div>
       </article>
     </template>

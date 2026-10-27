@@ -3413,6 +3413,15 @@ function bindEvents() {
     await persistState();
     renderToday();
   }));
+  $$(".workout-steps a").forEach((link) => {
+    link.addEventListener("click", (event) => {
+      event.preventDefault();
+      const target = $(link.getAttribute("href"));
+      if (target.tagName === "DETAILS") target.open = true;
+      target.scrollIntoView({ block: "start" });
+      (target.tagName === "DETAILS" ? target.querySelector("summary") : target).focus({ preventScroll: true });
+    });
+  });
   els.warmupList.addEventListener("change", updateWarmupCount);
   els.loadSession.addEventListener("click", loadLastSession);
   $("#save-workout").addEventListener("click", saveWorkout);

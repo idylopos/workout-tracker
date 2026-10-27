@@ -4616,3 +4616,41 @@ body[data-active-view="today"] .timer {
   outline: 2px solid currentColor;
   outline-offset: -3px;
 }
+
+/* Keep guidance available without competing with workout controls. */
+.workout-steps {
+  display: flex;
+  gap: 8px;
+  margin: 16px 0;
+}
+.workout-steps a {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: var(--ink);
+  background: var(--card);
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+}
+.workout-steps a:hover { background: var(--paper); }
+#training-step, #warmup-step, #review-step { scroll-margin-top: 90px; }
+.context-help > summary, .roadmap-summary {
+  min-height: 44px;
+  padding: 12px 0;
+  color: var(--ink-soft);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.context-help-content { display: grid; gap: 12px; padding: 0 0 12px; }
+.context-help-content p { margin: 0; line-height: 1.5; }
+.roadmap-summary { padding: 14px 16px; }
+.context-help > summary:focus-visible, .roadmap-summary:focus-visible,
+.workout-steps a:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
