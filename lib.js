@@ -1733,3 +1733,18 @@ export function formatPace(secondsPerKm) {
   const seconds = Math.max(0, Math.round(numeric(secondsPerKm)));
   return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
 }
+
+// Keep the original core exercise editable when revisiting a pre-change Friday.
+export function exercisesForSavedWorkout(exercises, log, planId = "form-flow") {
+  const legacy = log?.exercises?.["reverse-crunch"];
+  if (planId !== "form-flow" || !legacy) return exercises;
+  return exercises.flatMap(exercise => {
+    if (exercise.id !== "supine-heel-slide") return [exercise];
+    const original = {
+      id: "reverse-crunch", name: legacy.name || "Reverse crunch",
+      prescription: "Previously logged exercise · retained from this workout",
+      sets: legacy.sets?.length || 3, rest: 75, measurement: legacy.measurement || "reps", category: "Strength",
+    };
+    return log.exercises[exercise.id] ? [original, exercise] : [original];
+  });
+}

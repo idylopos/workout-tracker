@@ -22,6 +22,7 @@ import {
   countQualifiedLongRuns,
   dateToDayKey,
   evaluateLongRunProgress,
+  exercisesForSavedWorkout,
   eveningCheckInItems,
   findExerciseHistory,
   findPreviousSession,
@@ -1429,7 +1430,7 @@ function renderExercises(day, log) {
     `;
     return;
   }
-  day.exercises.forEach((exercise, index) => {
+  exercisesForSavedWorkout(day.exercises, log, activePlan.id).forEach((exercise, index) => {
     els.exerciseList.append(createExerciseCard(exercise, index, log?.exercises?.[exercise.id]));
   });
 }
