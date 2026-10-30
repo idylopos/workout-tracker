@@ -12,6 +12,7 @@ const files = [
   "app.js",
   "lib.js",
   "progression.js",
+  "load-picker.js",
   "crypto-vault.js",
   "unlock-session.js",
   "WORKOUT_PLAN.md",

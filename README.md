@@ -67,7 +67,8 @@ Every built-in exercise includes a collapsible **Quick form guide** covering set
 and a substitute when appropriate. Folder-based plans can provide the same guidance in `plan.json`.
 Exercises with a substitute advertise **alternative available** in the guide header. Assisted Nordic hamstrings also
 show an **Alternatives** button for logging machine curls, slider/stability-ball curls, or bridge walkouts without
-replacing the planned exercise or rewriting earlier logs.
+replacing the planned exercise or rewriting earlier logs. Friday now uses supine heel slides with abdominal bracing
+in place of reverse crunches, with Bird Dog and supine bracing available through the same Alternatives picker.
 
 Pull-up sessions include a six-step performance roadmap with separate same-day technique and following-morning
 recovery checks. The Week view groups the 16 long-run stages into four phases, retains each workout’s assigned stage,
@@ -93,6 +94,11 @@ sessions at the same difficulty. The running stages keep their own advancement r
 accepts a future target; **Keep my current plan** changes nothing. Load changes require an equipment-appropriate value
 from the user, and future rows are never marked complete. Past results are preserved. These suggestions do not automate
 Block 2 quality-run programming or custom folder plans.
+
+The web Next Session review shows completed working-set loads and up to five recent matching workouts beside the next-load choice.
+Use the slider, ± buttons, a past-load button, or direct entry; adjust the step to match your equipment.
+The initial value is today’s comparison load, not an automatic recommendation. Changes still require acceptance,
+and assisted pull-ups show that more assistance makes the exercise easier.
 
 The current built-in plan is also available as [WORKOUT_PLAN.md](WORKOUT_PLAN.md). It is generated from `lib.js` during
 `npm run build`; after changing the built-in plan, run `npm run sync-plan` and commit the updated Markdown together with

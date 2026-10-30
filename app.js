@@ -1,3 +1,4 @@
+import { loadReviewContext, mountLoadPicker } from "./load-picker.js";
 import {
   APP_VERSION,
   EXERCISE_ALTERNATIVES,
@@ -21,6 +22,7 @@ import {
   countQualifiedLongRuns,
   dateToDayKey,
   evaluateLongRunProgress,
+  exercisesForSavedWorkout,
   eveningCheckInItems,
   findExerciseHistory,
   findPreviousSession,
@@ -1232,7 +1234,8 @@ function renderCoachingAdvice() {
   const needsLoad = (["increase", "reduce"].includes(advice.action) || advice.nextStep === 3) && exercise.coachingPlan.kind !== "run";
   const field = exercise.coachingPlan.kind === "pullup" ? "assistance" : "weight";
   $("#coaching-content").innerHTML = `<h3>${escapeHtml(advice.title)}</h3><p>${escapeHtml(advice.detail)}</p>${needsLoad ?
-    `<label class="wide-label"><span>Next ${field === "assistance" ? "assistance" : "load"} (kg)</span><input id="coach-load" type="number" min="0" step="any" inputmode="decimal" /><small>Choose a value available on your equipment. Nothing changes until you accept.</small></label>` : ""}`;
+    `<div id="coach-load-picker"></div>` : ""}`;
+  if (needsLoad) mountLoadPicker($("#coach-load-picker"), loadReviewContext(log, id, state.workoutLogs, advice));
   if (advice.action !== "pending") coachingButton("Use this next time", async () => {
     const target = nextSessionTarget(log, id, advice, $("#coach-load")?.value ?? "");
     if (!target) { $("#coaching-status").textContent = `Enter ${field === "assistance" ? advice.nextStep === 3 ? "less assistance" : "more assistance" : advice.action === "increase" ? "a higher load" : "a lower load"} than the logged working sets.`; return; }
@@ -1427,7 +1430,7 @@ function renderExercises(day, log) {
     `;
     return;
   }
-  day.exercises.forEach((exercise, index) => {
+  exercisesForSavedWorkout(day.exercises, log, activePlan.id).forEach((exercise, index) => {
     els.exerciseList.append(createExerciseCard(exercise, index, log?.exercises?.[exercise.id]));
   });
 }
@@ -1773,6 +1776,9 @@ function setupExerciseGuidance(card, exercise) {
     $(`[data-guidance="${key}"]`, details).textContent = guide[key];
   });
   const option = $(".form-guide-option", details);
+  details.classList.toggle("has-alternative", Boolean(guide.option));
+  option.classList.toggle("is-hidden", !guide.option);
+  $(".form-guide summary small", details).textContent = "Setup · movement · watch";
   if (guide.option) {
     $(".form-guide summary small", details).textContent = "Setup · movement · alternative available";
     details.classList.add("has-alternative");
@@ -1798,6 +1804,7 @@ function exerciseVariants(exercise) {
 }
 
 function applyExerciseVariant(card, exercise, variant, { resetSets = false } = {}) {
+  setupExerciseGuidance(card, EXERCISE_GUIDANCE[variant.id] ? { id: variant.id } : exercise);
   card.dataset.variantId = variant.id;
   card.dataset.variantName = variant.name;
   card.dataset.defaultSets = variant.sets;
