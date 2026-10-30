@@ -4669,3 +4669,20 @@ body[data-active-view="today"] .timer {
   outline: 2px solid currentColor;
   outline-offset: -3px;
 }
+
+/* Next-session loads keep the workout record beside the decision. */
+.load-picker { display: grid; gap: 12px; margin-top: 18px; }
+.load-picker .load-record { margin: 0; font-weight: 650; }
+.load-picker .load-hint, .load-picker small { font-size: 13px; line-height: 1.5; }
+.load-heading { font-weight: 750; }
+.load-picker > input { width: 100%; min-width: 0; font-size: 24px; font-weight: 700; }
+.load-picker .load-change { margin: 0; font-size: 13px; }
+.load-slider-row { display: grid; grid-template-columns: 48px minmax(0, 1fr) 48px; align-items: center; gap: 12px; }
+.load-slider-row button { min-height: 48px; padding: 0; font-size: 24px; }
+.load-slider-row input[type="range"] { width: 100%; min-width: 0; padding: 0; accent-color: var(--ink); cursor: pointer; }
+.load-step { display: flex; align-items: center; justify-content: space-between; gap: 16px; font-size: 13px; }
+.load-step input { width: 100px; }
+.load-history h4 { margin: 10px 0; }
+.load-history-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 8px 0; }
+.load-history-row > span { font-size: 13px; margin-right: 4px; }
+.load-history-row .button { min-height: 44px; padding: 8px 12px; }

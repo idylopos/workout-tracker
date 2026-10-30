@@ -464,6 +464,22 @@ export const EXERCISE_GUIDANCE = {
     "Keep the upper arm quiet while straightening the elbow down and across, then return slowly.",
     "Use a shoulder position that feels natural; do not pull the shoulder forward.",
   ),
+  "supine-heel-slide": guidance(
+    "Lie on your back with knees bent, feet on the floor, and arms relaxed. Find a comfortable neutral lower-back position and gently brace.",
+    "Exhale as you slowly slide one heel away along the floor, then return and alternate. Keep the pelvis still; log repetitions per side.",
+    "Use a short range without arching or curling the back. Breathe normally and stop if back pain worsens, tingling appears, or pain spreads down the leg. Progress range only after symptom-stable sessions and following mornings.",
+    "Choose one alternative, not extra sets: Bird Dog, 2 × 5–6/side with 3–5-sec holds if shoulders tolerate hands-and-knees support; or supine abdominal bracing, 2 × 5 gentle 5–10-sec holds with normal breathing. No option is guaranteed suitable for a disc condition; seek individualized physiotherapy advice for ongoing symptoms.",
+  ),
+  "bird-dog": guidance(
+    "Start on hands and knees, hands under shoulders and knees under hips. Keep a comfortable neutral spine.",
+    "Gently brace and reach one arm and the opposite leg only as far as the trunk stays still. Hold 3–5 seconds, return, and alternate; log reps per side.",
+    "Do not arch or rotate the back. Use a leg-only reach if needed; choose supine bracing if shoulder support is uncomfortable. Stop for worsening back pain or spreading leg symptoms.",
+  ),
+  "supine-abdominal-bracing": guidance(
+    "Lie on your back with knees bent and feet supported. Keep your back in a comfortable position.",
+    "Gently tighten the abdominal wall, breathe normally for 5–10 seconds, then relax fully. Log one hold as one repetition.",
+    "Do not strain, hold your breath, or force the back flat. Stop for worsening back pain or spreading leg symptoms.",
+  ),
   "reverse-crunch": guidance(
     "Lie on your back with hips and knees bent and arms supported beside you.",
     "Exhale, gently roll the pelvis toward the ribs, and lift the tailbone slightly before lowering slowly.",
@@ -517,6 +533,22 @@ export const EXERCISE_GUIDANCE = {
 };
 
 export const EXERCISE_ALTERNATIVES = {
+  "supine-heel-slide": [
+    {
+      id: "bird-dog",
+      name: "Bird Dog",
+      prescription: "2 × 5–6 / side · 3–5-sec holds · keep trunk still; shoulder support must be comfortable",
+      sets: 2,
+      measurement: "reps",
+    },
+    {
+      id: "supine-abdominal-bracing",
+      name: "Supine abdominal bracing",
+      prescription: "2 × 5 holds · 5–10 sec each · breathe normally; log holds as reps",
+      sets: 2,
+      measurement: "reps",
+    },
+  ],
   "assisted-nordic": [
     {
       id: "seated-or-lying-leg-curl",
@@ -881,7 +913,7 @@ export const WEEK_PLAN = {
         60,
         "weight_distance",
       ),
-      lift("reverse-crunch", "Reverse crunch", "3 × 10–20 · curl the pelvis; do not swing", 3, 75, "reps"),
+      lift("supine-heel-slide", "Supine heel slide with abdominal bracing", "2 × 6–8 / side · slow, short-range slides · keep trunk still; log reps per side", 2, 60, "reps"),
       lift("mobility-b-chest", "Mobility B · Doorway chest stretch", "2 rounds · 45 sec / side", 2, 0, "completion", {
         category: "Mobility",
       }),

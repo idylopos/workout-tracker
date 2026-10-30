@@ -396,7 +396,7 @@ test("keeps encrypted workout drafts during state normalization", () => {
   assert.deepEqual(state.workoutDrafts["2026-07-31"], draft);
 });
 
-test("uses high-return chest, back, and rectus-abdominis volumes without removing functional core work", () => {
+test("preserves chest and back volumes while using low-fatigue Friday core work", () => {
   const tuesday = WEEK_PLAN.tuesday.exercises;
   const wednesday = WEEK_PLAN.wednesday.exercises;
   const friday = WEEK_PLAN.friday.exercises;
@@ -410,7 +410,8 @@ test("uses high-return chest, back, and rectus-abdominis volumes without removin
   assert.equal(wednesday[4].measurement, "weight_reps");
   assert.equal(friday.find((exercise) => exercise.id === "cable-scaption").sets, 3);
   assert.equal(friday.find((exercise) => exercise.id === "cable-chest-fly").sets, 2);
-  assert.equal(friday.find((exercise) => exercise.id === "reverse-crunch").sets, 3);
+  assert.equal(friday.find((exercise) => exercise.id === "supine-heel-slide").sets, 2);
+  assert.equal(friday.some((exercise) => exercise.id === "reverse-crunch"), false);
   assert.equal(friday.find((exercise) => exercise.id === "suitcase-carry").sets, 2);
   assert.equal(friday.find((exercise) => exercise.id === "suitcase-carry").measurement, "weight_distance");
   assert.equal(MEASUREMENT_TYPES.weight_distance.label, "Weight + distance");
@@ -437,8 +438,8 @@ test("uses high-return chest, back, and rectus-abdominis volumes without removin
   assert.equal(directBackSets, 12);
   assert.equal(
     tuesday.find((exercise) => exercise.id === "kneeling-cable-crunch").sets +
-      friday.find((exercise) => exercise.id === "reverse-crunch").sets,
-    6,
+      friday.find((exercise) => exercise.id === "supine-heel-slide").sets,
+    5,
   );
 });
 

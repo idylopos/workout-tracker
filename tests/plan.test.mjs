@@ -71,7 +71,7 @@ test("the readable workout plan is rendered from the built-in plan", async () =>
   assert.match(generated, /two separate 10 km runs/);
   assert.match(generated, /Tempo—10 min easy, 3 × 6 min/);
   assert.match(generated, /12–13 fractional sets/);
-  assert.match(generated, /6 direct dynamic sets/);
+  assert.match(generated, /3 direct dynamic sets/);
   assert.match(generated, /three-exercise Pull B base remains planned/);
   assert.match(generated, /3 × 6 → 3 × 7 → 3 × 8 min/);
   assert.match(generated, /Weight \+ distance/);

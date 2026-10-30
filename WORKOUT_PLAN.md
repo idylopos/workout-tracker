@@ -56,8 +56,9 @@ Evidence: [acute stretching review](https://pubmed.ncbi.nlm.nih.gov/26642915/),
   as half a chest set. The two weekly cable-fly slots add chest work without adding another heavy press.
 - **Back:** 12 direct lat/mid-back sets from pull-ups, rows, and pullovers. Wednesday face pulls add 3 rear-delt and
   upper-back sets; Saturday face pulls remain optional rather than being required to reach the back target.
-- **Rectus abdominis:** 6 direct dynamic sets from cable crunches and reverse crunches. Pallof presses and suitcase
-  carries remain for anti-rotation and lateral trunk function, but are not counted as rectus-hypertrophy sets.
+- **Rectus abdominis:** 3 direct dynamic sets from cable crunches. Friday adds 2 low-fatigue core-stability sets of
+  supine heel slides, with Bird Dog or supine bracing as alternatives. These, Pallof presses, and suitcase carries
+  are not counted as equivalent rectus-hypertrophy sets.
 - Start each newly added chest or abdominal exercise with 2 sets for its first two exposures. Use the full prescription
   only when technique, performance, shoulder/knee response, and following-morning recovery remain stable.
 
@@ -66,10 +67,22 @@ work and the rest of this six-day concurrent plan, rather than a claim that more
 
 ### Visible-abs reality check
 
-Cable crunches and reverse crunches give the rectus abdominis progressive, dynamic resistance and may make it larger.
-They do not selectively remove abdominal fat. Ab visibility also depends on total fat loss and individual fat
+Cable crunches provide dynamic abdominal resistance; Friday prioritizes comfortable trunk stability over more crunch volume.
+If cable crunches also provoke back or leg symptoms, stop and seek individualized advice.
+Abdominal exercises do not selectively remove abdominal fat. Ab visibility also depends on total fat loss and individual fat
 distribution, so continue tracking body weight and waist rather than adding more abdominal sets when waist reduction
 stalls. The first progression should be more repetitions or load at the target RIR, not more weekly exercises.
+
+### Friday core choices and back symptoms
+
+Use one core option after suitcase carries, before Mobility B. Heel slides avoid repeated pelvic curling and additional
+shoulder support after pressing; Bird Dog requires comfortable shoulders, while supine bracing is the simpler regression.
+The prescriptions are conservative starting points, not a treatment plan or proof of reduced disc pressure.
+Stop if symptoms worsen or spread down the leg; persistent symptoms need individualized assessment.
+
+References: [NHS heel slides with bracing](https://msk-bexley.nhs.uk/conditions/back-pain/acute-low-back-pain),
+[AAOS spine conditioning](https://orthoinfo.aaos.org/globalassets/pdfs/spine-conditioning-program_3-20-25.pdf),
+[NHS slipped-disc advice](https://www.nhs.uk/conditions/slipped-disc/).
 
 ## Recovery gate for optional sessions
 
@@ -448,11 +461,12 @@ work after each completed quality session; Saturday stays at 8–10 km easy. Beg
    - **Do:** Walk with short, controlled steps for the set distance, then switch sides.
    - **Watch:** Do not lean away from the weight or let the hip drop. Stop the set if grip fails before the trunk does, and note it in the log.
 
-8. **Reverse crunch** — 3 × 10–20 · curl the pelvis; do not swing · rest 1 min 15 sec
+8. **Supine heel slide with abdominal bracing** — 2 × 6–8 / side · slow, short-range slides · keep trunk still; log reps per side · rest 1 min
    - Log as: Reps only.
-   - **Setup:** Lie on your back with hips and knees bent and arms supported beside you.
-   - **Do:** Exhale, gently roll the pelvis toward the ribs, and lift the tailbone slightly before lowering slowly.
-   - **Watch:** Do not swing the legs, throw the hips overhead, or hold your breath.
+   - **Setup:** Lie on your back with knees bent, feet on the floor, and arms relaxed. Find a comfortable neutral lower-back position and gently brace.
+   - **Do:** Exhale as you slowly slide one heel away along the floor, then return and alternate. Keep the pelvis still; log repetitions per side.
+   - **Watch:** Use a short range without arching or curling the back. Breathe normally and stop if back pain worsens, tingling appears, or pain spreads down the leg. Progress range only after symptom-stable sessions and following mornings.
+   - **Alternative:** Choose one alternative, not extra sets: Bird Dog, 2 × 5–6/side with 3–5-sec holds if shoulders tolerate hands-and-knees support; or supine abdominal bracing, 2 × 5 gentle 5–10-sec holds with normal breathing. No option is guaranteed suitable for a disc condition; seek individualized physiotherapy advice for ongoing symptoms.
 
 9. **Mobility B · Doorway chest stretch** — 2 rounds · 45 sec / side
    - Log as: Check-off only.
