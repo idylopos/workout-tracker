@@ -4654,3 +4654,17 @@ body[data-active-view="today"] .timer {
 .roadmap-summary { padding: 14px 16px; }
 .context-help > summary:focus-visible, .roadmap-summary:focus-visible,
 .workout-steps a:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+
+.toast[data-tone="timer-finished"] {
+  background: var(--lime);
+  color: var(--ink);
+  border: 2px solid var(--ink);
+  box-shadow: 0 0 0 4px var(--lime), var(--shadow);
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.timer.is-finished .timer-display strong,
+.timer.is-finished .timer-play {
+  color: var(--ink);
+}

@@ -12,7 +12,7 @@ export const STRENGTH_PROGRESSION = {
 
 export const OPTIONAL_RECOVERY_RULE = {
   sleepHours: 7,
-  copy: "Keep optional Zone 2 cycling, Saturday swimming, and Saturday accessory add-ons off by default until weekly average sleep is at least 7 hours and joints, legs, and usual energy have returned to baseline the following morning for two stable weeks. Then add only one optional item at a time. Monday HIIT remains planned, at least 6 hours after lifting. Record sleep, run RPE, and following-morning response; missing entries do not establish recovery. If performance repeatedly falls or recovery remains worse than usual, take an easier week: reduce strength working sets by roughly one-third to one-half, keep runs easy, pause progression, and temporarily ease or skip HIIT if needed. These are practical adjustment rules, not fixed medical thresholds.",
+  copy: "Keep optional Wednesday Zone 2 cardio, Saturday swimming, and Saturday accessory add-ons off by default until weekly average sleep is at least 7 hours and joints, legs, and usual energy have returned to baseline the following morning for two stable weeks. Then add only one optional item at a time. Monday HIIT remains planned, at least 6 hours after lifting. Record sleep, run RPE, and following-morning response; missing entries do not establish recovery. If performance repeatedly falls or recovery remains worse than usual, take an easier week: reduce strength working sets by roughly one-third to one-half, keep runs easy, pause progression, and temporarily ease or skip HIIT if needed. These are practical adjustment rules, not fixed medical thresholds.",
 };
 
 export const RUN_QUALITY_PROGRESSION = {
@@ -411,6 +411,22 @@ export const EXERCISE_GUIDANCE = {
     "Use a comfortable saddle height and begin with several easy minutes.",
     "Ride steadily at RPE 2–3, where full sentences remain easy.",
     "This is optional recovery volume; skip it when sleep, legs, running, or joints are not normal.",
+    "Choose one alternative: incline treadmill walking, StairMaster, or elliptical. Use the same easy effort and recovery gate.",
+  ),
+  "zone-2-incline-walk": guidance(
+    "Start at an easy walking speed and a gentle incline.",
+    "Adjust speed and incline to keep full sentences easy.",
+    "Lower the incline or stop if you cannot keep the effort easy.",
+  ),
+  "zone-2-stairmaster": guidance(
+    "Start at a low step rate.",
+    "Keep the pace easy enough to speak in full sentences.",
+    "Choose another option if the lowest pace is too demanding.",
+  ),
+  "zone-2-elliptical": guidance(
+    "Start with low resistance and a comfortable stride.",
+    "Keep the pace easy enough to speak in full sentences.",
+    "Reduce resistance if the effort creeps up.",
   ),
   "kettlebell-swing": guidance(
     "Place the bell slightly ahead, hinge to grip it, and hike it back between the thighs.",
@@ -517,6 +533,17 @@ export const EXERCISE_GUIDANCE = {
 };
 
 export const EXERCISE_ALTERNATIVES = {
+  "zone-2-cycle": [
+    ["zone-2-incline-walk", "Incline treadmill walk"],
+    ["zone-2-stairmaster", "StairMaster"],
+    ["zone-2-elliptical", "Elliptical"],
+  ].map(([id, name]) => ({
+    id,
+    name: `Optional Zone 2 · ${name}`,
+    prescription: "25–40 min at RPE 2–3 · only after the optional-session recovery gate is met",
+    sets: 1,
+    measurement: "duration",
+  })),
   "assisted-nordic": [
     {
       id: "seated-or-lying-leg-curl",
@@ -758,7 +785,7 @@ export const WEEK_PLAN = {
     kicker: "Pull-up skill · recovery",
     estimate: "60–80 min",
     tone: "orange",
-    sequenceNote: "Optional cycling stays off by default until the sleep and following-morning recovery gate is met. Complete Mobility A last and keep it easy—not a second leg workout.",
+    sequenceNote: "Optional Zone 2 cardio stays off by default until the sleep and following-morning recovery gate is met. Complete Mobility A last and keep it easy—not a second leg workout.",
     warmup: [
       "Easy bicycle · 3 min",
       "Serratus wall slide · 1 × 8",

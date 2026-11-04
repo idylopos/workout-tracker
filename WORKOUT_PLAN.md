@@ -16,7 +16,7 @@ The lookup searches every earlier completed workout and local draft, so skipped 
 ## Mobility placement and limits
 
 Monday's lunge twists are a brief dynamic rehearsal before the squat and jump sequence, not extra working sets. Wednesday
-Mobility A is performed last (after optional cycling) as one easy round of movement practice. The five-exercise sequence
+Mobility A is performed last (after optional Zone 2 cardio) as one easy round of movement practice. The five-exercise sequence
 itself has not been shown to be uniquely superior: cat–cow, frog rock-backs, lateral lunges, and seated good mornings
 practice comfortable motion, while bridge leg lifts primarily train trunk–pelvic stability.
 
@@ -35,7 +35,7 @@ Evidence: [acute stretching review](https://pubmed.ncbi.nlm.nih.gov/26642915/),
 - **Sunday:** complete rest.
 - **Running:** Tuesday is fixed; Thursday is the second run; Saturday is the long run.
 - **Cycling:** Monday bicycle HIIT is a later session, separated from lifting by at least 6 hours. Wednesday Zone 2
-  cycling is optional and only for a well-recovered day.
+  cardio is optional and only for a well-recovered day. Choose cycling or one of its logged alternatives.
 - **Swimming:** Saturday technique-focused swimming is optional, at easy effort, after the recovery gate is met and only with comfortable shoulders and normal energy.
 - **Shoulder:** use comfortable paths. Do not force clicking, pinching, or the Friday raise if it remains uncomfortable.
 - **Knee:** track the response during training, later that day, and the following morning. Reduce load, range, or volume
@@ -73,10 +73,10 @@ stalls. The first progression should be more repetitions or load at the target R
 
 ## Recovery gate for optional sessions
 
-Keep optional Zone 2 cycling, Saturday swimming, and Saturday accessory add-ons off by default until weekly average sleep is at least 7 hours and joints, legs, and usual energy have returned to baseline the following morning for two stable weeks. Then add only one optional item at a time. Monday HIIT remains planned, at least 6 hours after lifting. Record sleep, run RPE, and following-morning response; missing entries do not establish recovery. If performance repeatedly falls or recovery remains worse than usual, take an easier week: reduce strength working sets by roughly one-third to one-half, keep runs easy, pause progression, and temporarily ease or skip HIIT if needed. These are practical adjustment rules, not fixed medical thresholds.
+Keep optional Wednesday Zone 2 cardio, Saturday swimming, and Saturday accessory add-ons off by default until weekly average sleep is at least 7 hours and joints, legs, and usual energy have returned to baseline the following morning for two stable weeks. Then add only one optional item at a time. Monday HIIT remains planned, at least 6 hours after lifting. Record sleep, run RPE, and following-morning response; missing entries do not establish recovery. If performance repeatedly falls or recovery remains worse than usual, take an easier week: reduce strength working sets by roughly one-third to one-half, keep runs easy, pause progression, and temporarily ease or skip HIIT if needed. These are practical adjustment rules, not fixed medical thresholds.
 
 The sleep threshold is a readiness rule, not a guarantee. Sunday remains complete rest. When recovery is limited, skip
-Wednesday Zone 2 cycling and Saturday swimming, then Saturday face pulls and curls; the three-exercise Pull B base remains planned.
+Wednesday Zone 2 cardio and Saturday swimming, then Saturday face pulls and curls; the three-exercise Pull B base remains planned.
 Do not replace skipped work with hard extra cardio.
 
 ## Block 1 and Block 2
@@ -243,7 +243,7 @@ work after each completed quality session; Saturday stays at 8–10 km easy. Beg
 ### Wednesday — Pull A + Mobility A
 **Theme:** Pull-up skill · recovery<br>
 **Estimated time:** 60–80 min<br>
-**Sequence note:** Optional cycling stays off by default until the sleep and following-morning recovery gate is met. Complete Mobility A last and keep it easy—not a second leg workout.
+**Sequence note:** Optional Zone 2 cardio stays off by default until the sleep and following-morning recovery gate is met. Complete Mobility A last and keep it easy—not a second leg workout.
 
 #### Warm-up
 - Easy bicycle · 3 min
@@ -289,6 +289,7 @@ work after each completed quality session; Saturday stays at 8–10 km easy. Beg
    - **Setup:** Use a comfortable saddle height and begin with several easy minutes.
    - **Do:** Ride steadily at RPE 2–3, where full sentences remain easy.
    - **Watch:** This is optional recovery volume; skip it when sleep, legs, running, or joints are not normal.
+   - **Alternative:** Choose one alternative: incline treadmill walking, StairMaster, or elliptical. Use the same easy effort and recovery gate.
 
 7. **Mobility A · Cat–cow** — 1 round · 6 slow cycles
    - Log as: Check-off only.

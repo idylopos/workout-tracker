@@ -1773,6 +1773,9 @@ function setupExerciseGuidance(card, exercise) {
     $(`[data-guidance="${key}"]`, details).textContent = guide[key];
   });
   const option = $(".form-guide-option", details);
+  details.classList.toggle("has-alternative", Boolean(guide.option));
+  option.classList.toggle("is-hidden", !guide.option);
+  $(".form-guide summary small", details).textContent = "Setup · movement · watch";
   if (guide.option) {
     $(".form-guide summary small", details).textContent = "Setup · movement · alternative available";
     details.classList.add("has-alternative");
@@ -1798,6 +1801,7 @@ function exerciseVariants(exercise) {
 }
 
 function applyExerciseVariant(card, exercise, variant, { resetSets = false } = {}) {
+  setupExerciseGuidance(card, EXERCISE_GUIDANCE[variant.id] ? { id: variant.id } : exercise);
   card.dataset.variantId = variant.id;
   card.dataset.variantName = variant.name;
   card.dataset.defaultSets = variant.sets;
@@ -3355,7 +3359,7 @@ function timerFinished() {
     // Visual and vibration feedback remain available if audio is blocked.
   }
   navigator.vibrate?.([120, 80, 120]);
-  showToast("Rest complete. Next set.");
+  showToast("Rest complete · Ready for your next set", "timer-finished");
 }
 
 function bindEvents() {

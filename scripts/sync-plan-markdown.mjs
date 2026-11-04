@@ -108,7 +108,7 @@ The lookup searches every earlier completed workout and local draft, so skipped 
 ## Mobility placement and limits
 
 Monday's lunge twists are a brief dynamic rehearsal before the squat and jump sequence, not extra working sets. Wednesday
-Mobility A is performed last (after optional cycling) as one easy round of movement practice. The five-exercise sequence
+Mobility A is performed last (after optional Zone 2 cardio) as one easy round of movement practice. The five-exercise sequence
 itself has not been shown to be uniquely superior: cat–cow, frog rock-backs, lateral lunges, and seated good mornings
 practice comfortable motion, while bridge leg lifts primarily train trunk–pelvic stability.
 
@@ -127,7 +127,7 @@ Evidence: [acute stretching review](https://pubmed.ncbi.nlm.nih.gov/26642915/),
 - **Sunday:** complete rest.
 - **Running:** Tuesday is fixed; Thursday is the second run; Saturday is the long run.
 - **Cycling:** Monday bicycle HIIT is a later session, separated from lifting by at least 6 hours. Wednesday Zone 2
-  cycling is optional and only for a well-recovered day.
+  cardio is optional and only for a well-recovered day. Choose cycling or one of its logged alternatives.
 - **Swimming:** Saturday technique-focused swimming is optional, at easy effort, after the recovery gate is met and only with comfortable shoulders and normal energy.
 - **Shoulder:** use comfortable paths. Do not force clicking, pinching, or the Friday raise if it remains uncomfortable.
 - **Knee:** track the response during training, later that day, and the following morning. Reduce load, range, or volume
@@ -168,7 +168,7 @@ stalls. The first progression should be more repetitions or load at the target R
 ${OPTIONAL_RECOVERY_RULE.copy}
 
 The sleep threshold is a readiness rule, not a guarantee. Sunday remains complete rest. When recovery is limited, skip
-Wednesday Zone 2 cycling and Saturday swimming, then Saturday face pulls and curls; the three-exercise Pull B base remains planned.
+Wednesday Zone 2 cardio and Saturday swimming, then Saturday face pulls and curls; the three-exercise Pull B base remains planned.
 Do not replace skipped work with hard extra cardio.
 
 ## Block 1 and Block 2
