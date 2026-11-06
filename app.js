@@ -21,6 +21,7 @@ import {
   countQualifiedLongRuns,
   dateToDayKey,
   evaluateLongRunProgress,
+  exercisesForSavedWorkout,
   eveningCheckInItems,
   findExerciseHistory,
   findPreviousSession,
@@ -84,7 +85,7 @@ const RUNNING_PHASES = {
     copy: "Stay here until two 10 km runs are completed at RPE 4 or below with a Comfortable or Mild following-morning response.",
     points: [
       ["Tuesday", "30 min easy · RPE 2–4"],
-      ["Thursday", "25–35 min easy · lift first"],
+      ["Thursday", "Morning easy run 25–35 min · evening Legs B"],
       ["Saturday", "Follow the 18-stage long-run progression"],
     ],
   },
@@ -1118,6 +1119,7 @@ function coachingPlanFor(card, exerciseLog) {
   }
   if (exerciseLog.measurement !== "weight_reps" || exercise.category !== "Strength" || id === "kettlebell-swing") return null;
   const variant = EXERCISE_ALTERNATIVES[id]?.find((entry) => entry.id === exerciseLog.variantId);
+  if (variant?.id === "seated-leg-curl") return null;
   const range = (variant?.prescription || exercise.prescription).match(/×\s*(\d+)\s*[–-]\s*(\d+)/);
   if (!range) return null;
   const compound = ["box-squat", "bulgarian-split-squat", "trap-bar-deadlift", "barbell-hip-thrust",
@@ -1308,7 +1310,7 @@ function activePrescription(exercise) {
   }
   if (exercise.id === "run-2") {
     return block === 1
-      ? "25–35 min easy · RPE 2–4 · lift first and separate by about 6 hours"
+      ? "25–35 min easy · RPE 2–4 · morning run · lift in the evening about 6 hours or more later"
       : `Alternate completed quality sessions: ${RUN_QUALITY_PROGRESSION.base}. ${RUN_QUALITY_PROGRESSION.progression}`;
   }
   if (exercise.id === "long-run") {
@@ -1374,6 +1376,7 @@ function renderToday() {
   renderWarmup(day, log);
   renderTrainingRules(day);
   renderExercises(day, log);
+  applyThursdaySelection();
   renderExtraActivities(day, log);
   loadResponseFields(log);
   updateSessionProgress();
@@ -1401,6 +1404,7 @@ function renderWarmup(day, log) {
   day.warmup.forEach((item, index) => {
     const label = document.createElement("label");
     label.className = "check-row";
+    if (/^(Light kettlebell (deadlift|swing)|Trap-bar ramp) ·/.test(item)) label.dataset.hingeWarmup = "";
     label.innerHTML = `
       <input type="checkbox" data-warmup-index="${index}" ${checked[index] ? "checked" : ""} />
       <span class="custom-check" aria-hidden="true">✓</span>
@@ -1410,6 +1414,27 @@ function renderWarmup(day, log) {
   });
   if (!day.warmup.length) {
     els.warmupList.innerHTML = `<p class="empty-copy">No warm-up today. Let recovery do its work.</p>`;
+  }
+  updateWarmupCount();
+}
+
+function applyThursdaySelection() {
+  if (activePlan.id !== BUILT_IN_PLAN.id || dateToDayKey(selectedDate) !== "thursday") return;
+  const trap = $('[data-exercise-id="trap-bar-deadlift"]', els.exerciseList);
+  const legCurl = trap?.dataset.variantId === "seated-leg-curl";
+  for (const row of $$("[data-hinge-warmup]", els.warmupList)) {
+    row.classList.toggle("is-hidden", legCurl);
+  }
+  const swing = $('[data-exercise-id="kettlebell-swing"]', els.exerciseList);
+  if (swing) {
+    const sets = collectSetRows(swing);
+    swing.classList.toggle("is-hidden", legCurl && !sets.some(hasSetContent));
+    $$(".set-row", swing).forEach((row, index) => {
+      row.classList.toggle("is-hidden", legCurl && !hasSetContent(sets[index]));
+    });
+    for (const controls of $$(".exercise-toolbar, .exercise-history-picker, .set-actions", swing)) {
+      controls.inert = legCurl;
+    }
   }
   updateWarmupCount();
 }
@@ -1427,8 +1452,10 @@ function renderExercises(day, log) {
     `;
     return;
   }
-  day.exercises.forEach((exercise, index) => {
-    els.exerciseList.append(createExerciseCard(exercise, index, log?.exercises?.[exercise.id]));
+  exercisesForSavedWorkout(day.exercises, log, activePlan.id).forEach((exercise, index) => {
+    const saved = log?.exercises?.[exercise.id];
+    const choice = log?.exerciseChoices?.[exercise.id];
+    els.exerciseList.append(createExerciseCard(exercise, index, saved || (choice ? { variantId: choice } : undefined)));
   });
 }
 
@@ -1860,6 +1887,7 @@ function setupExerciseAlternatives(card, exercise, savedExercise) {
       }
       applyExerciseVariant(card, exercise, variant, { resetSets: true });
       updatePreviousExerciseState(card, exercise);
+      if (exercise.id === "trap-bar-deadlift") applyThursdaySelection();
       picker.classList.add("is-hidden");
       toggle.setAttribute("aria-expanded", "false");
       markWorkoutDirty();
@@ -2376,8 +2404,12 @@ function hasSetContent(set) {
 function collectWorkoutRecord() {
   const dayKey = dateToDayKey(selectedDate);
   const exercises = {};
+  const exerciseChoices = {};
   $$(".exercise-card", els.exerciseList).forEach((card) => {
     const sets = collectSetRows(card);
+    if (card.dataset.variantId && card.dataset.variantId !== card.dataset.exerciseId) {
+      exerciseChoices[card.dataset.exerciseId] = card.dataset.variantId;
+    }
     if (sets.some(hasSetContent)) {
       const exerciseLog = {
         name: card.dataset.variantName || card.dataset.exerciseName,
@@ -2418,6 +2450,7 @@ function collectWorkoutRecord() {
     dayKey,
     planId: activePlan.id,
     warmup,
+    ...(Object.keys(exerciseChoices).length ? { exerciseChoices } : {}),
     exercises,
     extraActivities,
     response: {
@@ -2539,7 +2572,7 @@ function loadResponseFields(log) {
 }
 
 function updateWarmupCount() {
-  const inputs = $$("[data-warmup-index]", els.warmupList);
+  const inputs = $$(".check-row:not(.is-hidden) [data-warmup-index]", els.warmupList);
   const complete = inputs.filter((input) => input.checked).length;
   els.warmupCount.textContent = `${complete} / ${inputs.length}`;
   updateSessionProgress();
@@ -2547,7 +2580,7 @@ function updateWarmupCount() {
 
 function updateSessionProgress() {
   const checks = [
-    ...$$(".set-done input", els.exerciseList),
+    ...$$(".exercise-card:not(.is-hidden) .set-row:not(.is-hidden) .set-done input", els.exerciseList),
     ...$$(".set-done input", els.extraActivityList),
   ];
   const completed = checks.filter((check) => check.checked).length;

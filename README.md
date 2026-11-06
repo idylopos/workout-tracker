@@ -67,7 +67,8 @@ Every built-in exercise includes a collapsible **Quick form guide** covering set
 and a substitute when appropriate. Folder-based plans can provide the same guidance in `plan.json`.
 Exercises with a substitute advertise **alternative available** in the guide header. Assisted Nordic hamstrings also
 show an **Alternatives** button for logging machine curls, slider/stability-ball curls, or bridge walkouts without
-replacing the planned exercise or rewriting earlier logs.
+replacing the planned exercise or rewriting earlier logs. Friday uses Bird Dog by default. When hands-and-knees support bothers
+your shoulders, choose supine heel slides in **Alternatives**. Supine abdominal bracing is also available.
 
 Pull-up sessions include a six-step performance roadmap with separate same-day technique and following-morning
 recovery checks. The Week view groups the 16 long-run stages into four phases, retains each workout’s assigned stage,

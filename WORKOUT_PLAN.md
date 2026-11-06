@@ -45,7 +45,7 @@ Evidence: [acute stretching review](https://pubmed.ncbi.nlm.nih.gov/26642915/),
 
 - **Working-set effort:** Finish compound working sets with 2–3 RIR and isolation working sets with 1–3 RIR. Stop earlier or reduce load when sets reach 0–1 RIR instead of the compound target; do not chase failure. Power, mobility, cardio, and pull-up work follow their own prescriptions. End jumps and swings before speed or landing quality deteriorates.
 - **Double progression:** When every planned working set reaches the top of its rep range at the target RIR with stable technique and symptoms in two sessions, add the smallest available load and restart near the lower end of the range.
-- **Volume target:** Full weekly targets are about 12–13 fractional chest sets, 12 direct lat/mid-back sets plus rear-delt work, and 6 direct dynamic rectus-abdominis sets. Do not add volume while establishing consistent effort and recovery. For newly added work, perform 2 sets on the first two exposures before using the full prescription.
+- **Volume target:** Full weekly targets are about 12–13 fractional chest sets, 12 direct lat/mid-back sets plus rear-delt work, and 3 direct dynamic rectus-abdominis sets. Do not add volume while establishing consistent effort and recovery. For newly added work, perform 2 sets on the first two exposures before using the full prescription.
 - Use longer accessory rests when one minute causes a large repetition or technique drop; 75–90 seconds is appropriate.
 - Do not increase long-run distance, Thursday running intensity, lower-body lifting load, jump volume, and extra cardio
   at the same time. Change one major lower-body stressor at a time.
@@ -56,8 +56,9 @@ Evidence: [acute stretching review](https://pubmed.ncbi.nlm.nih.gov/26642915/),
   as half a chest set. The two weekly cable-fly slots add chest work without adding another heavy press.
 - **Back:** 12 direct lat/mid-back sets from pull-ups, rows, and pullovers. Wednesday face pulls add 3 rear-delt and
   upper-back sets; Saturday face pulls remain optional rather than being required to reach the back target.
-- **Rectus abdominis:** 6 direct dynamic sets from cable crunches and reverse crunches. Pallof presses and suitcase
-  carries remain for anti-rotation and lateral trunk function, but are not counted as rectus-hypertrophy sets.
+- **Rectus abdominis:** 3 direct dynamic sets from cable crunches. Friday adds 2 low-fatigue core-stability sets of
+  Bird Dog, with supine heel slides or supine bracing as alternatives. These, Pallof presses, and suitcase carries
+  are not counted as equivalent rectus-hypertrophy sets.
 - Start each newly added chest or abdominal exercise with 2 sets for its first two exposures. Use the full prescription
   only when technique, performance, shoulder/knee response, and following-morning recovery remain stable.
 
@@ -66,10 +67,29 @@ work and the rest of this six-day concurrent plan, rather than a claim that more
 
 ### Visible-abs reality check
 
-Cable crunches and reverse crunches give the rectus abdominis progressive, dynamic resistance and may make it larger.
-They do not selectively remove abdominal fat. Ab visibility also depends on total fat loss and individual fat
+Cable crunches provide dynamic abdominal resistance; Friday prioritizes comfortable trunk stability over more crunch volume.
+If cable crunches also provoke back or leg symptoms, stop and seek individualized advice.
+Abdominal exercises do not selectively remove abdominal fat. Ab visibility also depends on total fat loss and individual fat
 distribution, so continue tracking body weight and waist rather than adding more abdominal sets when waist reduction
 stalls. The first progression should be more repetitions or load at the target RIR, not more weekly exercises.
+
+### Friday core choices and back symptoms
+
+After suitcase carries and before Mobility B, do Bird Dog for 2 × 5–6 per side with 3–5-second holds.
+If supporting your weight on your hands bothers your shoulders, select supine heel slides in Alternatives and do
+2 × 6–8 slow slides per side. Choose one movement for the two sets. Supine bracing is also available.
+Monday’s Copenhagen planks and Friday’s suitcase carries already challenge the trunk sideways. Tuesday’s cable
+crunches train the abdominals and Wednesday’s Pallof presses train control against rotation. Given that workload
+and the shoulder tolerance needed for side planks, leave the modified curl-up and side plank out of the weekly plan.
+A small [trial in people with chronic low-back pain](https://pubmed.ncbi.nlm.nih.gov/29706690/) found similar
+improvements with the Big 3 and conventional exercises.
+
+The prescriptions are conservative starting points, not a treatment plan or proof of reduced disc pressure.
+Stop if symptoms worsen or spread down the leg; persistent symptoms need individualized assessment.
+
+References: [NHS heel slides with bracing](https://msk-bexley.nhs.uk/conditions/back-pain/acute-low-back-pain),
+[AAOS spine conditioning](https://orthoinfo.aaos.org/globalassets/pdfs/spine-conditioning-program_3-20-25.pdf),
+[NHS slipped-disc advice](https://www.nhs.uk/conditions/slipped-disc/).
 
 ## Recovery gate for optional sessions
 
@@ -321,69 +341,70 @@ work after each completed quality session; Saturday stays at 8–10 km easy. Beg
    - **Do:** Keep a long spine and hinge forward from the hips for eight slow, unloaded repetitions.
    - **Watch:** Stop at a mild posterior-chain stretch; do not round forcefully, bounce, or add weight.
 
-### Thursday — Legs B + Run 2
+### Thursday — Morning run + evening Legs B
 **Theme:** Posterior chain · run quality<br>
 **Estimated time:** 75–100 min total<br>
-**Sequence note:** Block 1: lift first. Block 2: quality run first; omit swings initially and use 2 hip-thrust sets while adapting. Separate sessions by about 6 hours. Keep Monday HIIT; do not progress Thursday running and lower-body lifting together. Use an easy Thursday when fatigue is above normal.
+**Sequence note:** Run in the morning and lift in the evening. Allow about 6 hours or more between sessions. Keep the Block 1 run easy. In Block 2, alternate tempo and intervals, omit swings initially and use 2 hip-thrust sets while adapting. Keep Monday HIIT. Progress only one of Thursday running and lower-body lifting at a time. Run easy when fatigue is above normal.
 
 #### Warm-up
-- Easy bicycle · 3–5 min
+- Evening lifting warm-up · easy bicycle for 3–5 min. If your back is stiff, use Seated leg curl under Trap-bar deadlift → Alternatives. Skip the kettlebell drills, working swings and trap-bar ramp. Warm up with a few light leg curls instead.
 - Ankle rocks · 8/side
 - Bodyweight hip hinge · 8
 - Bodyweight box squat · 8
 - Low step-down · 5/side
 - Light kettlebell deadlift · 5
-- Light kettlebell swing · 2 × 5
+- Light kettlebell swing · 2 × 5 only when swings are planned and the hinge feels comfortable
 - Trap-bar ramp · 40% × 6, 60% × 4, 75% × 2, optional 85% × 1
 
 #### Exercises and activities
-1. **Kettlebell swing** — Block 1: 2–3 × 8–12 · Block 2: omit initially; optional only after recovery is stable · rest 1 min 30 sec
+1. **Run 2** — Block 1: 25–35 min easy at RPE 2–4 · Block 2 alternates completed quality sessions: Tempo—10 min easy, 3 × 6 min at RPE 6–7 with 2 min easy, then 5–10 min easy; Intervals—10 min easy, 6 × 2 min at RPE 8 with 2 min easy, then 8–10 min easy
+   - Log as: Distance + time.
+   - **Setup:** Complete the prescribed easy warm-up before any faster work.
+   - **Do:** Follow the current block’s effort and recovery exactly; keep fast reps controlled rather than maximal.
+   - **Watch:** End the quality portion if form deteriorates or knee symptoms rise, and monitor the following morning.
+
+2. **Kettlebell swing** — Block 1: 2–3 × 8–12 · Block 2: omit initially; optional only after recovery is stable · rest 1 min 30 sec
    - Log as: Weight × reps.
    - **Setup:** Place the bell slightly ahead, hinge to grip it, and hike it back between the thighs.
    - **Do:** Snap the hips to float the bell, then let it return into the next hinge.
    - **Watch:** It is a hip hinge, not a squat or arm raise. Stop if the back rounds or the bell pulls the shoulders.
 
-2. **Trap-bar deadlift** — 3 × 4–6 · rest 3 min
+3. **Trap-bar deadlift** — 3 × 4–6 · rest 3 min
    - Log as: Weight × reps.
    - **Setup:** Stand centered in the bar, brace, and take the handles with the whole foot planted.
    - **Do:** Push the floor away and stand tall, then hinge and bend the knees to return the bar under control.
-   - **Watch:** Keep the load close and spine steady; do not jerk from the floor or lean back at lockout.
+   - **Watch:** Keep the load close and your spine steady. If stiffness builds during warm-up sets, reduce the load. Skip the lift if discomfort keeps increasing or spreads down a leg.
+   - **Alternative:** If your back still feels stiff, choose Seated leg curl in Alternatives for 2 × 8–12 easy, controlled reps. Skip kettlebell hinges, swings and trap-bar warm-up sets that evening. Keep hip thrusts only if comfortable.
 
-3. **Barbell hip thrust** — Block 1: 3 × 8–12 · Block 2: 2 × 8–12 while adapting to quality running · rest 2 min 30 sec
+4. **Barbell hip thrust** — Block 1: 3 × 8–12 · Block 2: 2 × 8–12 while adapting to quality running · rest 2 min 30 sec
    - Log as: Weight × reps.
    - **Setup:** Place the upper back on a bench, pad the bar, and set feet so the shins are near vertical at the top.
    - **Do:** Drive through the whole foot, finish by squeezing the glutes, and lower under control.
    - **Watch:** Do not overarch the lower back or throw the head backward.
 
-4. **Controlled step-down** — 2 × 6–10 / leg · 3-sec lowering · rest 1 min 30 sec
+5. **Controlled step-down** — 2 × 6–10 / leg · 3-sec lowering · rest 1 min 30 sec
    - Log as: Weight × reps.
    - **Setup:** Stand on a low step with the working foot fully supported and use a rail if needed.
    - **Do:** Lower the free heel toward the floor for about three seconds, lightly touch, then rise.
    - **Watch:** Keep the pelvis level and knee tracking over the foot. Reduce step height if symptoms increase.
 
-5. **Machine or cable hip abduction** — 2 × 12–20 · rest 1 min 15 sec
+6. **Machine or cable hip abduction** — 2 × 12–20 · rest 1 min 15 sec
    - Log as: Weight × reps.
    - **Setup:** Set the machine or cable so the pelvis stays level and the working leg begins under control.
    - **Do:** Move the thigh outward without leaning, pause briefly, and return slowly.
    - **Watch:** Use a range that comes from the hip rather than twisting the pelvis or turning the toes far outward.
 
-6. **Seated calf raise** — 2 × 10–15 · rest 1 min 15 sec
+7. **Seated calf raise** — 2 × 10–15 · rest 1 min 15 sec
    - Log as: Weight × reps.
    - **Setup:** Sit with knees bent about 90° and the balls of the feet secure on the platform.
    - **Do:** Lift the heels, pause, and lower slowly through a comfortable range.
    - **Watch:** Avoid bouncing or letting the feet roll inward or outward.
 
-7. **Tibialis raise** — 2 × 12–20 · rest 1 min
+8. **Tibialis raise** — 2 × 12–20 · rest 1 min
    - Log as: Weight × reps.
    - **Setup:** Lean against a wall with heels on the floor and feet slightly forward.
    - **Do:** Lift the forefeet and toes toward the shins, pause, then lower slowly.
    - **Watch:** Keep the heels planted and shorten the stance if the front of the shin cramps.
-
-8. **Run 2** — Block 1: 25–35 min easy at RPE 2–4 · Block 2 alternates completed quality sessions: Tempo—10 min easy, 3 × 6 min at RPE 6–7 with 2 min easy, then 5–10 min easy; Intervals—10 min easy, 6 × 2 min at RPE 8 with 2 min easy, then 8–10 min easy
-   - Log as: Distance + time.
-   - **Setup:** Complete the prescribed easy warm-up before any faster work.
-   - **Do:** Follow the current block’s effort and recovery exactly; keep fast reps controlled rather than maximal.
-   - **Watch:** End the quality portion if form deteriorates or knee symptoms rise, and monitor the following morning.
 
 9. **Pelvic-floor routine** — 5 breaths; 8 × 5-sec holds; 8 quick contractions
    - Log as: Time.
@@ -449,11 +470,12 @@ work after each completed quality session; Saturday stays at 8–10 km easy. Beg
    - **Do:** Walk with short, controlled steps for the set distance, then switch sides.
    - **Watch:** Do not lean away from the weight or let the hip drop. Stop the set if grip fails before the trunk does, and note it in the log.
 
-8. **Reverse crunch** — 3 × 10–20 · curl the pelvis; do not swing · rest 1 min 15 sec
+8. **Bird Dog** — 2 × 5–6 / side · 3–5-sec holds · log reps per side · rest 1 min
    - Log as: Reps only.
-   - **Setup:** Lie on your back with hips and knees bent and arms supported beside you.
-   - **Do:** Exhale, gently roll the pelvis toward the ribs, and lift the tailbone slightly before lowering slowly.
-   - **Watch:** Do not swing the legs, throw the hips overhead, or hold your breath.
+   - **Setup:** Start on hands and knees, hands under shoulders and knees under hips. Keep a comfortable neutral spine.
+   - **Do:** Gently brace and reach one arm and the opposite leg only as far as the trunk stays still. Hold 3–5 seconds, return, and alternate; log reps per side.
+   - **Watch:** Do not arch or rotate the back. Use a leg-only reach if needed. Stop for worsening back pain or spreading leg symptoms.
+   - **Alternative:** If supporting your weight on your hands bothers your shoulders, choose supine heel slides in Alternatives. Do 2 × 6–8 per side in place of Bird Dog. Supine bracing is also available.
 
 9. **Mobility B · Doorway chest stretch** — 2 rounds · 45 sec / side
    - Log as: Check-off only.
