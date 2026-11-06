@@ -2961,7 +2961,7 @@ dialog.coaching-dialog {
 }
 
 .timer {
-  --timer-progress: 360deg;
+  --timer-progress: 1;
   position: fixed;
   z-index: 40;
   right: 22px;
@@ -2998,8 +2998,10 @@ body[data-active-view="today"] .timer {
 
 .timer-display {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 2px;
   padding: 10px 14px;
   text-align: left;
 }
@@ -3022,6 +3024,33 @@ body[data-active-view="today"] .timer {
   color: var(--ink);
   font-size: 15px;
   font-weight: 900;
+}
+
+.timer-progress {
+  height: 5px;
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.timer-progress-fill {
+  height: 100%;
+  background: var(--lime);
+  transform: scaleX(var(--timer-progress));
+  transform-origin: left;
+  transition: transform 200ms linear;
+}
+
+.timer.is-ending {
+  border-color: var(--orange);
+  box-shadow: 0 0 0 2px var(--orange), var(--shadow);
+}
+
+.timer.is-ending .timer-display span,
+.timer.is-ending .timer-display strong {
+  color: var(--orange);
+}
+
+.timer.is-ending .timer-progress-fill {
+  background: var(--orange);
 }
 
 .timer-drawer {
@@ -3079,6 +3108,22 @@ body[data-active-view="today"] .timer {
 .timer.is-finished .timer-play {
   border-left-color: rgba(23, 33, 27, 0.2);
   background: #fff;
+}
+
+.timer.is-finished .timer-progress {
+  background: rgba(23, 33, 27, 0.2);
+}
+
+.timer.is-finished .timer-drawer,
+.timer.is-finished .timer-presets button,
+.timer.is-finished .timer-reset {
+  border-color: rgba(23, 33, 27, 0.3);
+  color: var(--ink);
+}
+
+.timer.is-finished .timer-presets button.is-active {
+  background: var(--ink);
+  color: #fff;
 }
 
 @keyframes timer-finish {
@@ -4264,6 +4309,14 @@ body[data-active-view="today"] .timer {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .timer-progress-fill {
+    transition: none;
+  }
+
+  .timer.is-finished {
+    animation: none;
+  }
+
   *,
   *::before,
   *::after {
