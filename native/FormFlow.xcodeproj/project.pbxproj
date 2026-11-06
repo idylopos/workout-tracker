@@ -1,0 +1,642 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {};
+	objectVersion = 77;
+	objects = {
+		C649629229F6187C3D12CE69 /* Main Group */ = {
+			isa = PBXGroup;
+			children = (
+				D4F4E26070B0A5E821A267F2 /* FormFlowiOS */,
+				319D8A0F18F74E10178EA2CC /* FormFlowWatch */,
+				6E15E6228DD4E37C3465D7FE /* FormFlowiOSTests */,
+				698A575D51893F6FDA5490FA /* FormFlowUITests */,
+				50D0D8DD11A959484CB838E0 /* Shared */,
+				FE0A091FDBFB3E9C31B7A1BD /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		D4F4E26070B0A5E821A267F2 /* FormFlowiOS */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "FormFlowiOS";
+			sourceTree = "<group>";
+		};
+		319D8A0F18F74E10178EA2CC /* FormFlowWatch */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "FormFlowWatch";
+			sourceTree = "<group>";
+		};
+		6E15E6228DD4E37C3465D7FE /* FormFlowiOSTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "FormFlowiOSTests";
+			sourceTree = "<group>";
+		};
+		698A575D51893F6FDA5490FA /* FormFlowUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "FormFlowUITests";
+			sourceTree = "<group>";
+		};
+		50D0D8DD11A959484CB838E0 /* Shared */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "Shared";
+			sourceTree = "<group>";
+		};
+		FE0A091FDBFB3E9C31B7A1BD /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				3B365C1BE38E973E5A9ABECF /* FormFlowiOS.app */,
+				4CAC6D1F5EA21237F7EF3346 /* FormFlowWatch.app */,
+				7471A1369ABD11703163E98E /* FormFlowiOSTests.xctest */,
+				22EA5FD280A918EA05E609E3 /* FormFlowUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		3B365C1BE38E973E5A9ABECF /* FormFlowiOS.app */ = {
+			isa = PBXFileReference;
+			explicitFileType = wrapper.application;
+			includeInIndex = 0;
+			path = "FormFlowiOS.app";
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		4CAC6D1F5EA21237F7EF3346 /* FormFlowWatch.app */ = {
+			isa = PBXFileReference;
+			explicitFileType = wrapper.application;
+			includeInIndex = 0;
+			path = "FormFlowWatch.app";
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		7471A1369ABD11703163E98E /* FormFlowiOSTests.xctest */ = {
+			isa = PBXFileReference;
+			explicitFileType = wrapper.cfbundle;
+			includeInIndex = 0;
+			path = "FormFlowiOSTests.xctest";
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		22EA5FD280A918EA05E609E3 /* FormFlowUITests.xctest */ = {
+			isa = PBXFileReference;
+			explicitFileType = wrapper.cfbundle;
+			includeInIndex = 0;
+			path = "FormFlowUITests.xctest";
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		E34B4972F506455FC23F5122 /* FormFlowCore package */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = "../packages/FormFlowCore";
+		};
+		D36EED38E2328ACB820DE7A9 /* FormFlowiOS Core product */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E34B4972F506455FC23F5122 /* FormFlowCore package */;
+			productName = FormFlowCore;
+		};
+		729BD142200365A532345B0D /* FormFlowiOS Core framework */ = {
+			isa = PBXBuildFile;
+			productRef = D36EED38E2328ACB820DE7A9 /* FormFlowiOS Core product */;
+		};
+		DEDCA9620BA003D3F8BA7380 /* FormFlowiOS Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9EC93F56F6F67DD05D8F253F /* FormFlowiOS Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		47DBA9277D7D42BAF2F8ADD1 /* FormFlowiOS Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				729BD142200365A532345B0D /* FormFlowiOS Core framework */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9B30048C0477960031FA37EF /* FormFlowWatch Core product */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E34B4972F506455FC23F5122 /* FormFlowCore package */;
+			productName = FormFlowCore;
+		};
+		11F111714F9B3576DB18F074 /* FormFlowWatch Core framework */ = {
+			isa = PBXBuildFile;
+			productRef = 9B30048C0477960031FA37EF /* FormFlowWatch Core product */;
+		};
+		C317CAB58FAE9C5961CA0C68 /* FormFlowWatch Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5D793E296DEACF291608CC07 /* FormFlowWatch Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A86BB26B0A2FE62B956A3838 /* FormFlowWatch Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				11F111714F9B3576DB18F074 /* FormFlowWatch Core framework */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B36EAC4DAF5CCDBD5AEE7FDA /* FormFlowiOSTests Core product */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E34B4972F506455FC23F5122 /* FormFlowCore package */;
+			productName = FormFlowCore;
+		};
+		03B00708B394ADA1BE424524 /* FormFlowiOSTests Core framework */ = {
+			isa = PBXBuildFile;
+			productRef = B36EAC4DAF5CCDBD5AEE7FDA /* FormFlowiOSTests Core product */;
+		};
+		66593C934CB4A46E742B7545 /* FormFlowiOSTests Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3183DAAF6F2F965F9C7CDDB0 /* FormFlowiOSTests Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		07C307203928C2298F4D0F7B /* FormFlowiOSTests Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				03B00708B394ADA1BE424524 /* FormFlowiOSTests Core framework */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EB8FC88BFD79719BA2B4AD95 /* FormFlowUITests Core product */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E34B4972F506455FC23F5122 /* FormFlowCore package */;
+			productName = FormFlowCore;
+		};
+		F01000D3444D7A1C02301A18 /* FormFlowUITests Core framework */ = {
+			isa = PBXBuildFile;
+			productRef = EB8FC88BFD79719BA2B4AD95 /* FormFlowUITests Core product */;
+		};
+		BC22CD4212931637BD9A7A66 /* FormFlowUITests Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		02F8CFA3B3A4F47F39B7D4E3 /* FormFlowUITests Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		840878965B0440E40D00E918 /* FormFlowUITests Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F01000D3444D7A1C02301A18 /* FormFlowUITests Core framework */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EEF73BA8BD22FFF92F68AD61 /* Embed Watch app */ = {
+			isa = PBXBuildFile;
+			fileRef = 4CAC6D1F5EA21237F7EF3346 /* FormFlowWatch.app */;
+			settings = { ATTRIBUTES = (RemoveHeadersOnCopy, ); };
+		};
+		B303503AD0501D6A5C73C0AA /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				EEF73BA8BD22FFF92F68AD61 /* Embed Watch app */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C3210B49DE58EC40F18C690B /* Watch proxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A2C37EF125A7E9061C28E18E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = ED6040391D9D6EBF5A67BBA6;
+			remoteInfo = FormFlowWatch;
+		};
+		5C1BD1E1A3E9937BBCB7ECB4 /* Watch dependency */ = {
+			isa = PBXTargetDependency;
+			target = ED6040391D9D6EBF5A67BBA6 /* FormFlowWatch target */;
+			targetProxy = C3210B49DE58EC40F18C690B /* Watch proxy */;
+		};
+		7FF3A0756227D4220FEE2BAF /* iOS host proxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A2C37EF125A7E9061C28E18E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 71DE7ABF0FC2D6608A06B17C;
+			remoteInfo = FormFlowiOS;
+		};
+		36BB1FCA549B887116A450EA /* iOS host dependency */ = {
+			isa = PBXTargetDependency;
+			target = 71DE7ABF0FC2D6608A06B17C /* FormFlowiOS target */;
+			targetProxy = 7FF3A0756227D4220FEE2BAF /* iOS host proxy */;
+		};
+		71DE7ABF0FC2D6608A06B17C /* FormFlowiOS target */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D1580734C4D0D2F9398976BB /* FormFlowiOS configurations */;
+			buildPhases = (
+				DEDCA9620BA003D3F8BA7380 /* FormFlowiOS Sources */,
+				47DBA9277D7D42BAF2F8ADD1 /* FormFlowiOS Frameworks */,
+				9EC93F56F6F67DD05D8F253F /* FormFlowiOS Resources */,
+				B303503AD0501D6A5C73C0AA /* Embed Watch Content */,
+			);
+			buildRules = ();
+			dependencies = (
+				5C1BD1E1A3E9937BBCB7ECB4 /* Watch dependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				D4F4E26070B0A5E821A267F2 /* FormFlowiOS */,
+				50D0D8DD11A959484CB838E0 /* Shared */,
+			);
+			name = FormFlowiOS;
+			packageProductDependencies = (
+				D36EED38E2328ACB820DE7A9 /* FormFlowiOS Core product */,
+			);
+			productName = FormFlowiOS;
+			productReference = 3B365C1BE38E973E5A9ABECF /* FormFlowiOS.app */;
+			productType = "com.apple.product-type.application";
+		};
+		ED6040391D9D6EBF5A67BBA6 /* FormFlowWatch target */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B8719116D5B2A59C92EB00E3 /* FormFlowWatch configurations */;
+			buildPhases = (
+				C317CAB58FAE9C5961CA0C68 /* FormFlowWatch Sources */,
+				A86BB26B0A2FE62B956A3838 /* FormFlowWatch Frameworks */,
+				5D793E296DEACF291608CC07 /* FormFlowWatch Resources */,
+			);
+			buildRules = ();
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				319D8A0F18F74E10178EA2CC /* FormFlowWatch */,
+				50D0D8DD11A959484CB838E0 /* Shared */,
+			);
+			name = FormFlowWatch;
+			packageProductDependencies = (
+				9B30048C0477960031FA37EF /* FormFlowWatch Core product */,
+			);
+			productName = FormFlowWatch;
+			productReference = 4CAC6D1F5EA21237F7EF3346 /* FormFlowWatch.app */;
+			productType = "com.apple.product-type.application";
+		};
+		F0E93E7072F380F94AF4EB78 /* FormFlowiOSTests target */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 80C9427C3C1F2D572823F341 /* FormFlowiOSTests configurations */;
+			buildPhases = (
+				66593C934CB4A46E742B7545 /* FormFlowiOSTests Sources */,
+				07C307203928C2298F4D0F7B /* FormFlowiOSTests Frameworks */,
+				3183DAAF6F2F965F9C7CDDB0 /* FormFlowiOSTests Resources */,
+			);
+			buildRules = ();
+			dependencies = (
+				36BB1FCA549B887116A450EA /* iOS host dependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				6E15E6228DD4E37C3465D7FE /* FormFlowiOSTests */,
+			);
+			name = FormFlowiOSTests;
+			packageProductDependencies = (
+				B36EAC4DAF5CCDBD5AEE7FDA /* FormFlowiOSTests Core product */,
+			);
+			productName = FormFlowiOSTests;
+			productReference = 7471A1369ABD11703163E98E /* FormFlowiOSTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		9EB7AB446876134EBB787843 /* FormFlowUITests target */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F4525D2935EF2E7043FA5F11 /* FormFlowUITests configurations */;
+			buildPhases = (
+				BC22CD4212931637BD9A7A66 /* FormFlowUITests Sources */,
+				840878965B0440E40D00E918 /* FormFlowUITests Frameworks */,
+				02F8CFA3B3A4F47F39B7D4E3 /* FormFlowUITests Resources */,
+			);
+			buildRules = ();
+			dependencies = (
+				36BB1FCA549B887116A450EA /* iOS host dependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				698A575D51893F6FDA5490FA /* FormFlowUITests */,
+			);
+			name = FormFlowUITests;
+			packageProductDependencies = (
+				EB8FC88BFD79719BA2B4AD95 /* FormFlowUITests Core product */,
+			);
+			productName = FormFlowUITests;
+			productReference = 22EA5FD280A918EA05E609E3 /* FormFlowUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		40609A412964FFB79DAE9C3A /* Project Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = "YES";
+				CLANG_ENABLE_OBJC_ARC = "YES";
+				ENABLE_STRICT_OBJC_MSGSEND = "YES";
+				ENABLE_USER_SCRIPT_SANDBOXING = "YES";
+				GCC_C_LANGUAGE_STANDARD = "gnu17";
+				SWIFT_VERSION = "5.0";
+				SWIFT_STRICT_CONCURRENCY = "complete";
+				ALWAYS_SEARCH_USER_PATHS = "NO";
+				DEBUG_INFORMATION_FORMAT = "dwarf";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				ENABLE_TESTABILITY = "YES";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				ONLY_ACTIVE_ARCH = "YES";
+			};
+			name = Debug;
+		};
+		24B7DFA423B1C8A2130AE03E /* Project Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = "YES";
+				CLANG_ENABLE_OBJC_ARC = "YES";
+				ENABLE_STRICT_OBJC_MSGSEND = "YES";
+				ENABLE_USER_SCRIPT_SANDBOXING = "YES";
+				GCC_C_LANGUAGE_STANDARD = "gnu17";
+				SWIFT_VERSION = "5.0";
+				SWIFT_STRICT_CONCURRENCY = "complete";
+				ALWAYS_SEARCH_USER_PATHS = "NO";
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_COMPILATION_MODE = "wholemodule";
+				VALIDATE_PRODUCT = "YES";
+			};
+			name = Release;
+		};
+		EA4CB304C2116E38EA8A7F98 /* Project configurations */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				40609A412964FFB79DAE9C3A /* Project Debug */,
+				24B7DFA423B1C8A2130AE03E /* Project Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		84FB7720610F6FCEE18AEDE3 /* FormFlowiOS Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = "Automatic";
+				CURRENT_PROJECT_VERSION = "1";
+				MARKETING_VERSION = "0.1.0";
+				GENERATE_INFOPLIST_FILE = "YES";
+				INFOPLIST_KEY_CFBundleDisplayName = "Form / Flow";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = "YES";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.formflow.training";
+				SDKROOT = "iphoneos";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				IPHONEOS_DEPLOYMENT_TARGET = "26.0";
+				TARGETED_DEVICE_FAMILY = "1";
+				SUPPORTS_MACCATALYST = "NO";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = "YES";
+				INFOPLIST_KEY_UILaunchScreen_Generation = "YES";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait";
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "Unlock your locally stored training records when you enable app lock.";
+				CODE_SIGN_ENTITLEMENTS = "Configuration/FormFlow.entitlements";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "Show workout heart rate and energy, and reconcile workouts saved by Form / Flow.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Save workouts to Apple Health when you choose Health recording.";
+			};
+			name = Debug;
+		};
+		630303C8382F16CD3BB4A1AC /* FormFlowiOS Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = "Automatic";
+				CURRENT_PROJECT_VERSION = "1";
+				MARKETING_VERSION = "0.1.0";
+				GENERATE_INFOPLIST_FILE = "YES";
+				INFOPLIST_KEY_CFBundleDisplayName = "Form / Flow";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = "YES";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.formflow.training";
+				SDKROOT = "iphoneos";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				IPHONEOS_DEPLOYMENT_TARGET = "26.0";
+				TARGETED_DEVICE_FAMILY = "1";
+				SUPPORTS_MACCATALYST = "NO";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = "YES";
+				INFOPLIST_KEY_UILaunchScreen_Generation = "YES";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait";
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "Unlock your locally stored training records when you enable app lock.";
+				CODE_SIGN_ENTITLEMENTS = "Configuration/FormFlow.entitlements";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "Show workout heart rate and energy, and reconcile workouts saved by Form / Flow.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Save workouts to Apple Health when you choose Health recording.";
+			};
+			name = Release;
+		};
+		D1580734C4D0D2F9398976BB /* FormFlowiOS configurations */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				84FB7720610F6FCEE18AEDE3 /* FormFlowiOS Debug */,
+				630303C8382F16CD3BB4A1AC /* FormFlowiOS Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CE347B7AC9F38969630F4473 /* FormFlowWatch Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = "Automatic";
+				CURRENT_PROJECT_VERSION = "1";
+				MARKETING_VERSION = "0.1.0";
+				GENERATE_INFOPLIST_FILE = "YES";
+				INFOPLIST_KEY_CFBundleDisplayName = "Form / Flow";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = "YES";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.formflow.training.watchkitapp";
+				SDKROOT = "watchos";
+				SUPPORTED_PLATFORMS = "watchos watchsimulator";
+				WATCHOS_DEPLOYMENT_TARGET = "26.0";
+				TARGETED_DEVICE_FAMILY = "4";
+				SKIP_INSTALL = "YES";
+				INFOPLIST_KEY_WKApplication = "YES";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "com.formflow.training";
+				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = "NO";
+				INFOPLIST_FILE = "Configuration/FormFlowWatch-Info.plist";
+				CODE_SIGN_ENTITLEMENTS = "Configuration/FormFlow.entitlements";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "Show workout heart rate and energy, and reconcile workouts saved by Form / Flow.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Save workouts to Apple Health when you choose Health recording.";
+			};
+			name = Debug;
+		};
+		9299AB25E3D753BF4232BD70 /* FormFlowWatch Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = "Automatic";
+				CURRENT_PROJECT_VERSION = "1";
+				MARKETING_VERSION = "0.1.0";
+				GENERATE_INFOPLIST_FILE = "YES";
+				INFOPLIST_KEY_CFBundleDisplayName = "Form / Flow";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = "YES";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.formflow.training.watchkitapp";
+				SDKROOT = "watchos";
+				SUPPORTED_PLATFORMS = "watchos watchsimulator";
+				WATCHOS_DEPLOYMENT_TARGET = "26.0";
+				TARGETED_DEVICE_FAMILY = "4";
+				SKIP_INSTALL = "YES";
+				INFOPLIST_KEY_WKApplication = "YES";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "com.formflow.training";
+				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = "NO";
+				INFOPLIST_FILE = "Configuration/FormFlowWatch-Info.plist";
+				CODE_SIGN_ENTITLEMENTS = "Configuration/FormFlow.entitlements";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "Show workout heart rate and energy, and reconcile workouts saved by Form / Flow.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Save workouts to Apple Health when you choose Health recording.";
+			};
+			name = Release;
+		};
+		B8719116D5B2A59C92EB00E3 /* FormFlowWatch configurations */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CE347B7AC9F38969630F4473 /* FormFlowWatch Debug */,
+				9299AB25E3D753BF4232BD70 /* FormFlowWatch Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E737E77940CDDA97C24007D2 /* FormFlowiOSTests Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = "Automatic";
+				CURRENT_PROJECT_VERSION = "1";
+				MARKETING_VERSION = "0.1.0";
+				GENERATE_INFOPLIST_FILE = "YES";
+				INFOPLIST_KEY_CFBundleDisplayName = "Form / Flow";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = "YES";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.formflow.training.tests";
+				SDKROOT = "iphoneos";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				IPHONEOS_DEPLOYMENT_TARGET = "26.0";
+				TARGETED_DEVICE_FAMILY = "1";
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FormFlowiOS.app/FormFlowiOS";
+			};
+			name = Debug;
+		};
+		10CB9BD44AA884E4FEE87CA4 /* FormFlowiOSTests Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = "Automatic";
+				CURRENT_PROJECT_VERSION = "1";
+				MARKETING_VERSION = "0.1.0";
+				GENERATE_INFOPLIST_FILE = "YES";
+				INFOPLIST_KEY_CFBundleDisplayName = "Form / Flow";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = "YES";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.formflow.training.tests";
+				SDKROOT = "iphoneos";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				IPHONEOS_DEPLOYMENT_TARGET = "26.0";
+				TARGETED_DEVICE_FAMILY = "1";
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FormFlowiOS.app/FormFlowiOS";
+			};
+			name = Release;
+		};
+		80C9427C3C1F2D572823F341 /* FormFlowiOSTests configurations */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E737E77940CDDA97C24007D2 /* FormFlowiOSTests Debug */,
+				10CB9BD44AA884E4FEE87CA4 /* FormFlowiOSTests Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		23491B9E4AB7012E4CABD0FF /* FormFlowUITests Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = "Automatic";
+				CURRENT_PROJECT_VERSION = "1";
+				MARKETING_VERSION = "0.1.0";
+				GENERATE_INFOPLIST_FILE = "YES";
+				INFOPLIST_KEY_CFBundleDisplayName = "Form / Flow";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = "YES";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.formflow.training.uitests";
+				SDKROOT = "iphoneos";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				IPHONEOS_DEPLOYMENT_TARGET = "26.0";
+				TARGETED_DEVICE_FAMILY = "1";
+				TEST_TARGET_NAME = "FormFlowiOS";
+			};
+			name = Debug;
+		};
+		5AE68975EDE78BD1F71A6885 /* FormFlowUITests Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = "Automatic";
+				CURRENT_PROJECT_VERSION = "1";
+				MARKETING_VERSION = "0.1.0";
+				GENERATE_INFOPLIST_FILE = "YES";
+				INFOPLIST_KEY_CFBundleDisplayName = "Form / Flow";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = "YES";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.formflow.training.uitests";
+				SDKROOT = "iphoneos";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				IPHONEOS_DEPLOYMENT_TARGET = "26.0";
+				TARGETED_DEVICE_FAMILY = "1";
+				TEST_TARGET_NAME = "FormFlowiOS";
+			};
+			name = Release;
+		};
+		F4525D2935EF2E7043FA5F11 /* FormFlowUITests configurations */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				23491B9E4AB7012E4CABD0FF /* FormFlowUITests Debug */,
+				5AE68975EDE78BD1F71A6885 /* FormFlowUITests Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A2C37EF125A7E9061C28E18E /* Project object */ = {
+			isa = PBXProject;
+			attributes = { BuildIndependentTargetsInParallel = YES; LastSwiftUpdateCheck = 2700; LastUpgradeCheck = 2700; };
+			buildConfigurationList = EA4CB304C2116E38EA8A7F98 /* Project configurations */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (en, Base,);
+			mainGroup = C649629229F6187C3D12CE69 /* Main Group */;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				E34B4972F506455FC23F5122 /* FormFlowCore package */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = FE0A091FDBFB3E9C31B7A1BD /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				71DE7ABF0FC2D6608A06B17C /* FormFlowiOS target */,
+				ED6040391D9D6EBF5A67BBA6 /* FormFlowWatch target */,
+				F0E93E7072F380F94AF4EB78 /* FormFlowiOSTests target */,
+				9EB7AB446876134EBB787843 /* FormFlowUITests target */,
+			);
+		};
+	};
+	rootObject = A2C37EF125A7E9061C28E18E /* Project object */;
+}

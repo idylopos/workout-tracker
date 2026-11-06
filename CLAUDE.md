@@ -4,6 +4,10 @@ Static, mobile-first workout log. No framework, no bundler: `index.html`, `style
 `npm run build` copies them plus the plan catalog into `dist/` (gitignored). Serve `dist/` locally with
 `python3 -m http.server 8080` from inside `dist/` so `/plans/index.json` resolves.
 
+## Health Stack
+
+- test: npm test
+
 ## Testing
 
 - Run: `npm test` (Node's built-in runner over `tests/*.test.mjs`)

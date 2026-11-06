@@ -1,0 +1,2333 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://formflow.local/schemas/plan-v2.schema.json",
+  "title": "Form / Flow weekly plan version 2",
+  "description": "One weekly plan under 1 MiB. Weekdays must be distinct; session IDs must be unique across the week; occurrence IDs must be unique within a session. At least one exercise is required across all days. Omitted weekdays are rest days. Range maxima must not be less than minima. These semantic checks also run in the app. No field grants medical suitability or executable policy permissions. Alternatives are flat (maximum 6). Interval templates have at most 40 steps per activity and expand to at most 400; the sum of the largest base/alternative expansion for each session occurrence must be at most 2000. Native validation enforces these sum and identity constraints. estimatedMinutes 0 means unknown.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {
+      "const": 2
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]{0,63}$"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120,
+      "pattern": "\\S"
+    },
+    "assumptions": {
+      "type": "array",
+      "maxItems": 20,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 500,
+        "pattern": "\\S"
+      }
+    },
+    "days": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 7,
+      "items": {
+        "$ref": "#/$defs/day"
+      }
+    },
+    "instructions": {
+      "anyOf": [
+        {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 3000,
+          "pattern": "\\S"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "id",
+    "name",
+    "assumptions",
+    "days"
+  ],
+  "$defs": {
+    "reps": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "min": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000
+        },
+        "max": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000
+        }
+      },
+      "required": [
+        "min",
+        "max"
+      ],
+      "description": "The maximum must be greater than or equal to the minimum."
+    },
+    "load": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 10000
+        },
+        "unit": {
+          "enum": [
+            "kg",
+            "lb"
+          ]
+        }
+      },
+      "required": [
+        "value",
+        "unit"
+      ]
+    },
+    "duration": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "min": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 1000000
+        },
+        "max": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 1000000
+        },
+        "unit": {
+          "enum": [
+            "s",
+            "min"
+          ]
+        }
+      },
+      "required": [
+        "min",
+        "max",
+        "unit"
+      ],
+      "description": "The maximum must be greater than or equal to the minimum."
+    },
+    "distance": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "min": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 1000000
+        },
+        "max": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 1000000
+        },
+        "unit": {
+          "enum": [
+            "m",
+            "km",
+            "mi"
+          ]
+        }
+      },
+      "required": [
+        "min",
+        "max",
+        "unit"
+      ],
+      "description": "The maximum must be greater than or equal to the minimum."
+    },
+    "calories": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "min": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 1000000
+        },
+        "max": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 1000000
+        },
+        "unit": {
+          "enum": [
+            "kcal"
+          ]
+        }
+      },
+      "required": [
+        "min",
+        "max",
+        "unit"
+      ],
+      "description": "The maximum must be greater than or equal to the minimum."
+    },
+    "effort": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "rir",
+            "rpe"
+          ]
+        },
+        "min": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10
+        },
+        "max": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10
+        }
+      },
+      "required": [
+        "kind",
+        "min",
+        "max"
+      ],
+      "description": "The maximum must be greater than or equal to the minimum. Strength uses rir; cardio uses rpe."
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]{0,63}$"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10000
+        },
+        "notes": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 500,
+              "pattern": "\\S"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "version"
+      ],
+      "description": "Informational only. This app preserves the reference for manual review and executes no imported progression policy."
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "sets": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20
+        },
+        "restSeconds": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 900
+        },
+        "reps": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/reps"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "load": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/load"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "assistance": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/load"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "duration": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/duration"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "distance": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/distance"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "calories": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/calories"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "effort": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/effort"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "sets",
+        "restSeconds"
+      ]
+    },
+    "exercise": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "instanceId": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]{0,63}$"
+        },
+        "exerciseId": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]{0,63}$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120,
+          "pattern": "\\S"
+        },
+        "measurement": {
+          "enum": [
+            "completion",
+            "weight_reps",
+            "reps",
+            "assisted_reps",
+            "weight_distance",
+            "duration",
+            "duration_calories",
+            "distance_time",
+            "distance"
+          ]
+        },
+        "equipment": {
+          "type": "array",
+          "maxItems": 20,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80,
+            "pattern": "\\S"
+          }
+        },
+        "target": {
+          "$ref": "#/$defs/target"
+        },
+        "optional": {
+          "type": "boolean"
+        },
+        "instructions": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 3000,
+              "pattern": "\\S"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "progressionPolicy": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/policy"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "intervals": {
+          "anyOf": [
+            {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 40,
+              "items": {
+                "$ref": "#/$defs/intervalBlock"
+              }
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "At most 40 template steps and 400 expanded steps across all blocks. Block IDs are unique; step IDs are unique per block. Every block repeats its entire ordered sequence. No nesting."
+        },
+        "alternatives": {
+          "anyOf": [
+            {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 6,
+              "items": {
+                "$ref": "#/$defs/alternative"
+              }
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Flat alternatives with distinct IDs. No nested alternatives and no inherited progression permission."
+        }
+      },
+      "required": [
+        "instanceId",
+        "exerciseId",
+        "name",
+        "measurement",
+        "equipment",
+        "target",
+        "optional"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "measurement": {
+                "const": "completion"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "target": {
+                "properties": {
+                  "reps": {
+                    "type": "null"
+                  },
+                  "load": {
+                    "type": "null"
+                  },
+                  "assistance": {
+                    "type": "null"
+                  },
+                  "duration": {
+                    "type": "null"
+                  },
+                  "distance": {
+                    "type": "null"
+                  },
+                  "calories": {
+                    "type": "null"
+                  },
+                  "effort": {
+                    "type": "null"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "measurement": {
+                "const": "weight_reps"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "target": {
+                "properties": {
+                  "assistance": {
+                    "type": "null"
+                  },
+                  "duration": {
+                    "type": "null"
+                  },
+                  "distance": {
+                    "type": "null"
+                  },
+                  "calories": {
+                    "type": "null"
+                  },
+                  "reps": {
+                    "$ref": "#/$defs/reps"
+                  },
+                  "effort": {
+                    "anyOf": [
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "allOf": [
+                          {
+                            "$ref": "#/$defs/effort"
+                          },
+                          {
+                            "properties": {
+                              "kind": {
+                                "const": "rir"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "reps"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "measurement": {
+                "const": "reps"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "target": {
+                "properties": {
+                  "load": {
+                    "type": "null"
+                  },
+                  "assistance": {
+                    "type": "null"
+                  },
+                  "duration": {
+                    "type": "null"
+                  },
+                  "distance": {
+                    "type": "null"
+                  },
+                  "calories": {
+                    "type": "null"
+                  },
+                  "reps": {
+                    "$ref": "#/$defs/reps"
+                  },
+                  "effort": {
+                    "anyOf": [
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "allOf": [
+                          {
+                            "$ref": "#/$defs/effort"
+                          },
+                          {
+                            "properties": {
+                              "kind": {
+                                "const": "rir"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "reps"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "measurement": {
+                "const": "assisted_reps"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "target": {
+                "properties": {
+                  "load": {
+                    "type": "null"
+                  },
+                  "duration": {
+                    "type": "null"
+                  },
+                  "distance": {
+                    "type": "null"
+                  },
+                  "calories": {
+                    "type": "null"
+                  },
+                  "reps": {
+                    "$ref": "#/$defs/reps"
+                  },
+                  "effort": {
+                    "anyOf": [
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "allOf": [
+                          {
+                            "$ref": "#/$defs/effort"
+                          },
+                          {
+                            "properties": {
+                              "kind": {
+                                "const": "rir"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "reps"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "measurement": {
+                "const": "weight_distance"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "target": {
+                "properties": {
+                  "reps": {
+                    "type": "null"
+                  },
+                  "assistance": {
+                    "type": "null"
+                  },
+                  "duration": {
+                    "type": "null"
+                  },
+                  "calories": {
+                    "type": "null"
+                  },
+                  "distance": {
+                    "$ref": "#/$defs/distance"
+                  },
+                  "effort": {
+                    "anyOf": [
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "allOf": [
+                          {
+                            "$ref": "#/$defs/effort"
+                          },
+                          {
+                            "properties": {
+                              "kind": {
+                                "const": "rir"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "distance"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "measurement": {
+                "const": "duration"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "target": {
+                "properties": {
+                  "reps": {
+                    "type": "null"
+                  },
+                  "load": {
+                    "type": "null"
+                  },
+                  "assistance": {
+                    "type": "null"
+                  },
+                  "distance": {
+                    "type": "null"
+                  },
+                  "calories": {
+                    "type": "null"
+                  },
+                  "duration": {
+                    "$ref": "#/$defs/duration"
+                  },
+                  "effort": {
+                    "anyOf": [
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "allOf": [
+                          {
+                            "$ref": "#/$defs/effort"
+                          },
+                          {
+                            "properties": {
+                              "kind": {
+                                "const": "rpe"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "duration"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "measurement": {
+                "const": "duration_calories"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "target": {
+                "properties": {
+                  "reps": {
+                    "type": "null"
+                  },
+                  "load": {
+                    "type": "null"
+                  },
+                  "assistance": {
+                    "type": "null"
+                  },
+                  "distance": {
+                    "type": "null"
+                  },
+                  "duration": {
+                    "$ref": "#/$defs/duration"
+                  },
+                  "effort": {
+                    "anyOf": [
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "allOf": [
+                          {
+                            "$ref": "#/$defs/effort"
+                          },
+                          {
+                            "properties": {
+                              "kind": {
+                                "const": "rpe"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "duration"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "measurement": {
+                "const": "distance_time"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "target": {
+                "properties": {
+                  "reps": {
+                    "type": "null"
+                  },
+                  "load": {
+                    "type": "null"
+                  },
+                  "assistance": {
+                    "type": "null"
+                  },
+                  "calories": {
+                    "type": "null"
+                  },
+                  "distance": {
+                    "$ref": "#/$defs/distance"
+                  },
+                  "effort": {
+                    "anyOf": [
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "allOf": [
+                          {
+                            "$ref": "#/$defs/effort"
+                          },
+                          {
+                            "properties": {
+                              "kind": {
+                                "const": "rpe"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "anyOf": [
+                  {
+                    "required": [
+                      "distance"
+                    ],
+                    "properties": {
+                      "distance": {
+                        "$ref": "#/$defs/distance"
+                      }
+                    }
+                  },
+                  {
+                    "required": [
+                      "duration"
+                    ],
+                    "properties": {
+                      "duration": {
+                        "$ref": "#/$defs/duration"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "measurement": {
+                "const": "distance"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "target": {
+                "properties": {
+                  "reps": {
+                    "type": "null"
+                  },
+                  "load": {
+                    "type": "null"
+                  },
+                  "assistance": {
+                    "type": "null"
+                  },
+                  "duration": {
+                    "type": "null"
+                  },
+                  "calories": {
+                    "type": "null"
+                  },
+                  "distance": {
+                    "$ref": "#/$defs/distance"
+                  },
+                  "effort": {
+                    "anyOf": [
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "allOf": [
+                          {
+                            "$ref": "#/$defs/effort"
+                          },
+                          {
+                            "properties": {
+                              "kind": {
+                                "const": "rpe"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "distance"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "intervals"
+            ],
+            "properties": {
+              "intervals": {
+                "type": "array"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "measurement": {
+                "enum": [
+                  "duration",
+                  "duration_calories",
+                  "distance_time",
+                  "distance"
+                ]
+              },
+              "target": {
+                "properties": {
+                  "sets": {
+                    "const": 1
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "session": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]{0,63}$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120,
+          "pattern": "\\S"
+        },
+        "kind": {
+          "enum": [
+            "strength",
+            "cardio",
+            "mobility",
+            "mixed"
+          ]
+        },
+        "estimatedMinutes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1440,
+          "description": "0 means duration not specified; positive values are estimates in minutes."
+        },
+        "warmup": {
+          "type": "array",
+          "maxItems": 30,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500,
+            "pattern": "\\S"
+          }
+        },
+        "exercises": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 30,
+          "items": {
+            "$ref": "#/$defs/exercise"
+          }
+        },
+        "instructions": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 3000,
+              "pattern": "\\S"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "kind",
+        "estimatedMinutes",
+        "warmup",
+        "exercises"
+      ]
+    },
+    "day": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "weekday": {
+          "enum": [
+            "monday",
+            "tuesday",
+            "wednesday",
+            "thursday",
+            "friday",
+            "saturday",
+            "sunday"
+          ]
+        },
+        "sessions": {
+          "type": "array",
+          "maxItems": 3,
+          "items": {
+            "$ref": "#/$defs/session"
+          }
+        }
+      },
+      "required": [
+        "weekday",
+        "sessions"
+      ]
+    },
+    "intervalStep": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]{0,63}$"
+        },
+        "kind": {
+          "enum": [
+            "warmup",
+            "work",
+            "recovery",
+            "cooldown"
+          ]
+        },
+        "measurement": {
+          "enum": [
+            "duration",
+            "duration_calories",
+            "distance_time",
+            "distance"
+          ]
+        },
+        "target": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/target"
+            },
+            {
+              "properties": {
+                "sets": {
+                  "const": 1
+                },
+                "restSeconds": {
+                  "const": 0
+                }
+              }
+            }
+          ]
+        },
+        "instructions": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 3000,
+              "pattern": "\\S"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "measurement",
+        "target"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "measurement": {
+                "const": "completion"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "target": {
+                "properties": {
+                  "reps": {
+                    "type": "null"
+                  },
+                  "load": {
+                    "type": "null"
+                  },
+                  "assistance": {
+                    "type": "null"
+                  },
+                  "duration": {
+                    "type": "null"
+                  },
+                  "distance": {
+                    "type": "null"
+                  },
+                  "calories": {
+                    "type": "null"
+                  },
+                  "effort": {
+                    "type": "null"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "measurement": {
+                "const": "weight_reps"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "target": {
+                "properties": {
+                  "assistance": {
+                    "type": "null"
+                  },
+                  "duration": {
+                    "type": "null"
+                  },
+                  "distance": {
+                    "type": "null"
+                  },
+                  "calories": {
+                    "type": "null"
+                  },
+                  "reps": {
+                    "$ref": "#/$defs/reps"
+                  },
+                  "effort": {
+                    "anyOf": [
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "allOf": [
+                          {
+                            "$ref": "#/$defs/effort"
+                          },
+                          {
+                            "properties": {
+                              "kind": {
+                                "const": "rir"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "reps"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "measurement": {
+                "const": "reps"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "target": {
+                "properties": {
+                  "load": {
+                    "type": "null"
+                  },
+                  "assistance": {
+                    "type": "null"
+                  },
+                  "duration": {
+                    "type": "null"
+                  },
+                  "distance": {
+                    "type": "null"
+                  },
+                  "calories": {
+                    "type": "null"
+                  },
+                  "reps": {
+                    "$ref": "#/$defs/reps"
+                  },
+                  "effort": {
+                    "anyOf": [
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "allOf": [
+                          {
+                            "$ref": "#/$defs/effort"
+                          },
+                          {
+                            "properties": {
+                              "kind": {
+                                "const": "rir"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "reps"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "measurement": {
+                "const": "assisted_reps"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "target": {
+                "properties": {
+                  "load": {
+                    "type": "null"
+                  },
+                  "duration": {
+                    "type": "null"
+                  },
+                  "distance": {
+                    "type": "null"
+                  },
+                  "calories": {
+                    "type": "null"
+                  },
+                  "reps": {
+                    "$ref": "#/$defs/reps"
+                  },
+                  "effort": {
+                    "anyOf": [
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "allOf": [
+                          {
+                            "$ref": "#/$defs/effort"
+                          },
+                          {
+                            "properties": {
+                              "kind": {
+                                "const": "rir"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "reps"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "measurement": {
+                "const": "weight_distance"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "target": {
+                "properties": {
+                  "reps": {
+                    "type": "null"
+                  },
+                  "assistance": {
+                    "type": "null"
+                  },
+                  "duration": {
+                    "type": "null"
+                  },
+                  "calories": {
+                    "type": "null"
+                  },
+                  "distance": {
+                    "$ref": "#/$defs/distance"
+                  },
+                  "effort": {
+                    "anyOf": [
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "allOf": [
+                          {
+                            "$ref": "#/$defs/effort"
+                          },
+                          {
+                            "properties": {
+                              "kind": {
+                                "const": "rir"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "distance"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "measurement": {
+                "const": "duration"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "target": {
+                "properties": {
+                  "reps": {
+                    "type": "null"
+                  },
+                  "load": {
+                    "type": "null"
+                  },
+                  "assistance": {
+                    "type": "null"
+                  },
+                  "distance": {
+                    "type": "null"
+                  },
+                  "calories": {
+                    "type": "null"
+                  },
+                  "duration": {
+                    "$ref": "#/$defs/duration"
+                  },
+                  "effort": {
+                    "anyOf": [
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "allOf": [
+                          {
+                            "$ref": "#/$defs/effort"
+                          },
+                          {
+                            "properties": {
+                              "kind": {
+                                "const": "rpe"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "duration"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "measurement": {
+                "const": "duration_calories"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "target": {
+                "properties": {
+                  "reps": {
+                    "type": "null"
+                  },
+                  "load": {
+                    "type": "null"
+                  },
+                  "assistance": {
+                    "type": "null"
+                  },
+                  "distance": {
+                    "type": "null"
+                  },
+                  "duration": {
+                    "$ref": "#/$defs/duration"
+                  },
+                  "effort": {
+                    "anyOf": [
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "allOf": [
+                          {
+                            "$ref": "#/$defs/effort"
+                          },
+                          {
+                            "properties": {
+                              "kind": {
+                                "const": "rpe"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "duration"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "measurement": {
+                "const": "distance_time"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "target": {
+                "properties": {
+                  "reps": {
+                    "type": "null"
+                  },
+                  "load": {
+                    "type": "null"
+                  },
+                  "assistance": {
+                    "type": "null"
+                  },
+                  "calories": {
+                    "type": "null"
+                  },
+                  "distance": {
+                    "$ref": "#/$defs/distance"
+                  },
+                  "effort": {
+                    "anyOf": [
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "allOf": [
+                          {
+                            "$ref": "#/$defs/effort"
+                          },
+                          {
+                            "properties": {
+                              "kind": {
+                                "const": "rpe"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "anyOf": [
+                  {
+                    "required": [
+                      "distance"
+                    ],
+                    "properties": {
+                      "distance": {
+                        "$ref": "#/$defs/distance"
+                      }
+                    }
+                  },
+                  {
+                    "required": [
+                      "duration"
+                    ],
+                    "properties": {
+                      "duration": {
+                        "$ref": "#/$defs/duration"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "measurement": {
+                "const": "distance"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "target": {
+                "properties": {
+                  "reps": {
+                    "type": "null"
+                  },
+                  "load": {
+                    "type": "null"
+                  },
+                  "assistance": {
+                    "type": "null"
+                  },
+                  "duration": {
+                    "type": "null"
+                  },
+                  "calories": {
+                    "type": "null"
+                  },
+                  "distance": {
+                    "$ref": "#/$defs/distance"
+                  },
+                  "effort": {
+                    "anyOf": [
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "allOf": [
+                          {
+                            "$ref": "#/$defs/effort"
+                          },
+                          {
+                            "properties": {
+                              "kind": {
+                                "const": "rpe"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "distance"
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "intervalBlock": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]{0,63}$"
+        },
+        "repeatCount": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "steps": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 40,
+          "items": {
+            "$ref": "#/$defs/intervalStep"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "repeatCount",
+        "steps"
+      ]
+    },
+    "alternative": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "exerciseId": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]{0,63}$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120,
+          "pattern": "\\S"
+        },
+        "measurement": {
+          "enum": [
+            "completion",
+            "weight_reps",
+            "reps",
+            "assisted_reps",
+            "weight_distance",
+            "duration",
+            "duration_calories",
+            "distance_time",
+            "distance"
+          ]
+        },
+        "equipment": {
+          "type": "array",
+          "maxItems": 20,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80,
+            "pattern": "\\S"
+          }
+        },
+        "target": {
+          "$ref": "#/$defs/target"
+        },
+        "instructions": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 3000,
+              "pattern": "\\S"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "intervals": {
+          "anyOf": [
+            {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 40,
+              "items": {
+                "$ref": "#/$defs/intervalBlock"
+              }
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "At most 40 template steps and 400 expanded steps across all blocks. Block IDs are unique; step IDs are unique per block. Every block repeats its entire ordered sequence. No nesting."
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]{0,63}$"
+        }
+      },
+      "required": [
+        "id",
+        "exerciseId",
+        "name",
+        "measurement",
+        "equipment",
+        "target"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "measurement": {
+                "const": "completion"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "target": {
+                "properties": {
+                  "reps": {
+                    "type": "null"
+                  },
+                  "load": {
+                    "type": "null"
+                  },
+                  "assistance": {
+                    "type": "null"
+                  },
+                  "duration": {
+                    "type": "null"
+                  },
+                  "distance": {
+                    "type": "null"
+                  },
+                  "calories": {
+                    "type": "null"
+                  },
+                  "effort": {
+                    "type": "null"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "measurement": {
+                "const": "weight_reps"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "target": {
+                "properties": {
+                  "assistance": {
+                    "type": "null"
+                  },
+                  "duration": {
+                    "type": "null"
+                  },
+                  "distance": {
+                    "type": "null"
+                  },
+                  "calories": {
+                    "type": "null"
+                  },
+                  "reps": {
+                    "$ref": "#/$defs/reps"
+                  },
+                  "effort": {
+                    "anyOf": [
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "allOf": [
+                          {
+                            "$ref": "#/$defs/effort"
+                          },
+                          {
+                            "properties": {
+                              "kind": {
+                                "const": "rir"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "reps"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "measurement": {
+                "const": "reps"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "target": {
+                "properties": {
+                  "load": {
+                    "type": "null"
+                  },
+                  "assistance": {
+                    "type": "null"
+                  },
+                  "duration": {
+                    "type": "null"
+                  },
+                  "distance": {
+                    "type": "null"
+                  },
+                  "calories": {
+                    "type": "null"
+                  },
+                  "reps": {
+                    "$ref": "#/$defs/reps"
+                  },
+                  "effort": {
+                    "anyOf": [
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "allOf": [
+                          {
+                            "$ref": "#/$defs/effort"
+                          },
+                          {
+                            "properties": {
+                              "kind": {
+                                "const": "rir"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "reps"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "measurement": {
+                "const": "assisted_reps"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "target": {
+                "properties": {
+                  "load": {
+                    "type": "null"
+                  },
+                  "duration": {
+                    "type": "null"
+                  },
+                  "distance": {
+                    "type": "null"
+                  },
+                  "calories": {
+                    "type": "null"
+                  },
+                  "reps": {
+                    "$ref": "#/$defs/reps"
+                  },
+                  "effort": {
+                    "anyOf": [
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "allOf": [
+                          {
+                            "$ref": "#/$defs/effort"
+                          },
+                          {
+                            "properties": {
+                              "kind": {
+                                "const": "rir"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "reps"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "measurement": {
+                "const": "weight_distance"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "target": {
+                "properties": {
+                  "reps": {
+                    "type": "null"
+                  },
+                  "assistance": {
+                    "type": "null"
+                  },
+                  "duration": {
+                    "type": "null"
+                  },
+                  "calories": {
+                    "type": "null"
+                  },
+                  "distance": {
+                    "$ref": "#/$defs/distance"
+                  },
+                  "effort": {
+                    "anyOf": [
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "allOf": [
+                          {
+                            "$ref": "#/$defs/effort"
+                          },
+                          {
+                            "properties": {
+                              "kind": {
+                                "const": "rir"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "distance"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "measurement": {
+                "const": "duration"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "target": {
+                "properties": {
+                  "reps": {
+                    "type": "null"
+                  },
+                  "load": {
+                    "type": "null"
+                  },
+                  "assistance": {
+                    "type": "null"
+                  },
+                  "distance": {
+                    "type": "null"
+                  },
+                  "calories": {
+                    "type": "null"
+                  },
+                  "duration": {
+                    "$ref": "#/$defs/duration"
+                  },
+                  "effort": {
+                    "anyOf": [
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "allOf": [
+                          {
+                            "$ref": "#/$defs/effort"
+                          },
+                          {
+                            "properties": {
+                              "kind": {
+                                "const": "rpe"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "duration"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "measurement": {
+                "const": "duration_calories"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "target": {
+                "properties": {
+                  "reps": {
+                    "type": "null"
+                  },
+                  "load": {
+                    "type": "null"
+                  },
+                  "assistance": {
+                    "type": "null"
+                  },
+                  "distance": {
+                    "type": "null"
+                  },
+                  "duration": {
+                    "$ref": "#/$defs/duration"
+                  },
+                  "effort": {
+                    "anyOf": [
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "allOf": [
+                          {
+                            "$ref": "#/$defs/effort"
+                          },
+                          {
+                            "properties": {
+                              "kind": {
+                                "const": "rpe"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "duration"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "measurement": {
+                "const": "distance_time"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "target": {
+                "properties": {
+                  "reps": {
+                    "type": "null"
+                  },
+                  "load": {
+                    "type": "null"
+                  },
+                  "assistance": {
+                    "type": "null"
+                  },
+                  "calories": {
+                    "type": "null"
+                  },
+                  "distance": {
+                    "$ref": "#/$defs/distance"
+                  },
+                  "effort": {
+                    "anyOf": [
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "allOf": [
+                          {
+                            "$ref": "#/$defs/effort"
+                          },
+                          {
+                            "properties": {
+                              "kind": {
+                                "const": "rpe"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "anyOf": [
+                  {
+                    "required": [
+                      "distance"
+                    ],
+                    "properties": {
+                      "distance": {
+                        "$ref": "#/$defs/distance"
+                      }
+                    }
+                  },
+                  {
+                    "required": [
+                      "duration"
+                    ],
+                    "properties": {
+                      "duration": {
+                        "$ref": "#/$defs/duration"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "measurement": {
+                "const": "distance"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "target": {
+                "properties": {
+                  "reps": {
+                    "type": "null"
+                  },
+                  "load": {
+                    "type": "null"
+                  },
+                  "assistance": {
+                    "type": "null"
+                  },
+                  "duration": {
+                    "type": "null"
+                  },
+                  "calories": {
+                    "type": "null"
+                  },
+                  "distance": {
+                    "$ref": "#/$defs/distance"
+                  },
+                  "effort": {
+                    "anyOf": [
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "allOf": [
+                          {
+                            "$ref": "#/$defs/effort"
+                          },
+                          {
+                            "properties": {
+                              "kind": {
+                                "const": "rpe"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "distance"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "intervals"
+            ],
+            "properties": {
+              "intervals": {
+                "type": "array"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "measurement": {
+                "enum": [
+                  "duration",
+                  "duration_calories",
+                  "distance_time",
+                  "distance"
+                ]
+              },
+              "target": {
+                "properties": {
+                  "sets": {
+                    "const": 1
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

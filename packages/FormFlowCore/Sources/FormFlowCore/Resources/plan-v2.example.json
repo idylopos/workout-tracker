@@ -1,0 +1,201 @@
+{
+  "schemaVersion": 2,
+  "id": "example-week",
+  "name": "Example strength and cardio week",
+  "assumptions": [
+    "This is a format example, not a personalized exercise recommendation."
+  ],
+  "days": [
+    {
+      "weekday": "monday",
+      "sessions": [
+        {
+          "id": "strength-a",
+          "name": "Strength A",
+          "kind": "strength",
+          "estimatedMinutes": 35,
+          "warmup": [
+            "Use the warm-up agreed when reviewing your plan."
+          ],
+          "exercises": [
+            {
+              "instanceId": "squat-1",
+              "exerciseId": "goblet-squat",
+              "name": "Goblet squat",
+              "measurement": "weight_reps",
+              "equipment": [
+                "dumbbell"
+              ],
+              "target": {
+                "sets": 3,
+                "reps": {
+                  "min": 8,
+                  "max": 10
+                },
+                "load": null,
+                "restSeconds": 120,
+                "effort": {
+                  "kind": "rir",
+                  "min": 2,
+                  "max": 3
+                }
+              },
+              "optional": false,
+              "instructions": "Choose the starting load during plan review.",
+              "progressionPolicy": null,
+              "alternatives": [
+                {
+                  "id": "bodyweight",
+                  "exerciseId": "bodyweight-squat",
+                  "name": "Bodyweight squat",
+                  "measurement": "reps",
+                  "equipment": [],
+                  "target": {
+                    "sets": 3,
+                    "restSeconds": 90,
+                    "reps": {
+                      "min": 8,
+                      "max": 10
+                    }
+                  },
+                  "instructions": "An example substitution to review before beginning this exercise."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "weekday": "thursday",
+      "sessions": [
+        {
+          "id": "walk-a",
+          "name": "Easy walk",
+          "kind": "cardio",
+          "estimatedMinutes": 25,
+          "warmup": [],
+          "exercises": [
+            {
+              "instanceId": "walk-1",
+              "exerciseId": "easy-walk",
+              "name": "Easy walk",
+              "measurement": "duration",
+              "equipment": [],
+              "target": {
+                "sets": 1,
+                "duration": {
+                  "min": 20,
+                  "max": 25,
+                  "unit": "min"
+                },
+                "restSeconds": 0,
+                "effort": {
+                  "kind": "rpe",
+                  "min": 2,
+                  "max": 3
+                }
+              },
+              "optional": false,
+              "progressionPolicy": null,
+              "alternatives": [
+                {
+                  "id": "walk-intervals",
+                  "exerciseId": "walk-intervals",
+                  "name": "Walk with easy recovery intervals",
+                  "measurement": "duration",
+                  "equipment": [],
+                  "target": {
+                    "sets": 1,
+                    "restSeconds": 0,
+                    "duration": {
+                      "min": 20,
+                      "max": 20,
+                      "unit": "min"
+                    }
+                  },
+                  "intervals": [
+                    {
+                      "id": "warmup",
+                      "repeatCount": 1,
+                      "steps": [
+                        {
+                          "id": "warmup",
+                          "kind": "warmup",
+                          "measurement": "duration",
+                          "target": {
+                            "sets": 1,
+                            "restSeconds": 0,
+                            "duration": {
+                              "min": 2,
+                              "max": 2,
+                              "unit": "min"
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "id": "main",
+                      "repeatCount": 4,
+                      "steps": [
+                        {
+                          "id": "walk",
+                          "kind": "work",
+                          "measurement": "duration",
+                          "target": {
+                            "sets": 1,
+                            "restSeconds": 0,
+                            "duration": {
+                              "min": 3,
+                              "max": 3,
+                              "unit": "min"
+                            }
+                          }
+                        },
+                        {
+                          "id": "easy",
+                          "kind": "recovery",
+                          "measurement": "duration",
+                          "target": {
+                            "sets": 1,
+                            "restSeconds": 0,
+                            "duration": {
+                              "min": 1,
+                              "max": 1,
+                              "unit": "min"
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "id": "cooldown",
+                      "repeatCount": 1,
+                      "steps": [
+                        {
+                          "id": "cooldown",
+                          "kind": "cooldown",
+                          "measurement": "duration",
+                          "target": {
+                            "sets": 1,
+                            "restSeconds": 0,
+                            "duration": {
+                              "min": 2,
+                              "max": 2,
+                              "unit": "min"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

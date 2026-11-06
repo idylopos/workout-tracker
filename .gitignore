@@ -1,7 +1,14 @@
 # Local operating-system and project metadata
 .DS_Store
+
+# Native Swift / Xcode local output
+.build/
+.swiftpm/
+DerivedData/
+*.xcuserstate
+xcuserdata/
 AGENTS.md
-sources/
+/sources/
 
 # Generated site output
 dist/
@@ -13,3 +20,8 @@ evidence-based-weekly-workout-plan.md
 exports/
 
 .gstack/
+
+# Server secrets (example remains public)
+.env
+.env.*
+!.env.example

@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "test": "node --test tests/*.test.mjs",
+    "lint": "node scripts/lint.mjs",
     "sync-plan": "node scripts/sync-plan-markdown.mjs",
-    "build": "node scripts/build.mjs"
+    "build": "node scripts/build.mjs",
+    "review:server": "node server/review-server.mjs"
   }
 }

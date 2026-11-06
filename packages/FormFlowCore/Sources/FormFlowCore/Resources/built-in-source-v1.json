@@ -1,0 +1,1128 @@
+{
+  "version": 1,
+  "source": "lib.js built-in revision 5",
+  "week": {
+    "monday": {
+      "label": "Monday",
+      "short": "MON",
+      "focus": "Legs A + bicycle HIIT",
+      "kicker": "Strength · power · intervals",
+      "estimate": "70–90 min + later HIIT",
+      "tone": "lime",
+      "sequenceNote": "Keep the bicycle HIIT at least 6 hours after lifting.",
+      "warmup": [
+        "Easy bicycle · 3–5 min at RPE 2–3",
+        "Ankle rocks · 8/side",
+        "Bodyweight hip hinge · 8",
+        "Lunge twist · 1 × 4/side · step forward, use a shallow comfortable lunge, rotate the upper torso toward the lead leg, then return",
+        "Bodyweight box squat · 8",
+        "Low step-down · 5/side",
+        "Glute bridge with breathing · 2 × 8",
+        "Squat-jump practice · 2 reps at 50–60%, then 2 at 70–80%",
+        "Box-squat ramp · light × 8, 50% × 5, 70% × 3, optional 80–85% × 1"
+      ],
+      "exercises": [
+        {
+          "id": "squat-jump",
+          "name": "Squat jump",
+          "prescription": "2 × 3 · add only after 2 symptom-stable weeks",
+          "sets": 2,
+          "rest": 90,
+          "measurement": "reps",
+          "category": "Strength"
+        },
+        {
+          "id": "box-squat",
+          "name": "Box squat",
+          "prescription": "3 × 5–8",
+          "sets": 3,
+          "rest": 150,
+          "measurement": "weight_reps",
+          "category": "Strength"
+        },
+        {
+          "id": "bulgarian-split-squat",
+          "name": "Bulgarian split squat",
+          "prescription": "2 × 8–10 / leg",
+          "sets": 2,
+          "rest": 120,
+          "measurement": "weight_reps",
+          "category": "Strength"
+        },
+        {
+          "id": "assisted-nordic",
+          "name": "Assisted Nordic hamstring",
+          "prescription": "1–2 × 3–5",
+          "sets": 2,
+          "rest": 120,
+          "measurement": "reps",
+          "category": "Strength"
+        },
+        {
+          "id": "hip-abduction",
+          "name": "Machine or cable hip abduction",
+          "prescription": "2 × 12–20",
+          "sets": 2,
+          "rest": 75,
+          "measurement": "weight_reps",
+          "category": "Strength"
+        },
+        {
+          "id": "standing-calf-raise",
+          "name": "Standing calf raise",
+          "prescription": "2 × 8–15",
+          "sets": 2,
+          "rest": 75,
+          "measurement": "weight_reps",
+          "category": "Strength"
+        },
+        {
+          "id": "tibialis-raise",
+          "name": "Tibialis raise",
+          "prescription": "2 × 12–20",
+          "sets": 2,
+          "rest": 60,
+          "measurement": "weight_reps",
+          "category": "Strength"
+        },
+        {
+          "id": "copenhagen-plank",
+          "name": "Short-lever Copenhagen plank",
+          "prescription": "2 × 15–25 sec / side",
+          "sets": 2,
+          "rest": 60,
+          "measurement": "duration",
+          "category": "Strength"
+        },
+        {
+          "id": "bicycle-hiit",
+          "name": "Bicycle HIIT",
+          "prescription": "10-min warm-up; 6 × 1 min at RPE 8–9 with 2 min easy; 8–10-min cooldown",
+          "sets": 1,
+          "rest": 0,
+          "measurement": "duration",
+          "category": "Cardio",
+          "section": "Later session"
+        }
+      ]
+    },
+    "tuesday": {
+      "label": "Tuesday",
+      "short": "TUE",
+      "focus": "Push A + easy run",
+      "kicker": "Upper strength · aerobic base",
+      "estimate": "85–105 min total",
+      "tone": "blue",
+      "sequenceNote": "Keep the run conversational. Separate it from lifting when practical.",
+      "warmup": [
+        "Easy bicycle or elliptical · 3 min",
+        "Serratus wall slide · 1 × 8",
+        "Very light cable external rotation · 1 × 10/side",
+        "Slow arm circles · 5 each direction",
+        "Landmine ramp · light × 8/side, 50% × 5/side, 70% × 3/side",
+        "Dumbbell press · 1 lighter set × 5"
+      ],
+      "exercises": [
+        {
+          "id": "half-kneeling-landmine-press",
+          "name": "Half-kneeling 1-arm landmine press",
+          "prescription": "3 × 6–8 / side · keep 2 RIR · use a comfortable path",
+          "sets": 3,
+          "rest": 120,
+          "measurement": "weight_reps",
+          "category": "Strength"
+        },
+        {
+          "id": "neutral-db-bench",
+          "name": "Neutral-grip dumbbell bench press",
+          "prescription": "3 × 6–10",
+          "sets": 3,
+          "rest": 150,
+          "measurement": "weight_reps",
+          "category": "Strength"
+        },
+        {
+          "id": "cable-chest-fly",
+          "name": "Cable chest fly",
+          "prescription": "2 × 10–15 · comfortable shoulder range",
+          "sets": 2,
+          "rest": 90,
+          "measurement": "weight_reps",
+          "category": "Strength"
+        },
+        {
+          "id": "cable-lateral-raise",
+          "name": "Cable lateral raise",
+          "prescription": "3 × 12–20 · stop before shrugging",
+          "sets": 3,
+          "rest": 75,
+          "measurement": "weight_reps",
+          "category": "Strength"
+        },
+        {
+          "id": "rope-pressdown",
+          "name": "Rope triceps press-down",
+          "prescription": "2 × 10–15",
+          "sets": 2,
+          "rest": 75,
+          "measurement": "weight_reps",
+          "category": "Strength"
+        },
+        {
+          "id": "cable-external-rotation",
+          "name": "Cable external rotation",
+          "prescription": "2 × 12–20",
+          "sets": 2,
+          "rest": 60,
+          "measurement": "weight_reps",
+          "category": "Strength"
+        },
+        {
+          "id": "kneeling-cable-crunch",
+          "name": "Kneeling cable crunch",
+          "prescription": "3 × 8–15 · controlled spinal flexion",
+          "sets": 3,
+          "rest": 90,
+          "measurement": "weight_reps",
+          "category": "Strength"
+        },
+        {
+          "id": "easy-run",
+          "name": "Easy run",
+          "prescription": "Block 1: 30 min, RPE 2–4 · Block 2: 30–40 min + 4 × 20-sec strides",
+          "sets": 1,
+          "rest": 0,
+          "measurement": "distance_time",
+          "category": "Cardio"
+        },
+        {
+          "id": "pelvic-floor",
+          "name": "Pelvic-floor routine",
+          "prescription": "5 breaths; 8 × 5-sec holds with full relaxation; 8 quick contractions",
+          "sets": 1,
+          "rest": 0,
+          "measurement": "duration",
+          "category": "Recovery"
+        }
+      ]
+    },
+    "wednesday": {
+      "label": "Wednesday",
+      "short": "WED",
+      "focus": "Pull A + Mobility A",
+      "kicker": "Pull-up skill · recovery",
+      "estimate": "60–80 min",
+      "tone": "orange",
+      "sequenceNote": "Optional cycling stays off by default until the sleep and following-morning recovery gate is met. Complete Mobility A last and keep it easy—not a second leg workout.",
+      "warmup": [
+        "Easy bicycle · 3 min",
+        "Serratus wall slide · 1 × 8",
+        "Very light cable external rotation · 1 × 10/side",
+        "Foot-assisted scapular pull-up · 1 × 5",
+        "Highly assisted neutral-grip pull-up · 1 × 5",
+        "Moderately assisted pull-up · 1 × 2–3"
+      ],
+      "exercises": [
+        {
+          "id": "pull-up-progression",
+          "name": "Pull-up progression",
+          "prescription": "Choose your current performance step below",
+          "sets": 3,
+          "rest": 150,
+          "measurement": "assisted_reps",
+          "category": "Strength",
+          "progression": "pullup"
+        },
+        {
+          "id": "chest-supported-row",
+          "name": "Chest-supported neutral-grip row",
+          "prescription": "3 × 6–10",
+          "sets": 3,
+          "rest": 120,
+          "measurement": "weight_reps",
+          "category": "Strength"
+        },
+        {
+          "id": "face-pull",
+          "name": "Face pull",
+          "prescription": "3 × 12–20 · controlled rear-delt focus",
+          "sets": 3,
+          "rest": 75,
+          "measurement": "weight_reps",
+          "category": "Strength"
+        },
+        {
+          "id": "hammer-curl",
+          "name": "Neutral-grip hammer curl",
+          "prescription": "2 × 8–15",
+          "sets": 2,
+          "rest": 75,
+          "measurement": "weight_reps",
+          "category": "Strength"
+        },
+        {
+          "id": "pallof-press",
+          "name": "Pallof press",
+          "prescription": "2 × 8–10 / side · 2-sec hold at full extension",
+          "sets": 2,
+          "rest": 60,
+          "measurement": "weight_reps",
+          "category": "Strength"
+        },
+        {
+          "id": "zone-2-cycle",
+          "name": "Optional Zone 2 cycling",
+          "prescription": "25–40 min at RPE 2–3 · only after the optional-session recovery gate is met",
+          "sets": 1,
+          "rest": 0,
+          "measurement": "duration",
+          "category": "Cardio",
+          "optional": true
+        },
+        {
+          "id": "mobility-a-cat-cow",
+          "name": "Mobility A · Cat–cow",
+          "prescription": "1 round · 6 slow cycles",
+          "sets": 1,
+          "rest": 0,
+          "measurement": "completion",
+          "category": "Mobility"
+        },
+        {
+          "id": "mobility-a-frog",
+          "name": "Mobility A · Dynamic frog rock-back",
+          "prescription": "1 round · 8 slow reps",
+          "sets": 1,
+          "rest": 0,
+          "measurement": "completion",
+          "category": "Mobility"
+        },
+        {
+          "id": "mobility-a-lateral-lunge",
+          "name": "Mobility A · Half-kneeling lateral lunge",
+          "prescription": "1 round · 6 controlled reps / side",
+          "sets": 1,
+          "rest": 0,
+          "measurement": "completion",
+          "category": "Mobility"
+        },
+        {
+          "id": "mobility-a-bridge-march",
+          "name": "Mobility A · Bridge leg lift",
+          "prescription": "1 round · 6 alternating reps / side",
+          "sets": 1,
+          "rest": 0,
+          "measurement": "completion",
+          "category": "Mobility"
+        },
+        {
+          "id": "mobility-a-seated-good-morning",
+          "name": "Mobility A · Seated good morning",
+          "prescription": "1 round · 8 slow unloaded reps",
+          "sets": 1,
+          "rest": 0,
+          "measurement": "completion",
+          "category": "Mobility"
+        }
+      ]
+    },
+    "thursday": {
+      "label": "Thursday",
+      "short": "THU",
+      "focus": "Morning run + evening Legs B",
+      "kicker": "Posterior chain · run quality",
+      "estimate": "75–100 min total",
+      "tone": "pink",
+      "sequenceNote": "Run in the morning and lift in the evening. Allow about 6 hours or more between sessions. Keep the Block 1 run easy. In Block 2, alternate tempo and intervals, omit swings initially and use 2 hip-thrust sets while adapting. Keep Monday HIIT. Progress only one of Thursday running and lower-body lifting at a time. Run easy when fatigue is above normal.",
+      "warmup": [
+        "Evening lifting warm-up · easy bicycle for 3–5 min. If your back is stiff, use Seated leg curl under Trap-bar deadlift → Alternatives. Skip the kettlebell drills, working swings and trap-bar ramp. Warm up with a few light leg curls instead.",
+        "Ankle rocks · 8/side",
+        "Bodyweight hip hinge · 8",
+        "Bodyweight box squat · 8",
+        "Low step-down · 5/side",
+        "Light kettlebell deadlift · 5",
+        "Light kettlebell swing · 2 × 5 only when swings are planned and the hinge feels comfortable",
+        "Trap-bar ramp · 40% × 6, 60% × 4, 75% × 2, optional 85% × 1"
+      ],
+      "exercises": [
+        {
+          "id": "run-2",
+          "name": "Run 2",
+          "prescription": "Block 1: 25–35 min easy at RPE 2–4 · Block 2 alternates completed quality sessions: Tempo—10 min easy, 3 × 6 min at RPE 6–7 with 2 min easy, then 5–10 min easy; Intervals—10 min easy, 6 × 2 min at RPE 8 with 2 min easy, then 8–10 min easy",
+          "sets": 1,
+          "rest": 0,
+          "measurement": "distance_time",
+          "category": "Cardio"
+        },
+        {
+          "id": "kettlebell-swing",
+          "name": "Kettlebell swing",
+          "prescription": "Block 1: 2–3 × 8–12 · Block 2: omit initially; optional only after recovery is stable",
+          "sets": 3,
+          "rest": 90,
+          "measurement": "weight_reps",
+          "category": "Strength"
+        },
+        {
+          "id": "trap-bar-deadlift",
+          "name": "Trap-bar deadlift",
+          "prescription": "3 × 4–6",
+          "sets": 3,
+          "rest": 180,
+          "measurement": "weight_reps",
+          "category": "Strength"
+        },
+        {
+          "id": "barbell-hip-thrust",
+          "name": "Barbell hip thrust",
+          "prescription": "Block 1: 3 × 8–12 · Block 2: 2 × 8–12 while adapting to quality running",
+          "sets": 3,
+          "rest": 150,
+          "measurement": "weight_reps",
+          "category": "Strength"
+        },
+        {
+          "id": "controlled-step-down",
+          "name": "Controlled step-down",
+          "prescription": "2 × 6–10 / leg · 3-sec lowering",
+          "sets": 2,
+          "rest": 90,
+          "measurement": "weight_reps",
+          "category": "Strength"
+        },
+        {
+          "id": "hip-abduction",
+          "name": "Machine or cable hip abduction",
+          "prescription": "2 × 12–20",
+          "sets": 2,
+          "rest": 75,
+          "measurement": "weight_reps",
+          "category": "Strength"
+        },
+        {
+          "id": "seated-calf-raise",
+          "name": "Seated calf raise",
+          "prescription": "2 × 10–15",
+          "sets": 2,
+          "rest": 75,
+          "measurement": "weight_reps",
+          "category": "Strength"
+        },
+        {
+          "id": "tibialis-raise",
+          "name": "Tibialis raise",
+          "prescription": "2 × 12–20",
+          "sets": 2,
+          "rest": 60,
+          "measurement": "weight_reps",
+          "category": "Strength"
+        },
+        {
+          "id": "pelvic-floor",
+          "name": "Pelvic-floor routine",
+          "prescription": "5 breaths; 8 × 5-sec holds; 8 quick contractions",
+          "sets": 1,
+          "rest": 0,
+          "measurement": "duration",
+          "category": "Recovery"
+        }
+      ]
+    },
+    "friday": {
+      "label": "Friday",
+      "short": "FRI",
+      "focus": "Push B + Mobility B",
+      "kicker": "Upper hypertrophy · mobility",
+      "estimate": "75–95 min",
+      "tone": "purple",
+      "sequenceNote": "Use comfortable shoulder paths; do not force clicking or pinching.",
+      "warmup": [
+        "Easy bicycle or elliptical · 3 min",
+        "Serratus wall slide · 1 × 8",
+        "Very light cable external rotation · 1 × 10/side",
+        "Slow arm circles · 5 each direction",
+        "Landmine ramp · light × 8/side, 50% × 5/side, 70% × 3/side",
+        "Incline dumbbell press · 1 lighter set × 5"
+      ],
+      "exercises": [
+        {
+          "id": "neutral-incline-db-press",
+          "name": "Neutral-grip incline dumbbell press",
+          "prescription": "3 × 8–12",
+          "sets": 3,
+          "rest": 150,
+          "measurement": "weight_reps",
+          "category": "Strength"
+        },
+        {
+          "id": "one-arm-landmine-press",
+          "name": "One-arm landmine press",
+          "prescription": "2 × 10–12 / side",
+          "sets": 2,
+          "rest": 120,
+          "measurement": "weight_reps",
+          "category": "Strength"
+        },
+        {
+          "id": "cable-chest-fly",
+          "name": "Cable chest fly",
+          "prescription": "2 × 10–15 · comfortable shoulder range",
+          "sets": 2,
+          "rest": 90,
+          "measurement": "weight_reps",
+          "category": "Strength"
+        },
+        {
+          "id": "cable-scaption",
+          "name": "One-arm cable scaption raise (side delt)",
+          "prescription": "3 × 12–20 · raise only through a fully comfortable range; otherwise use the guide’s substitute",
+          "sets": 3,
+          "rest": 75,
+          "measurement": "weight_reps",
+          "category": "Strength"
+        },
+        {
+          "id": "cross-body-triceps",
+          "name": "Cross-body cable triceps extension",
+          "prescription": "2 × 10–15",
+          "sets": 2,
+          "rest": 75,
+          "measurement": "weight_reps",
+          "category": "Strength"
+        },
+        {
+          "id": "cable-external-rotation",
+          "name": "Cable external rotation",
+          "prescription": "2 × 12–20",
+          "sets": 2,
+          "rest": 60,
+          "measurement": "weight_reps",
+          "category": "Strength"
+        },
+        {
+          "id": "suitcase-carry",
+          "name": "Suitcase carry",
+          "prescription": "2 × 20–30 m / side",
+          "sets": 2,
+          "rest": 60,
+          "measurement": "weight_distance",
+          "category": "Strength"
+        },
+        {
+          "id": "bird-dog",
+          "name": "Bird Dog",
+          "prescription": "2 × 5–6 / side · 3–5-sec holds · log reps per side",
+          "sets": 2,
+          "rest": 60,
+          "measurement": "reps",
+          "category": "Strength"
+        },
+        {
+          "id": "mobility-b-chest",
+          "name": "Mobility B · Doorway chest stretch",
+          "prescription": "2 rounds · 45 sec / side",
+          "sets": 2,
+          "rest": 0,
+          "measurement": "completion",
+          "category": "Mobility"
+        },
+        {
+          "id": "mobility-b-shoulder",
+          "name": "Mobility B · Cross-body shoulder stretch",
+          "prescription": "2 rounds · 45 sec / side",
+          "sets": 2,
+          "rest": 0,
+          "measurement": "completion",
+          "category": "Mobility"
+        },
+        {
+          "id": "mobility-b-adductor",
+          "name": "Mobility B · Adductor Rock Back",
+          "prescription": "2 rounds · 45 sec / side",
+          "sets": 2,
+          "rest": 0,
+          "measurement": "completion",
+          "category": "Mobility"
+        }
+      ]
+    },
+    "saturday": {
+      "label": "Saturday",
+      "short": "SAT",
+      "focus": "Long run + swim + Pull B",
+      "kicker": "Endurance · technique",
+      "estimate": "105–155 min total",
+      "tone": "teal",
+      "sequenceNote": "Long run and the three-exercise Pull B base are planned. Separate them by at least 4 hours when practical. Swimming is optional after the recovery gate is met and only with comfortable shoulders and normal energy. Skip optional face pulls and curls when recovery is limited.",
+      "warmup": [
+        "Long run · start with 5–10 min very easy",
+        "Swim · begin with relaxed technique lengths",
+        "Pull B · 2–3 min easy movement",
+        "Pull B · wall slide 1 × 6",
+        "Pull B · highly assisted pull-up 1 × 5",
+        "Pull B · light cable row 1 × 8"
+      ],
+      "exercises": [
+        {
+          "id": "long-run",
+          "name": "Long run",
+          "prescription": "Block 1: use the 18-stage progression · Block 2: 8–10 km easy",
+          "sets": 1,
+          "rest": 0,
+          "measurement": "distance_time",
+          "category": "Cardio"
+        },
+        {
+          "id": "easy-swim",
+          "name": "Optional technique-focused swim",
+          "prescription": "25–40 min at RPE 2–3 · only after the recovery gate is met, with comfortable shoulders and normal energy · no paddles or hard butterfly",
+          "sets": 1,
+          "rest": 0,
+          "measurement": "duration",
+          "category": "Cardio",
+          "optional": true
+        },
+        {
+          "id": "pull-up-progression",
+          "name": "Pull-up progression",
+          "prescription": "Repeat your current performance step · stop with the prescribed RIR",
+          "sets": 2,
+          "rest": 150,
+          "measurement": "assisted_reps",
+          "category": "Strength",
+          "progression": "pullup"
+        },
+        {
+          "id": "one-arm-cable-row",
+          "name": "One-arm cable row",
+          "prescription": "2 × 10–15 / side",
+          "sets": 2,
+          "rest": 90,
+          "measurement": "weight_reps",
+          "category": "Strength"
+        },
+        {
+          "id": "db-pullover",
+          "name": "Light dumbbell pullover",
+          "prescription": "2 × 10–15",
+          "sets": 2,
+          "rest": 90,
+          "measurement": "weight_reps",
+          "category": "Strength"
+        },
+        {
+          "id": "face-pull",
+          "name": "Optional face pull",
+          "prescription": "2 × 12–20",
+          "sets": 2,
+          "rest": 75,
+          "measurement": "weight_reps",
+          "category": "Strength",
+          "optional": true
+        },
+        {
+          "id": "cable-curl",
+          "name": "Optional cable curl",
+          "prescription": "1–2 × 10–15",
+          "sets": 2,
+          "rest": 75,
+          "measurement": "weight_reps",
+          "category": "Strength",
+          "optional": true
+        },
+        {
+          "id": "pelvic-floor",
+          "name": "Pelvic-floor routine",
+          "prescription": "5 breaths; 8 × 5-sec holds; 8 quick contractions",
+          "sets": 1,
+          "rest": 0,
+          "measurement": "duration",
+          "category": "Recovery"
+        }
+      ]
+    },
+    "sunday": {
+      "label": "Sunday",
+      "short": "SUN",
+      "focus": "Complete rest",
+      "kicker": "Recover · review · reset",
+      "estimate": "No training",
+      "tone": "rest",
+      "sequenceNote": "Ordinary relaxed movement is fine. Review sleep, load, pain, and next-morning responses.",
+      "warmup": [],
+      "exercises": []
+    }
+  },
+  "guidance": {
+    "squat-jump": {
+      "setup": "Stand about hip-width apart with a stable foot tripod.",
+      "action": "Dip only slightly, jump vertically, and land softly in the same stance. Reset before every rep.",
+      "watch": "Keep the landing quiet and knees tracking over the feet. Stop if knee symptoms rise.",
+      "option": ""
+    },
+    "box-squat": {
+      "setup": "Set the box at a depth you can control. Brace, keep the whole foot planted, and sit back toward it.",
+      "action": "Touch down under control without relaxing, then drive the floor away to stand.",
+      "watch": "Do not drop onto the box or let the knees collapse inward. Shorten the range if symptoms increase.",
+      "option": ""
+    },
+    "bulgarian-split-squat": {
+      "setup": "Place the rear foot on a low bench and keep enough distance for the front heel to stay down.",
+      "action": "Lower mostly through the front leg, then push through the whole front foot to rise.",
+      "watch": "Use support for balance. Keep the front knee tracking with the toes and use a comfortable depth.",
+      "option": ""
+    },
+    "assisted-nordic": {
+      "setup": "Kneel on padding with the ankles firmly anchored; use a band or hands for assistance.",
+      "action": "Keep hips extended and lower the body as one line as slowly as possible, then assist the return.",
+      "watch": "Start with a short range. Stop for hamstring cramping, sharp pain, or loss of hip position.",
+      "option": "No ankle anchor or band: use bridge hamstring walkouts for 2 × 6–10. If available, use slider or stability-ball leg curls for 2 × 8–12, or a seated/lying leg-curl machine for 2 × 8–12. Move slowly; these preserve knee-flexion hamstring work but are not identical to Nordic eccentric exposure."
+    },
+    "hip-abduction": {
+      "setup": "Set the machine or cable so the pelvis stays level and the working leg begins under control.",
+      "action": "Move the thigh outward without leaning, pause briefly, and return slowly.",
+      "watch": "Use a range that comes from the hip rather than twisting the pelvis or turning the toes far outward.",
+      "option": ""
+    },
+    "standing-calf-raise": {
+      "setup": "Stand tall with the ball of the foot secure and use light hand support.",
+      "action": "Rise onto the toes, pause at the top, then lower under control through a comfortable stretch.",
+      "watch": "Keep the ankle tracking straight; do not bounce or roll onto the outer edge of the foot.",
+      "option": ""
+    },
+    "seated-calf-raise": {
+      "setup": "Sit with knees bent about 90° and the balls of the feet secure on the platform.",
+      "action": "Lift the heels, pause, and lower slowly through a comfortable range.",
+      "watch": "Avoid bouncing or letting the feet roll inward or outward.",
+      "option": ""
+    },
+    "tibialis-raise": {
+      "setup": "Lean against a wall with heels on the floor and feet slightly forward.",
+      "action": "Lift the forefeet and toes toward the shins, pause, then lower slowly.",
+      "watch": "Keep the heels planted and shorten the stance if the front of the shin cramps.",
+      "option": ""
+    },
+    "copenhagen-plank": {
+      "setup": "Lie side-on with the top knee supported on a bench and the lower knee bent beneath you.",
+      "action": "Lift the hips into a straight shoulder-to-knee line and breathe normally.",
+      "watch": "Stop if you feel groin pain rather than muscular effort. Use more bench support to make it easier.",
+      "option": ""
+    },
+    "bicycle-hiit": {
+      "setup": "Adjust the saddle so the knee remains slightly bent at the bottom of the pedal stroke.",
+      "action": "Warm up fully, ride each hard minute at RPE 8–9, and make every recovery genuinely easy.",
+      "watch": "Hard does not mean all-out. Keep cadence controlled and stop for chest pain, dizziness, or unusual breathlessness.",
+      "option": ""
+    },
+    "half-kneeling-landmine-press": {
+      "setup": "Kneel with the leg opposite the pressing arm forward. Hold the bar end near the shoulder and brace gently.",
+      "action": "Press up and forward along the bar path while allowing the shoulder blade to rotate, then lower slowly.",
+      "watch": "Do not lean back, shrug, or force a pinching range. Keep about two reps in reserve.",
+      "option": ""
+    },
+    "neutral-db-bench": {
+      "setup": "Lie with feet planted and hold the dumbbells with palms facing each other.",
+      "action": "Lower with elbows roughly 30–45° from the torso, then press without bouncing.",
+      "watch": "Stop the descent before shoulder discomfort and keep the shoulder blades comfortably supported.",
+      "option": ""
+    },
+    "cable-lateral-raise": {
+      "setup": "Stand tall with the cable low and the arm slightly in front of the body.",
+      "action": "Lead with the elbow and raise only through a comfortable range, then lower for about two seconds.",
+      "watch": "Use light weight; do not shrug, swing, or push through shoulder discomfort.",
+      "option": ""
+    },
+    "rope-pressdown": {
+      "setup": "Stand tall with elbows close to the ribs and shoulders relaxed.",
+      "action": "Extend the elbows, separate the rope slightly at the bottom, and return without moving the upper arms.",
+      "watch": "Avoid leaning your body onto the cable or letting the shoulders roll forward.",
+      "option": ""
+    },
+    "cable-external-rotation": {
+      "setup": "Set a light cable at elbow height and keep the elbow gently against the side, bent 90°.",
+      "action": "Rotate the forearm outward while the upper arm stays still, then return slowly.",
+      "watch": "Use a small, painless range. Do not twist the torso or chase heavier loads.",
+      "option": ""
+    },
+    "easy-run": {
+      "setup": "Begin with 5–10 minutes very easy and use a relaxed, natural stride.",
+      "action": "Keep the effort conversational at RPE 2–4; walk breaks are allowed.",
+      "watch": "Reduce duration or pace if knee symptoms rise during the run or are worse the following morning.",
+      "option": ""
+    },
+    "pelvic-floor": {
+      "setup": "Breathe normally and imagine gently lifting around the urethra and anus without moving the pelvis.",
+      "action": "Use a submaximal contraction, then fully release for at least as long as each hold.",
+      "watch": "Do not hold your breath, bear down, or keep the muscles clenched between reps.",
+      "option": ""
+    },
+    "pull-up-progression": {
+      "setup": "Use a neutral grip, begin with controlled shoulder blades, and select the assistance shown in your current step.",
+      "action": "Pull the chest toward the handles without kicking, then lower to the step’s full controlled range.",
+      "watch": "Stop before grinding or shoulder pain. Advance only after the performance checks shown below.",
+      "option": ""
+    },
+    "chest-supported-row": {
+      "setup": "Set the bench so the chest stays supported and use a neutral grip.",
+      "action": "Pull the elbows back toward the hips, pause, and lower until the shoulder blades move naturally forward.",
+      "watch": "Do not lift the chest off the pad, shrug, or jerk the weight.",
+      "option": ""
+    },
+    "face-pull": {
+      "setup": "Set the rope around upper-chest to face height and step back into light tension.",
+      "action": "Pull toward the nose or forehead with elbows comfortably out, then return slowly.",
+      "watch": "Keep the ribs down and shoulders away from the ears; use a painless path.",
+      "option": ""
+    },
+    "hammer-curl": {
+      "setup": "Stand tall with palms facing each other and elbows near the ribs.",
+      "action": "Curl without moving the upper arms, then lower under control.",
+      "watch": "Avoid swinging, leaning back, or letting the shoulders roll forward.",
+      "option": ""
+    },
+    "kneeling-cable-crunch": {
+      "setup": "Kneel facing the cable with the rope beside the head and hips mostly still.",
+      "action": "Exhale and curl the ribs toward the pelvis, then return under control.",
+      "watch": "Do not pull with the arms, sit the hips backward, or hold your breath.",
+      "option": ""
+    },
+    "pallof-press": {
+      "setup": "Set a cable at chest height. Stand side-on, hold the handle at the sternum with both hands, and place the feet hip-width apart.",
+      "action": "Press the handle straight out until the arms are extended, hold for two seconds, then return under control.",
+      "watch": "Keep the hips and shoulders square. Do not let the cable rotate the torso. Reduce the load if the ribs flare or you hold your breath.",
+      "option": ""
+    },
+    "mobility-a-cat-cow": {
+      "setup": "Start on hands and knees with hands under shoulders and knees under hips.",
+      "action": "Move slowly between a comfortable rounded and gently extended spine for six controlled cycles.",
+      "watch": "Spread the movement across the spine; do not force the neck or lower back into end range.",
+      "option": ""
+    },
+    "mobility-a-frog": {
+      "setup": "On padding, place both knees comfortably wide with the lower legs supported and keep the spine neutral.",
+      "action": "Rock the hips backward and forward through a mild inner-thigh stretch for eight slow repetitions.",
+      "watch": "Use a narrower knee position if needed; stop before groin, hip, or knee pain.",
+      "option": ""
+    },
+    "mobility-a-lateral-lunge": {
+      "setup": "Half-kneel on padding, place the other foot out to the side, and keep that whole foot planted.",
+      "action": "Shift gently toward the planted foot for six controlled repetitions, keeping its knee aligned with the toes.",
+      "watch": "Use a shallow range and support the hands on a bench if balance or the knee feels uncertain.",
+      "option": ""
+    },
+    "mobility-a-bridge-march": {
+      "setup": "Lie on your back with knees bent, feet planted, and lift into a comfortable glute bridge.",
+      "action": "Keep the pelvis level while alternately lifting one foot only a few centimetres for six repetitions per side.",
+      "watch": "This is a stability drill, not a stretch; lower the hips if the back arches or hamstrings cramp.",
+      "option": ""
+    },
+    "mobility-a-seated-good-morning": {
+      "setup": "Sit near the front of a bench with feet comfortably wide, whole feet planted, and hands across the chest.",
+      "action": "Keep a long spine and hinge forward from the hips for eight slow, unloaded repetitions.",
+      "watch": "Stop at a mild posterior-chain stretch; do not round forcefully, bounce, or add weight.",
+      "option": ""
+    },
+    "zone-2-cycle": {
+      "setup": "Use a comfortable saddle height and begin with several easy minutes.",
+      "action": "Ride steadily at RPE 2–3, where full sentences remain easy.",
+      "watch": "This is optional recovery volume; skip it when sleep, legs, running, or joints are not normal.",
+      "option": ""
+    },
+    "kettlebell-swing": {
+      "setup": "Place the bell slightly ahead, hinge to grip it, and hike it back between the thighs.",
+      "action": "Snap the hips to float the bell, then let it return into the next hinge.",
+      "watch": "It is a hip hinge, not a squat or arm raise. Stop if the back rounds or the bell pulls the shoulders.",
+      "option": ""
+    },
+    "trap-bar-deadlift": {
+      "setup": "Stand centered in the bar, brace, and take the handles with the whole foot planted.",
+      "action": "Push the floor away and stand tall, then hinge and bend the knees to return the bar under control.",
+      "watch": "Keep the load close and your spine steady. If stiffness builds during warm-up sets, reduce the load. Skip the lift if discomfort keeps increasing or spreads down a leg.",
+      "option": "If your back still feels stiff, choose Seated leg curl in Alternatives for 2 × 8–12 easy, controlled reps. Skip kettlebell hinges, swings and trap-bar warm-up sets that evening. Keep hip thrusts only if comfortable."
+    },
+    "barbell-hip-thrust": {
+      "setup": "Place the upper back on a bench, pad the bar, and set feet so the shins are near vertical at the top.",
+      "action": "Drive through the whole foot, finish by squeezing the glutes, and lower under control.",
+      "watch": "Do not overarch the lower back or throw the head backward.",
+      "option": ""
+    },
+    "controlled-step-down": {
+      "setup": "Stand on a low step with the working foot fully supported and use a rail if needed.",
+      "action": "Lower the free heel toward the floor for about three seconds, lightly touch, then rise.",
+      "watch": "Keep the pelvis level and knee tracking over the foot. Reduce step height if symptoms increase.",
+      "option": ""
+    },
+    "run-2": {
+      "setup": "Complete the prescribed easy warm-up before any faster work.",
+      "action": "Follow the current block’s effort and recovery exactly; keep fast reps controlled rather than maximal.",
+      "watch": "End the quality portion if form deteriorates or knee symptoms rise, and monitor the following morning.",
+      "option": ""
+    },
+    "neutral-incline-db-press": {
+      "setup": "Use a low incline, plant the feet, and hold the dumbbells with palms facing each other.",
+      "action": "Lower with elbows in a comfortable 30–45° path, then press smoothly.",
+      "watch": "Use the lowest comfortable incline and stop the descent before pinching or clicking becomes uncomfortable.",
+      "option": ""
+    },
+    "cable-chest-fly": {
+      "setup": "Set two cable handles around mid-chest height, use a split stance, and begin with the elbows softly bent and the hands only slightly behind the torso.",
+      "action": "Bring the upper arms inward in a wide hugging arc, pause when the hands meet, then return slowly through a comfortable chest stretch.",
+      "watch": "Keep the shoulders down and ribs stacked. Do not chase a deep stretch, let the elbows drift far behind the body, or continue through front-of-shoulder discomfort.",
+      "option": "Use a neutral-grip machine chest press for 2 × 10–15 if the fly path is not completely comfortable."
+    },
+    "one-arm-landmine-press": {
+      "setup": "Stand in a split stance with the bar near the working shoulder and ribs stacked over the pelvis.",
+      "action": "Press up and forward while allowing the shoulder blade to move, then lower slowly.",
+      "watch": "Do not twist, lean back, shrug, or force an uncomfortable endpoint.",
+      "option": ""
+    },
+    "cable-scaption": {
+      "setup": "This is simply a one-arm cable scaption raise: set a cable pulley at its lowest position with a very light load. Stand sideways with the working arm farther from the machine and hold the handle with a slight elbow bend.",
+      "action": "Set the arm 20–30° forward of directly sideways—like a wide V when viewed from above—with the thumb up or slightly forward. Raise slowly to the highest completely comfortable point (shoulder height is a ceiling, not a requirement), then lower for about two seconds. This trains the side deltoid to help build shoulder width.",
+      "watch": "First reduce the load or range and stop before discomfort. If the shoulder still feels uncomfortable, do not force the exercise.",
+      "option": "Use a supported machine lateral raise for 2–3 × 12–20 in a comfortable path. If that also feels uncomfortable, omit Friday’s raise and keep the landmine presses."
+    },
+    "cross-body-triceps": {
+      "setup": "Set the cable above shoulder height and hold it with the opposite hand across the body.",
+      "action": "Keep the upper arm quiet while straightening the elbow down and across, then return slowly.",
+      "watch": "Use a shoulder position that feels natural; do not pull the shoulder forward.",
+      "option": ""
+    },
+    "reverse-crunch": {
+      "setup": "Lie on your back with hips and knees bent and arms supported beside you.",
+      "action": "Exhale, gently roll the pelvis toward the ribs, and lift the tailbone slightly before lowering slowly.",
+      "watch": "Do not swing the legs, throw the hips overhead, or hold your breath.",
+      "option": ""
+    },
+    "suitcase-carry": {
+      "setup": "Hold one kettlebell or dumbbell at the side. Stand tall with the shoulders level and the free arm relaxed.",
+      "action": "Walk with short, controlled steps for the set distance, then switch sides.",
+      "watch": "Do not lean away from the weight or let the hip drop. Stop the set if grip fails before the trunk does, and note it in the log.",
+      "option": ""
+    },
+    "mobility-b-chest": {
+      "setup": "Place the forearm on a doorway with the elbow below shoulder height.",
+      "action": "Step or turn away gently until the chest feels a mild stretch.",
+      "watch": "Do not force the shoulder forward or continue if the front of the shoulder pinches.",
+      "option": ""
+    },
+    "mobility-b-shoulder": {
+      "setup": "Bring one arm across the chest and support it above the elbow with the other arm.",
+      "action": "Draw it gently closer while keeping the shoulder down and relaxed.",
+      "watch": "The stretch should be behind the shoulder, not a pinch at the front or top.",
+      "option": ""
+    },
+    "mobility-b-adductor": {
+      "setup": "This is not the adductor machine. Put both hands on a bench, keep one knee under the hip, and extend the other leg to the side with its foot flat.",
+      "action": "Keep the spine neutral and slowly send the hips backward until the inner thigh feels a gentle stretch.",
+      "watch": "Use the bench for support and stop before groin, hip, or knee pain.",
+      "option": ""
+    },
+    "long-run": {
+      "setup": "Start 5–10 minutes very easily and choose a flat, familiar route when possible.",
+      "action": "Stay conversational and use planned or unplanned walk breaks to keep the effort easy.",
+      "watch": "Repeat rather than advance the progression if joint symptoms or usual energy are not back to baseline the next morning.",
+      "option": ""
+    },
+    "easy-swim": {
+      "setup": "Begin with relaxed technique lengths and choose strokes that feel comfortable at the shoulder.",
+      "action": "Keep the effort at RPE 2–3 with generous rest as needed.",
+      "watch": "Avoid paddles, hard butterfly, or fatigued overhead work; stop any stroke that provokes shoulder discomfort.",
+      "option": ""
+    },
+    "one-arm-cable-row": {
+      "setup": "Stand or sit square to the cable with the arm reaching forward under control.",
+      "action": "Pull the elbow toward the hip without rotating the torso, then return slowly.",
+      "watch": "Keep the shoulder away from the ear and use a comfortable reach.",
+      "option": ""
+    },
+    "db-pullover": {
+      "setup": "Lie supported on a bench, hold one light dumbbell over the chest, and keep a small elbow bend.",
+      "action": "Lower only until the shoulders remain comfortable, then bring the weight back over the chest.",
+      "watch": "Keep the ribs down and do not chase a deep overhead stretch or painful clicking.",
+      "option": ""
+    },
+    "cable-curl": {
+      "setup": "Stand tall with elbows near the ribs and wrists neutral.",
+      "action": "Curl without moving the upper arms, then lower slowly.",
+      "watch": "Avoid swinging, leaning back, or allowing the shoulders to roll forward.",
+      "option": ""
+    },
+    "supine-heel-slide": {
+      "setup": "Lie on your back with knees bent, feet on the floor, and arms relaxed. Find a comfortable neutral lower-back position and gently brace.",
+      "action": "Exhale as you slowly slide one heel away along the floor, then return and alternate. Keep the pelvis still; log repetitions per side.",
+      "watch": "Use a short range without arching or curling the back. Breathe normally and stop if back pain worsens, tingling appears, or pain spreads down the leg. Progress range only after symptom-stable sessions and following mornings.",
+      "option": ""
+    },
+    "bird-dog": {
+      "setup": "Start on hands and knees, hands under shoulders and knees under hips. Keep a comfortable neutral spine.",
+      "action": "Gently brace and reach one arm and the opposite leg only as far as the trunk stays still. Hold 3–5 seconds, return, and alternate; log reps per side.",
+      "watch": "Do not arch or rotate the back. Use a leg-only reach if needed. Stop for worsening back pain or spreading leg symptoms.",
+      "option": "If supporting your weight on your hands bothers your shoulders, choose supine heel slides in Alternatives. Do 2 × 6–8 per side in place of Bird Dog. Supine bracing is also available."
+    },
+    "supine-abdominal-bracing": {
+      "setup": "Lie on your back with knees bent and feet supported. Keep your back in a comfortable position.",
+      "action": "Gently tighten the abdominal wall, breathe normally for 5–10 seconds, then relax fully. Log one hold as one repetition.",
+      "watch": "Do not strain, hold your breath, or force the back flat. Stop for worsening back pain or spreading leg symptoms.",
+      "option": ""
+    },
+    "seated-leg-curl": {
+      "setup": "Adjust the backrest so the machine pivot lines up with your knee. Secure the thigh pad and place the roller just above your heels.",
+      "action": "Try a few easy reps. Keep your pelvis against the seat as you bend your knees, then return slowly. Use a comfortable range and leave at least 3 reps in reserve.",
+      "watch": "Skip this exercise if sitting or curling increases back symptoms or brings on leg pain or tingling. Check how you feel the next morning.",
+      "option": ""
+    }
+  },
+  "alternatives": {
+    "assisted-nordic": [
+      {
+        "id": "seated-or-lying-leg-curl",
+        "name": "Seated or lying leg curl",
+        "prescription": "2 × 8–12 · slow, controlled lowering",
+        "sets": 2,
+        "measurement": "weight_reps"
+      },
+      {
+        "id": "slider-or-ball-leg-curl",
+        "name": "Slider or stability-ball leg curl",
+        "prescription": "2 × 8–12 · keep hips lifted",
+        "sets": 2,
+        "measurement": "reps"
+      },
+      {
+        "id": "bridge-hamstring-walkout",
+        "name": "Bridge hamstring walkout",
+        "prescription": "2 × 6–10 · controlled steps out and back",
+        "sets": 2,
+        "measurement": "reps"
+      }
+    ],
+    "bird-dog": [
+      {
+        "id": "supine-heel-slide",
+        "name": "Supine heel slide with abdominal bracing",
+        "prescription": "2 × 6–8 / side · slow, short-range slides · log reps per side",
+        "sets": 2,
+        "rest": 60,
+        "measurement": "reps",
+        "category": "Strength"
+      },
+      {
+        "id": "supine-abdominal-bracing",
+        "name": "Supine abdominal bracing",
+        "prescription": "2 × 5 holds · 5–10 sec each · breathe normally; log holds as reps",
+        "sets": 2,
+        "rest": 60,
+        "measurement": "reps",
+        "category": "Strength"
+      }
+    ],
+    "trap-bar-deadlift": [
+      {
+        "id": "seated-leg-curl",
+        "name": "Seated leg curl",
+        "prescription": "2 × 8–12 · controlled return · at least 3 reps in reserve",
+        "sets": 2,
+        "measurement": "weight_reps"
+      }
+    ]
+  },
+  "pullUpSteps": [
+    {
+      "id": 1,
+      "short": "Base",
+      "label": "Step 1 · Assisted base",
+      "title": "Assisted neutral-grip pull-up",
+      "prescription": "3 × 5 · choose assistance that leaves about 2 reps in reserve",
+      "sets": 3,
+      "measurement": "assisted_reps",
+      "target": "Complete all 3 × 5 with smooth, full-range reps.",
+      "next": "After 2 successful sessions, keep the same assistance and move to Step 2."
+    },
+    {
+      "id": 2,
+      "short": "Build reps",
+      "label": "Step 2 · Build assisted reps",
+      "title": "Assisted neutral-grip pull-up",
+      "prescription": "3 × 6–8 · keep at least 1 rep in reserve",
+      "sets": 3,
+      "measurement": "assisted_reps",
+      "target": "Build to 3 × 8 without shortening the range or kicking.",
+      "next": "After 2 successful 3 × 8 sessions, move to Step 3."
+    },
+    {
+      "id": 3,
+      "short": "Less help",
+      "label": "Step 3 · Reduce assistance",
+      "title": "Lightly assisted neutral-grip pull-up",
+      "prescription": "3 × 5–8 · reduce assistance by the smallest available step",
+      "sets": 3,
+      "measurement": "assisted_reps",
+      "target": "Rebuild from 3 × 5 toward 3 × 8 each time assistance is reduced.",
+      "next": "After 2 successful 3 × 8 sessions with low assistance, move to Step 4 only when a clean unassisted single is available with at least 1 rep in reserve. The lowest machine setting does not guarantee readiness; otherwise stay assisted."
+    },
+    {
+      "id": 4,
+      "short": "Singles",
+      "label": "Step 4 · Clean singles",
+      "title": "Pull-up singles + assisted back-off sets",
+      "prescription": "1–3 unassisted singles, then 2 × 5–8 assisted back-off reps · at least 1 RIR throughout · rest 2–3 min · log 0 assistance for unassisted reps; remove unused single rows",
+      "sets": 5,
+      "measurement": "assisted_reps",
+      "target": "Complete 3 clean unassisted singles and both assisted back-off sets with at least 1 RIR and stable technique. An all-out single is 0 RIR; stay assisted if that is your only available rep.",
+      "next": "After 2 qualified sessions, move to Step 5 and use assistance for doubles until unassisted doubles meet the reserve target."
+    },
+    {
+      "id": 5,
+      "short": "Doubles",
+      "label": "Step 5 · Repeatable doubles",
+      "title": "Pull-up doubles · assisted as needed",
+      "prescription": "4 × 2 · use enough assistance to keep at least 1 RIR · gradually reduce assistance; log 0 only for unassisted sets",
+      "sets": 4,
+      "measurement": "assisted_reps",
+      "target": "Complete all 4 × 2 unassisted with at least 1 RIR and the same controlled range and tempo. Assisted doubles build capacity but do not qualify for advancement.",
+      "next": "After 2 qualified unassisted sessions, move to Step 6. Keep using assistance until every double meets the target."
+    },
+    {
+      "id": 6,
+      "short": "5 reps",
+      "label": "Step 6 · Build to five",
+      "title": "Unassisted pull-up",
+      "prescription": "3 sets · aim for 3–5 clean reps · stop with at least 1 rep in reserve",
+      "sets": 3,
+      "measurement": "reps",
+      "target": "Build the first set to five continuous, clean repetitions.",
+      "next": "Five clean reps completes the 0 → 5 roadmap. Stay here and add total reps gradually."
+    }
+  ],
+  "longRuns": [
+    "4.5 km",
+    "4.8 km",
+    "5.2 km",
+    "4.5 km cutback",
+    "5.6 km",
+    "6.0 km",
+    "6.5 km",
+    "5.2 km cutback",
+    "7.0 km",
+    "7.6 km",
+    "8.2 km",
+    "6.5 km cutback",
+    "8.8 km",
+    "9.4 km",
+    "10.0 km",
+    "8.0 km cutback",
+    "10.0 km repeat",
+    "6–7 km recovery"
+  ],
+  "strengthProgression": {
+    "effort": "Finish compound working sets with 2–3 RIR and isolation working sets with 1–3 RIR. Stop earlier or reduce load when sets reach 0–1 RIR instead of the compound target; do not chase failure. Power, mobility, cardio, and pull-up work follow their own prescriptions. End jumps and swings before speed or landing quality deteriorates.",
+    "load": "When every planned working set reaches the top of its rep range at the target RIR with stable technique and symptoms in two sessions, add the smallest available load and restart near the lower end of the range.",
+    "volume": "Full weekly targets are about 12–13 fractional chest sets, 12 direct lat/mid-back sets plus rear-delt work, and 3 direct dynamic rectus-abdominis sets. Do not add volume while establishing consistent effort and recovery. For newly added work, perform 2 sets on the first two exposures before using the full prescription."
+  },
+  "optionalRecovery": "Keep optional Zone 2 cycling, Saturday swimming, and Saturday accessory add-ons off by default until weekly average sleep is at least 7 hours and joints, legs, and usual energy have returned to baseline the following morning for two stable weeks. Then add only one optional item at a time. Monday HIIT remains planned, at least 6 hours after lifting. Record sleep, run RPE, and following-morning response; missing entries do not establish recovery. If performance repeatedly falls or recovery remains worse than usual, take an easier week: reduce strength working sets by roughly one-third to one-half, keep runs easy, pause progression, and temporarily ease or skip HIIT if needed. These are practical adjustment rules, not fixed medical thresholds.",
+  "runQuality": {
+    "base": "Tempo—10 min easy, 3 × 6 min at RPE 6–7 with 2 min easy, then 5–10 min easy; Intervals—10 min easy, 6 × 2 min at RPE 8 with 2 min easy, then 8–10 min easy",
+    "progression": "Complete each workout twice with stable form, joints, and following-morning recovery before adding work. Then progress tempo 3 × 6 → 3 × 7 → 3 × 8 min and intervals 6 × 2 → 5 × 3 → 4 × 4 min. Change duration rather than deliberately increasing pace, and use an easy Thursday when accumulated fatigue is above normal."
+  }
+}

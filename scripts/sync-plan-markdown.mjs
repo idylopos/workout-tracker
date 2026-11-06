@@ -108,7 +108,7 @@ The lookup searches every earlier completed workout and local draft, so skipped 
 ## Mobility placement and limits
 
 Monday's lunge twists are a brief dynamic rehearsal before the squat and jump sequence, not extra working sets. Wednesday
-Mobility A is performed last (after optional cycling) as one easy round of movement practice. The five-exercise sequence
+Mobility A is performed last (after optional Zone 2 cardio) as one easy round of movement practice. The five-exercise sequence
 itself has not been shown to be uniquely superior: cat–cow, frog rock-backs, lateral lunges, and seated good mornings
 practice comfortable motion, while bridge leg lifts primarily train trunk–pelvic stability.
 
@@ -127,7 +127,7 @@ Evidence: [acute stretching review](https://pubmed.ncbi.nlm.nih.gov/26642915/),
 - **Sunday:** complete rest.
 - **Running:** Tuesday is fixed; Thursday is the second run; Saturday is the long run.
 - **Cycling:** Monday bicycle HIIT is a later session, separated from lifting by at least 6 hours. Wednesday Zone 2
-  cycling is optional and only for a well-recovered day.
+  cardio is optional and only for a well-recovered day. Choose cycling or one of its logged alternatives.
 - **Swimming:** Saturday technique-focused swimming is optional, at easy effort, after the recovery gate is met and only with comfortable shoulders and normal energy.
 - **Shoulder:** use comfortable paths. Do not force clicking, pinching, or the Friday raise if it remains uncomfortable.
 - **Knee:** track the response during training, later that day, and the following morning. Reduce load, range, or volume
@@ -149,7 +149,7 @@ Evidence: [acute stretching review](https://pubmed.ncbi.nlm.nih.gov/26642915/),
 - **Back:** 12 direct lat/mid-back sets from pull-ups, rows, and pullovers. Wednesday face pulls add 3 rear-delt and
   upper-back sets; Saturday face pulls remain optional rather than being required to reach the back target.
 - **Rectus abdominis:** 3 direct dynamic sets from cable crunches. Friday adds 2 low-fatigue core-stability sets of
-  supine heel slides, with Bird Dog or supine bracing as alternatives. These, Pallof presses, and suitcase carries
+  Bird Dog, with supine heel slides or supine bracing as alternatives. These, Pallof presses, and suitcase carries
   are not counted as equivalent rectus-hypertrophy sets.
 - Start each newly added chest or abdominal exercise with 2 sets for its first two exposures. Use the full prescription
   only when technique, performance, shoulder/knee response, and following-morning recovery remain stable.
@@ -167,8 +167,15 @@ stalls. The first progression should be more repetitions or load at the target R
 
 ### Friday core choices and back symptoms
 
-Use one core option after suitcase carries, before Mobility B. Heel slides avoid repeated pelvic curling and additional
-shoulder support after pressing; Bird Dog requires comfortable shoulders, while supine bracing is the simpler regression.
+After suitcase carries and before Mobility B, do Bird Dog for 2 × 5–6 per side with 3–5-second holds.
+If supporting your weight on your hands bothers your shoulders, select supine heel slides in Alternatives and do
+2 × 6–8 slow slides per side. Choose one movement for the two sets. Supine bracing is also available.
+Monday’s Copenhagen planks and Friday’s suitcase carries already challenge the trunk sideways. Tuesday’s cable
+crunches train the abdominals and Wednesday’s Pallof presses train control against rotation. Given that workload
+and the shoulder tolerance needed for side planks, leave the modified curl-up and side plank out of the weekly plan.
+A small [trial in people with chronic low-back pain](https://pubmed.ncbi.nlm.nih.gov/29706690/) found similar
+improvements with the Big 3 and conventional exercises.
+
 The prescriptions are conservative starting points, not a treatment plan or proof of reduced disc pressure.
 Stop if symptoms worsen or spread down the leg; persistent symptoms need individualized assessment.
 
@@ -181,7 +188,7 @@ References: [NHS heel slides with bracing](https://msk-bexley.nhs.uk/conditions/
 ${OPTIONAL_RECOVERY_RULE.copy}
 
 The sleep threshold is a readiness rule, not a guarantee. Sunday remains complete rest. When recovery is limited, skip
-Wednesday Zone 2 cycling and Saturday swimming, then Saturday face pulls and curls; the three-exercise Pull B base remains planned.
+Wednesday Zone 2 cardio and Saturday swimming, then Saturday face pulls and curls; the three-exercise Pull B base remains planned.
 Do not replace skipped work with hard extra cardio.
 
 ## Block 1 and Block 2

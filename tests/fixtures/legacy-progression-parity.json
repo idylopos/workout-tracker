@@ -1,0 +1,1369 @@
+[
+  {
+    "name": "explicit recovered matching target",
+    "today": "2026-09-20",
+    "exerciseID": "neutral-db-bench",
+    "log": {
+      "date": "2026-09-15",
+      "planId": "form-flow",
+      "response": {
+        "scaleVersion": 2,
+        "readiness": "yes"
+      },
+      "exercises": {
+        "neutral-db-bench": {
+          "measurement": "weight_reps",
+          "coachingPlan": {
+            "kind": "strength",
+            "sets": 3,
+            "minReps": 6,
+            "maxReps": 10,
+            "minRir": 2
+          },
+          "coaching": {
+            "technique": "yes"
+          },
+          "sets": [
+            {
+              "weight": 20,
+              "reps": 10,
+              "rir": 2,
+              "completed": true
+            },
+            {
+              "weight": 20,
+              "reps": 10,
+              "rir": 2,
+              "completed": true
+            },
+            {
+              "weight": 20,
+              "reps": 10,
+              "rir": 2,
+              "completed": true
+            }
+          ]
+        }
+      }
+    },
+    "expectedQualified": true
+  },
+  {
+    "name": "unknown technique",
+    "today": "2026-09-20",
+    "exerciseID": "neutral-db-bench",
+    "log": {
+      "date": "2026-09-15",
+      "planId": "form-flow",
+      "response": {
+        "scaleVersion": 2,
+        "readiness": "yes"
+      },
+      "exercises": {
+        "neutral-db-bench": {
+          "measurement": "weight_reps",
+          "coachingPlan": {
+            "kind": "strength",
+            "sets": 3,
+            "minReps": 6,
+            "maxReps": 10,
+            "minRir": 2
+          },
+          "coaching": {
+            "technique": "unknown"
+          },
+          "sets": [
+            {
+              "weight": 20,
+              "reps": 10,
+              "rir": 2,
+              "completed": true
+            },
+            {
+              "weight": 20,
+              "reps": 10,
+              "rir": 2,
+              "completed": true
+            },
+            {
+              "weight": 20,
+              "reps": 10,
+              "rir": 2,
+              "completed": true
+            }
+          ]
+        }
+      }
+    },
+    "expectedQualified": false
+  },
+  {
+    "name": "failed technique",
+    "today": "2026-09-20",
+    "exerciseID": "neutral-db-bench",
+    "log": {
+      "date": "2026-09-15",
+      "planId": "form-flow",
+      "response": {
+        "scaleVersion": 2,
+        "readiness": "yes"
+      },
+      "exercises": {
+        "neutral-db-bench": {
+          "measurement": "weight_reps",
+          "coachingPlan": {
+            "kind": "strength",
+            "sets": 3,
+            "minReps": 6,
+            "maxReps": 10,
+            "minRir": 2
+          },
+          "coaching": {
+            "technique": "no"
+          },
+          "sets": [
+            {
+              "weight": 20,
+              "reps": 10,
+              "rir": 2,
+              "completed": true
+            },
+            {
+              "weight": 20,
+              "reps": 10,
+              "rir": 2,
+              "completed": true
+            },
+            {
+              "weight": 20,
+              "reps": 10,
+              "rir": 2,
+              "completed": true
+            }
+          ]
+        }
+      }
+    },
+    "expectedQualified": false
+  },
+  {
+    "name": "missing effort",
+    "today": "2026-09-20",
+    "exerciseID": "neutral-db-bench",
+    "log": {
+      "date": "2026-09-15",
+      "planId": "form-flow",
+      "response": {
+        "scaleVersion": 2,
+        "readiness": "yes"
+      },
+      "exercises": {
+        "neutral-db-bench": {
+          "measurement": "weight_reps",
+          "coachingPlan": {
+            "kind": "strength",
+            "sets": 3,
+            "minReps": 6,
+            "maxReps": 10,
+            "minRir": 2
+          },
+          "coaching": {
+            "technique": "yes"
+          },
+          "sets": [
+            {
+              "weight": 20,
+              "reps": 10,
+              "completed": true
+            },
+            {
+              "weight": 20,
+              "reps": 10,
+              "completed": true
+            },
+            {
+              "weight": 20,
+              "reps": 10,
+              "completed": true
+            }
+          ]
+        }
+      }
+    },
+    "expectedQualified": false
+  },
+  {
+    "name": "summary reserve fills missing effort",
+    "today": "2026-09-20",
+    "exerciseID": "neutral-db-bench",
+    "log": {
+      "date": "2026-09-15",
+      "planId": "form-flow",
+      "response": {
+        "scaleVersion": 2,
+        "readiness": "yes"
+      },
+      "exercises": {
+        "neutral-db-bench": {
+          "measurement": "weight_reps",
+          "coachingPlan": {
+            "kind": "strength",
+            "sets": 3,
+            "minReps": 6,
+            "maxReps": 10,
+            "minRir": 2
+          },
+          "coaching": {
+            "technique": "yes",
+            "reserve": 2
+          },
+          "sets": [
+            {
+              "weight": 20,
+              "reps": 10,
+              "completed": true
+            },
+            {
+              "weight": 20,
+              "reps": 10,
+              "completed": true
+            },
+            {
+              "weight": 20,
+              "reps": 10,
+              "completed": true
+            }
+          ]
+        }
+      }
+    },
+    "expectedQualified": true
+  },
+  {
+    "name": "hardest effort overrides summary",
+    "today": "2026-09-20",
+    "exerciseID": "neutral-db-bench",
+    "log": {
+      "date": "2026-09-15",
+      "planId": "form-flow",
+      "response": {
+        "scaleVersion": 2,
+        "readiness": "yes"
+      },
+      "exercises": {
+        "neutral-db-bench": {
+          "measurement": "weight_reps",
+          "coachingPlan": {
+            "kind": "strength",
+            "sets": 3,
+            "minReps": 6,
+            "maxReps": 10,
+            "minRir": 2
+          },
+          "coaching": {
+            "technique": "yes",
+            "reserve": 4
+          },
+          "sets": [
+            {
+              "weight": 20,
+              "reps": 10,
+              "rir": 0,
+              "completed": true
+            },
+            {
+              "weight": 20,
+              "reps": 10,
+              "rir": 2,
+              "completed": true
+            },
+            {
+              "weight": 20,
+              "reps": 10,
+              "rir": 2,
+              "completed": true
+            }
+          ]
+        }
+      }
+    },
+    "expectedQualified": false
+  },
+  {
+    "name": "missing load",
+    "today": "2026-09-20",
+    "exerciseID": "neutral-db-bench",
+    "log": {
+      "date": "2026-09-15",
+      "planId": "form-flow",
+      "response": {
+        "scaleVersion": 2,
+        "readiness": "yes"
+      },
+      "exercises": {
+        "neutral-db-bench": {
+          "measurement": "weight_reps",
+          "coachingPlan": {
+            "kind": "strength",
+            "sets": 3,
+            "minReps": 6,
+            "maxReps": 10,
+            "minRir": 2
+          },
+          "coaching": {
+            "technique": "yes"
+          },
+          "sets": [
+            {
+              "weight": 20,
+              "reps": 10,
+              "rir": 2,
+              "completed": true
+            },
+            {
+              "reps": 10,
+              "rir": 2,
+              "completed": true
+            },
+            {
+              "weight": 20,
+              "reps": 10,
+              "rir": 2,
+              "completed": true
+            }
+          ]
+        }
+      }
+    },
+    "expectedQualified": false
+  },
+  {
+    "name": "incomplete set",
+    "today": "2026-09-20",
+    "exerciseID": "neutral-db-bench",
+    "log": {
+      "date": "2026-09-15",
+      "planId": "form-flow",
+      "response": {
+        "scaleVersion": 2,
+        "readiness": "yes"
+      },
+      "exercises": {
+        "neutral-db-bench": {
+          "measurement": "weight_reps",
+          "coachingPlan": {
+            "kind": "strength",
+            "sets": 3,
+            "minReps": 6,
+            "maxReps": 10,
+            "minRir": 2
+          },
+          "coaching": {
+            "technique": "yes"
+          },
+          "sets": [
+            {
+              "weight": 20,
+              "reps": 10,
+              "rir": 2,
+              "completed": true
+            },
+            {
+              "weight": 20,
+              "reps": 10,
+              "rir": 2,
+              "completed": true
+            },
+            {
+              "weight": 20,
+              "reps": 10,
+              "rir": 2,
+              "completed": false
+            }
+          ]
+        }
+      }
+    },
+    "expectedQualified": false
+  },
+  {
+    "name": "below target",
+    "today": "2026-09-20",
+    "exerciseID": "neutral-db-bench",
+    "log": {
+      "date": "2026-09-15",
+      "planId": "form-flow",
+      "response": {
+        "scaleVersion": 2,
+        "readiness": "yes"
+      },
+      "exercises": {
+        "neutral-db-bench": {
+          "measurement": "weight_reps",
+          "coachingPlan": {
+            "kind": "strength",
+            "sets": 3,
+            "minReps": 6,
+            "maxReps": 10,
+            "minRir": 2
+          },
+          "coaching": {
+            "technique": "yes"
+          },
+          "sets": [
+            {
+              "weight": 20,
+              "reps": 10,
+              "rir": 2,
+              "completed": true
+            },
+            {
+              "weight": 20,
+              "reps": 9,
+              "rir": 2,
+              "completed": true
+            },
+            {
+              "weight": 20,
+              "reps": 10,
+              "rir": 2,
+              "completed": true
+            }
+          ]
+        }
+      }
+    },
+    "expectedQualified": false
+  },
+  {
+    "name": "missing recovery",
+    "today": "2026-09-20",
+    "exerciseID": "neutral-db-bench",
+    "log": {
+      "date": "2026-09-15",
+      "planId": "form-flow",
+      "response": {
+        "scaleVersion": 2
+      },
+      "exercises": {
+        "neutral-db-bench": {
+          "measurement": "weight_reps",
+          "coachingPlan": {
+            "kind": "strength",
+            "sets": 3,
+            "minReps": 6,
+            "maxReps": 10,
+            "minRir": 2
+          },
+          "coaching": {
+            "technique": "yes"
+          },
+          "sets": [
+            {
+              "weight": 20,
+              "reps": 10,
+              "rir": 2,
+              "completed": true
+            },
+            {
+              "weight": 20,
+              "reps": 10,
+              "rir": 2,
+              "completed": true
+            },
+            {
+              "weight": 20,
+              "reps": 10,
+              "rir": 2,
+              "completed": true
+            }
+          ]
+        }
+      }
+    },
+    "expectedQualified": false
+  },
+  {
+    "name": "unknown recovery overrides zero rating",
+    "today": "2026-09-20",
+    "exerciseID": "neutral-db-bench",
+    "log": {
+      "date": "2026-09-15",
+      "planId": "form-flow",
+      "response": {
+        "scaleVersion": 2,
+        "readiness": "unknown",
+        "painNext": 0
+      },
+      "exercises": {
+        "neutral-db-bench": {
+          "measurement": "weight_reps",
+          "coachingPlan": {
+            "kind": "strength",
+            "sets": 3,
+            "minReps": 6,
+            "maxReps": 10,
+            "minRir": 2
+          },
+          "coaching": {
+            "technique": "yes"
+          },
+          "sets": [
+            {
+              "weight": 20,
+              "reps": 10,
+              "rir": 2,
+              "completed": true
+            },
+            {
+              "weight": 20,
+              "reps": 10,
+              "rir": 2,
+              "completed": true
+            },
+            {
+              "weight": 20,
+              "reps": 10,
+              "rir": 2,
+              "completed": true
+            }
+          ]
+        }
+      }
+    },
+    "expectedQualified": false
+  },
+  {
+    "name": "explicit nonrecovery",
+    "today": "2026-09-20",
+    "exerciseID": "neutral-db-bench",
+    "log": {
+      "date": "2026-09-15",
+      "planId": "form-flow",
+      "response": {
+        "scaleVersion": 2,
+        "readiness": "no"
+      },
+      "exercises": {
+        "neutral-db-bench": {
+          "measurement": "weight_reps",
+          "coachingPlan": {
+            "kind": "strength",
+            "sets": 3,
+            "minReps": 6,
+            "maxReps": 10,
+            "minRir": 2
+          },
+          "coaching": {
+            "technique": "yes"
+          },
+          "sets": [
+            {
+              "weight": 20,
+              "reps": 10,
+              "rir": 2,
+              "completed": true
+            },
+            {
+              "weight": 20,
+              "reps": 10,
+              "rir": 2,
+              "completed": true
+            },
+            {
+              "weight": 20,
+              "reps": 10,
+              "rir": 2,
+              "completed": true
+            }
+          ]
+        }
+      }
+    },
+    "expectedQualified": false
+  },
+  {
+    "name": "legacy low next rating establishes recovery",
+    "today": "2026-09-20",
+    "exerciseID": "neutral-db-bench",
+    "log": {
+      "date": "2026-09-15",
+      "planId": "form-flow",
+      "response": {
+        "scaleVersion": 1,
+        "painNext": 2
+      },
+      "exercises": {
+        "neutral-db-bench": {
+          "measurement": "weight_reps",
+          "coachingPlan": {
+            "kind": "strength",
+            "sets": 3,
+            "minReps": 6,
+            "maxReps": 10,
+            "minRir": 2
+          },
+          "coaching": {
+            "technique": "yes"
+          },
+          "sets": [
+            {
+              "weight": 20,
+              "reps": 10,
+              "rir": 2,
+              "completed": true
+            },
+            {
+              "weight": 20,
+              "reps": 10,
+              "rir": 2,
+              "completed": true
+            },
+            {
+              "weight": 20,
+              "reps": 10,
+              "rir": 2,
+              "completed": true
+            }
+          ]
+        }
+      }
+    },
+    "expectedQualified": true
+  },
+  {
+    "name": "during rating blocks",
+    "today": "2026-09-20",
+    "exerciseID": "neutral-db-bench",
+    "log": {
+      "date": "2026-09-15",
+      "planId": "form-flow",
+      "response": {
+        "scaleVersion": 2,
+        "readiness": "yes",
+        "painDuring": 2
+      },
+      "exercises": {
+        "neutral-db-bench": {
+          "measurement": "weight_reps",
+          "coachingPlan": {
+            "kind": "strength",
+            "sets": 3,
+            "minReps": 6,
+            "maxReps": 10,
+            "minRir": 2
+          },
+          "coaching": {
+            "technique": "yes"
+          },
+          "sets": [
+            {
+              "weight": 20,
+              "reps": 10,
+              "rir": 2,
+              "completed": true
+            },
+            {
+              "weight": 20,
+              "reps": 10,
+              "rir": 2,
+              "completed": true
+            },
+            {
+              "weight": 20,
+              "reps": 10,
+              "rir": 2,
+              "completed": true
+            }
+          ]
+        }
+      }
+    },
+    "expectedQualified": false
+  },
+  {
+    "name": "later rating blocks",
+    "today": "2026-09-20",
+    "exerciseID": "neutral-db-bench",
+    "log": {
+      "date": "2026-09-15",
+      "planId": "form-flow",
+      "response": {
+        "scaleVersion": 2,
+        "readiness": "yes",
+        "painLater": 2
+      },
+      "exercises": {
+        "neutral-db-bench": {
+          "measurement": "weight_reps",
+          "coachingPlan": {
+            "kind": "strength",
+            "sets": 3,
+            "minReps": 6,
+            "maxReps": 10,
+            "minRir": 2
+          },
+          "coaching": {
+            "technique": "yes"
+          },
+          "sets": [
+            {
+              "weight": 20,
+              "reps": 10,
+              "rir": 2,
+              "completed": true
+            },
+            {
+              "weight": 20,
+              "reps": 10,
+              "rir": 2,
+              "completed": true
+            },
+            {
+              "weight": 20,
+              "reps": 10,
+              "rir": 2,
+              "completed": true
+            }
+          ]
+        }
+      }
+    },
+    "expectedQualified": false
+  },
+  {
+    "name": "next rating overrides yes",
+    "today": "2026-09-20",
+    "exerciseID": "neutral-db-bench",
+    "log": {
+      "date": "2026-09-15",
+      "planId": "form-flow",
+      "response": {
+        "scaleVersion": 2,
+        "readiness": "yes",
+        "painNext": 2
+      },
+      "exercises": {
+        "neutral-db-bench": {
+          "measurement": "weight_reps",
+          "coachingPlan": {
+            "kind": "strength",
+            "sets": 3,
+            "minReps": 6,
+            "maxReps": 10,
+            "minRir": 2
+          },
+          "coaching": {
+            "technique": "yes"
+          },
+          "sets": [
+            {
+              "weight": 20,
+              "reps": 10,
+              "rir": 2,
+              "completed": true
+            },
+            {
+              "weight": 20,
+              "reps": 10,
+              "rir": 2,
+              "completed": true
+            },
+            {
+              "weight": 20,
+              "reps": 10,
+              "rir": 2,
+              "completed": true
+            }
+          ]
+        }
+      }
+    },
+    "expectedQualified": false
+  },
+  {
+    "name": "old scale limiting during pain",
+    "today": "2026-09-20",
+    "exerciseID": "neutral-db-bench",
+    "log": {
+      "date": "2026-09-15",
+      "planId": "form-flow",
+      "response": {
+        "scaleVersion": 1,
+        "readiness": "yes",
+        "painDuring": 4
+      },
+      "exercises": {
+        "neutral-db-bench": {
+          "measurement": "weight_reps",
+          "coachingPlan": {
+            "kind": "strength",
+            "sets": 3,
+            "minReps": 6,
+            "maxReps": 10,
+            "minRir": 2
+          },
+          "coaching": {
+            "technique": "yes"
+          },
+          "sets": [
+            {
+              "weight": 20,
+              "reps": 10,
+              "rir": 2,
+              "completed": true
+            },
+            {
+              "weight": 20,
+              "reps": 10,
+              "rir": 2,
+              "completed": true
+            },
+            {
+              "weight": 20,
+              "reps": 10,
+              "rir": 2,
+              "completed": true
+            }
+          ]
+        }
+      }
+    },
+    "expectedQualified": false
+  },
+  {
+    "name": "same day cannot qualify",
+    "today": "2026-09-20",
+    "exerciseID": "neutral-db-bench",
+    "log": {
+      "date": "2026-09-20",
+      "planId": "form-flow",
+      "response": {
+        "scaleVersion": 2,
+        "readiness": "yes"
+      },
+      "exercises": {
+        "neutral-db-bench": {
+          "measurement": "weight_reps",
+          "coachingPlan": {
+            "kind": "strength",
+            "sets": 3,
+            "minReps": 6,
+            "maxReps": 10,
+            "minRir": 2
+          },
+          "coaching": {
+            "technique": "yes"
+          },
+          "sets": [
+            {
+              "weight": 20,
+              "reps": 10,
+              "rir": 2,
+              "completed": true
+            },
+            {
+              "weight": 20,
+              "reps": 10,
+              "rir": 2,
+              "completed": true
+            },
+            {
+              "weight": 20,
+              "reps": 10,
+              "rir": 2,
+              "completed": true
+            }
+          ]
+        }
+      }
+    },
+    "expectedQualified": false
+  },
+  {
+    "name": "pull-up step 1 explicit target",
+    "today": "2026-09-20",
+    "exerciseID": "pull-up-progression",
+    "log": {
+      "date": "2026-09-15",
+      "planId": "form-flow",
+      "response": {
+        "scaleVersion": 2,
+        "readiness": "yes"
+      },
+      "exercises": {
+        "pull-up-progression": {
+          "measurement": "assisted_reps",
+          "progressionStep": 1,
+          "coachingPlan": {
+            "kind": "pullup",
+            "sets": 3,
+            "minReps": 5,
+            "maxReps": 5,
+            "minRir": 2
+          },
+          "coaching": {
+            "technique": "yes"
+          },
+          "sets": [
+            {
+              "reps": 5,
+              "assistance": 23,
+              "rir": 2,
+              "completed": true
+            },
+            {
+              "reps": 5,
+              "assistance": 23,
+              "rir": 2,
+              "completed": true
+            },
+            {
+              "reps": 5,
+              "assistance": 23,
+              "rir": 2,
+              "completed": true
+            }
+          ]
+        }
+      }
+    },
+    "expectedQualified": true
+  },
+  {
+    "name": "pull-up step 2 explicit target",
+    "today": "2026-09-20",
+    "exerciseID": "pull-up-progression",
+    "log": {
+      "date": "2026-09-15",
+      "planId": "form-flow",
+      "response": {
+        "scaleVersion": 2,
+        "readiness": "yes"
+      },
+      "exercises": {
+        "pull-up-progression": {
+          "measurement": "assisted_reps",
+          "progressionStep": 2,
+          "coachingPlan": {
+            "kind": "pullup",
+            "sets": 3,
+            "minReps": 6,
+            "maxReps": 8,
+            "minRir": 1
+          },
+          "coaching": {
+            "technique": "yes"
+          },
+          "sets": [
+            {
+              "reps": 8,
+              "assistance": 23,
+              "rir": 1,
+              "completed": true
+            },
+            {
+              "reps": 8,
+              "assistance": 23,
+              "rir": 1,
+              "completed": true
+            },
+            {
+              "reps": 8,
+              "assistance": 23,
+              "rir": 1,
+              "completed": true
+            }
+          ]
+        }
+      }
+    },
+    "expectedQualified": true
+  },
+  {
+    "name": "pull-up reps below top target",
+    "today": "2026-09-20",
+    "exerciseID": "pull-up-progression",
+    "log": {
+      "date": "2026-09-15",
+      "planId": "form-flow",
+      "response": {
+        "scaleVersion": 2,
+        "readiness": "yes"
+      },
+      "exercises": {
+        "pull-up-progression": {
+          "measurement": "assisted_reps",
+          "progressionStep": 2,
+          "coachingPlan": {
+            "kind": "pullup",
+            "sets": 3,
+            "minReps": 6,
+            "maxReps": 8,
+            "minRir": 1
+          },
+          "coaching": {
+            "technique": "yes"
+          },
+          "sets": [
+            {
+              "reps": 6,
+              "assistance": 23,
+              "rir": 1,
+              "completed": true
+            },
+            {
+              "reps": 6,
+              "assistance": 23,
+              "rir": 1,
+              "completed": true
+            },
+            {
+              "reps": 6,
+              "assistance": 23,
+              "rir": 1,
+              "completed": true
+            }
+          ]
+        }
+      }
+    },
+    "expectedQualified": false
+  },
+  {
+    "name": "pull-up step 3 explicit target",
+    "today": "2026-09-20",
+    "exerciseID": "pull-up-progression",
+    "log": {
+      "date": "2026-09-15",
+      "planId": "form-flow",
+      "response": {
+        "scaleVersion": 2,
+        "readiness": "yes"
+      },
+      "exercises": {
+        "pull-up-progression": {
+          "measurement": "assisted_reps",
+          "progressionStep": 3,
+          "coachingPlan": {
+            "kind": "pullup",
+            "sets": 3,
+            "minReps": 5,
+            "maxReps": 8,
+            "minRir": 1
+          },
+          "coaching": {
+            "technique": "yes"
+          },
+          "sets": [
+            {
+              "reps": 8,
+              "assistance": 23,
+              "rir": 1,
+              "completed": true
+            },
+            {
+              "reps": 8,
+              "assistance": 23,
+              "rir": 1,
+              "completed": true
+            },
+            {
+              "reps": 8,
+              "assistance": 23,
+              "rir": 1,
+              "completed": true
+            }
+          ]
+        }
+      }
+    },
+    "expectedQualified": true
+  },
+  {
+    "name": "pull-up step 4 explicit target",
+    "today": "2026-09-20",
+    "exerciseID": "pull-up-progression",
+    "log": {
+      "date": "2026-09-15",
+      "planId": "form-flow",
+      "response": {
+        "scaleVersion": 2,
+        "readiness": "yes"
+      },
+      "exercises": {
+        "pull-up-progression": {
+          "measurement": "assisted_reps",
+          "progressionStep": 4,
+          "coachingPlan": {
+            "kind": "pullup",
+            "sets": 5,
+            "minReps": 1,
+            "maxReps": 1,
+            "minRir": 1
+          },
+          "coaching": {
+            "technique": "yes"
+          },
+          "sets": [
+            {
+              "reps": 1,
+              "assistance": 0,
+              "rir": 1,
+              "completed": true
+            },
+            {
+              "reps": 1,
+              "assistance": 0,
+              "rir": 1,
+              "completed": true
+            },
+            {
+              "reps": 1,
+              "assistance": 0,
+              "rir": 1,
+              "completed": true
+            },
+            {
+              "reps": 5,
+              "assistance": 12,
+              "rir": 1,
+              "completed": true
+            },
+            {
+              "reps": 5,
+              "assistance": 12,
+              "rir": 1,
+              "completed": true
+            }
+          ]
+        }
+      }
+    },
+    "expectedQualified": true
+  },
+  {
+    "name": "assisted first single does not qualify",
+    "today": "2026-09-20",
+    "exerciseID": "pull-up-progression",
+    "log": {
+      "date": "2026-09-15",
+      "planId": "form-flow",
+      "response": {
+        "scaleVersion": 2,
+        "readiness": "yes"
+      },
+      "exercises": {
+        "pull-up-progression": {
+          "measurement": "assisted_reps",
+          "progressionStep": 4,
+          "coachingPlan": {
+            "kind": "pullup",
+            "sets": 5,
+            "minReps": 1,
+            "maxReps": 1,
+            "minRir": 1
+          },
+          "coaching": {
+            "technique": "yes"
+          },
+          "sets": [
+            {
+              "reps": 1,
+              "assistance": 5,
+              "rir": 1,
+              "completed": true
+            },
+            {
+              "reps": 1,
+              "assistance": 0,
+              "rir": 1,
+              "completed": true
+            },
+            {
+              "reps": 1,
+              "assistance": 0,
+              "rir": 1,
+              "completed": true
+            },
+            {
+              "reps": 5,
+              "assistance": 12,
+              "rir": 1,
+              "completed": true
+            },
+            {
+              "reps": 5,
+              "assistance": 12,
+              "rir": 1,
+              "completed": true
+            }
+          ]
+        }
+      }
+    },
+    "expectedQualified": false
+  },
+  {
+    "name": "pull-up step 5 explicit target",
+    "today": "2026-09-20",
+    "exerciseID": "pull-up-progression",
+    "log": {
+      "date": "2026-09-15",
+      "planId": "form-flow",
+      "response": {
+        "scaleVersion": 2,
+        "readiness": "yes"
+      },
+      "exercises": {
+        "pull-up-progression": {
+          "measurement": "assisted_reps",
+          "progressionStep": 5,
+          "coachingPlan": {
+            "kind": "pullup",
+            "sets": 4,
+            "minReps": 2,
+            "maxReps": 2,
+            "minRir": 1
+          },
+          "coaching": {
+            "technique": "yes"
+          },
+          "sets": [
+            {
+              "reps": 2,
+              "assistance": 0,
+              "rir": 1,
+              "completed": true
+            },
+            {
+              "reps": 2,
+              "assistance": 0,
+              "rir": 1,
+              "completed": true
+            },
+            {
+              "reps": 2,
+              "assistance": 0,
+              "rir": 1,
+              "completed": true
+            },
+            {
+              "reps": 2,
+              "assistance": 0,
+              "rir": 1,
+              "completed": true
+            }
+          ]
+        }
+      }
+    },
+    "expectedQualified": true
+  },
+  {
+    "name": "assisted doubles do not qualify",
+    "today": "2026-09-20",
+    "exerciseID": "pull-up-progression",
+    "log": {
+      "date": "2026-09-15",
+      "planId": "form-flow",
+      "response": {
+        "scaleVersion": 2,
+        "readiness": "yes"
+      },
+      "exercises": {
+        "pull-up-progression": {
+          "measurement": "assisted_reps",
+          "progressionStep": 5,
+          "coachingPlan": {
+            "kind": "pullup",
+            "sets": 4,
+            "minReps": 2,
+            "maxReps": 2,
+            "minRir": 1
+          },
+          "coaching": {
+            "technique": "yes"
+          },
+          "sets": [
+            {
+              "reps": 2,
+              "assistance": 5,
+              "rir": 1,
+              "completed": true
+            },
+            {
+              "reps": 2,
+              "assistance": 0,
+              "rir": 1,
+              "completed": true
+            },
+            {
+              "reps": 2,
+              "assistance": 0,
+              "rir": 1,
+              "completed": true
+            },
+            {
+              "reps": 2,
+              "assistance": 0,
+              "rir": 1,
+              "completed": true
+            }
+          ]
+        }
+      }
+    },
+    "expectedQualified": false
+  },
+  {
+    "name": "pull-up step 6 explicit target",
+    "today": "2026-09-20",
+    "exerciseID": "pull-up-progression",
+    "log": {
+      "date": "2026-09-15",
+      "planId": "form-flow",
+      "response": {
+        "scaleVersion": 2,
+        "readiness": "yes"
+      },
+      "exercises": {
+        "pull-up-progression": {
+          "measurement": "reps",
+          "progressionStep": 6,
+          "coachingPlan": {
+            "kind": "pullup",
+            "sets": 3,
+            "minReps": 3,
+            "maxReps": 5,
+            "minRir": 1
+          },
+          "coaching": {
+            "technique": "yes"
+          },
+          "sets": [
+            {
+              "reps": 5,
+              "assistance": 0,
+              "rir": 1,
+              "completed": true
+            },
+            {
+              "reps": 3,
+              "assistance": 0,
+              "rir": 1,
+              "completed": true
+            },
+            {
+              "reps": 3,
+              "assistance": 0,
+              "rir": 1,
+              "completed": true
+            }
+          ]
+        }
+      }
+    },
+    "expectedQualified": true
+  }
+]

@@ -13,6 +13,12 @@ const files = [
   "lib.js",
   "progression.js",
   "load-picker.js",
+  "weekly-review.js",
+  "review-contract.js",
+  "review-storage.js",
+  "review-client.js",
+  "review-ui.js",
+  "review-config.js",
   "crypto-vault.js",
   "unlock-session.js",
   "WORKOUT_PLAN.md",
@@ -22,6 +28,18 @@ const files = [
 await rm(destination, { recursive: true, force: true });
 await mkdir(destination, { recursive: true });
 await Promise.all(files.map((file) => cp(resolve(root, file), resolve(destination, file))));
+const endpoint = process.env.AI_REVIEW_ENDPOINT || "";
+if (endpoint) {
+  const url = new URL(endpoint);
+  const local = ["localhost", "127.0.0.1", "[::1]"].includes(url.hostname);
+  if ((url.protocol !== "https:" && !(local && url.protocol === "http:")) || url.username || url.password ||
+    url.search || url.hash || url.pathname !== "/api/weekly-review") {
+    throw new Error("AI_REVIEW_ENDPOINT must be an HTTPS /api/weekly-review URL without credentials, query, or fragment (HTTP localhost is allowed for development).");
+  }
+  const html = await readFile(resolve(destination, "index.html"), "utf8");
+  await writeFile(resolve(destination, "index.html"), html.replace("connect-src 'self'", `connect-src 'self' ${url.origin}`));
+}
+await writeFile(resolve(destination, "review-config.js"), `export const reviewConfig = Object.freeze(${JSON.stringify({ endpoint })});\n`);
 await cp(resolve(root, "assets"), resolve(destination, "assets"), { recursive: true });
 
 const plansSource = resolve(root, "plans");

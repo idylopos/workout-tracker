@@ -1,4 +1,6 @@
 import { loadReviewContext, mountLoadPicker } from "./load-picker.js";
+import { mountReviewUi } from "./review-ui.js";
+import { reviewConfig } from "./review-config.js";
 import {
   APP_VERSION,
   EXERCISE_ALTERNATIVES,
@@ -86,7 +88,7 @@ const RUNNING_PHASES = {
     copy: "Stay here until two 10 km runs are completed at RPE 4 or below with a Comfortable or Mild following-morning response.",
     points: [
       ["Tuesday", "30 min easy · RPE 2–4"],
-      ["Thursday", "25–35 min easy · lift first"],
+      ["Thursday", "Morning easy run 25–35 min · evening Legs B"],
       ["Saturday", "Follow the 18-stage long-run progression"],
     ],
   },
@@ -136,6 +138,7 @@ let coachingKey = null;
 let coachingIndex = 0;
 let coachingIds = [];
 let coachingBusy = false;
+let weeklyReviewUi = null;
 const savedThisVisit = new Set();
 const progressSelections = new Map();
 
@@ -525,6 +528,7 @@ function normalizePlan(raw, expectedId) {
   return {
     id,
     name: String(raw.name || id),
+    version: raw.version === undefined && raw.revision === undefined ? null : String(raw.version ?? raw.revision).slice(0, 80),
     description: String(raw.description || ""),
     days,
     longRuns: Array.isArray(raw.longRuns) ? raw.longRuns.map(String).slice(0, 52) : [],
@@ -1120,6 +1124,7 @@ function coachingPlanFor(card, exerciseLog) {
   }
   if (exerciseLog.measurement !== "weight_reps" || exercise.category !== "Strength" || id === "kettlebell-swing") return null;
   const variant = EXERCISE_ALTERNATIVES[id]?.find((entry) => entry.id === exerciseLog.variantId);
+  if (variant?.id === "seated-leg-curl") return null;
   const range = (variant?.prescription || exercise.prescription).match(/×\s*(\d+)\s*[–-]\s*(\d+)/);
   if (!range) return null;
   const compound = ["box-squat", "bulgarian-split-squat", "trap-bar-deadlift", "barbell-hip-thrust",
@@ -1311,7 +1316,7 @@ function activePrescription(exercise) {
   }
   if (exercise.id === "run-2") {
     return block === 1
-      ? "25–35 min easy · RPE 2–4 · lift first and separate by about 6 hours"
+      ? "25–35 min easy · RPE 2–4 · morning run · lift in the evening about 6 hours or more later"
       : `Alternate completed quality sessions: ${RUN_QUALITY_PROGRESSION.base}. ${RUN_QUALITY_PROGRESSION.progression}`;
   }
   if (exercise.id === "long-run") {
@@ -1377,6 +1382,7 @@ function renderToday() {
   renderWarmup(day, log);
   renderTrainingRules(day);
   renderExercises(day, log);
+  applyThursdaySelection();
   renderExtraActivities(day, log);
   loadResponseFields(log);
   updateSessionProgress();
@@ -1404,6 +1410,7 @@ function renderWarmup(day, log) {
   day.warmup.forEach((item, index) => {
     const label = document.createElement("label");
     label.className = "check-row";
+    if (/^(Light kettlebell (deadlift|swing)|Trap-bar ramp) ·/.test(item)) label.dataset.hingeWarmup = "";
     label.innerHTML = `
       <input type="checkbox" data-warmup-index="${index}" ${checked[index] ? "checked" : ""} />
       <span class="custom-check" aria-hidden="true">✓</span>
@@ -1413,6 +1420,27 @@ function renderWarmup(day, log) {
   });
   if (!day.warmup.length) {
     els.warmupList.innerHTML = `<p class="empty-copy">No warm-up today. Let recovery do its work.</p>`;
+  }
+  updateWarmupCount();
+}
+
+function applyThursdaySelection() {
+  if (activePlan.id !== BUILT_IN_PLAN.id || dateToDayKey(selectedDate) !== "thursday") return;
+  const trap = $('[data-exercise-id="trap-bar-deadlift"]', els.exerciseList);
+  const legCurl = trap?.dataset.variantId === "seated-leg-curl";
+  for (const row of $$("[data-hinge-warmup]", els.warmupList)) {
+    row.classList.toggle("is-hidden", legCurl);
+  }
+  const swing = $('[data-exercise-id="kettlebell-swing"]', els.exerciseList);
+  if (swing) {
+    const sets = collectSetRows(swing);
+    swing.classList.toggle("is-hidden", legCurl && !sets.some(hasSetContent));
+    $$(".set-row", swing).forEach((row, index) => {
+      row.classList.toggle("is-hidden", legCurl && !hasSetContent(sets[index]));
+    });
+    for (const controls of $$(".exercise-toolbar, .exercise-history-picker, .set-actions", swing)) {
+      controls.inert = legCurl;
+    }
   }
   updateWarmupCount();
 }
@@ -1431,7 +1459,9 @@ function renderExercises(day, log) {
     return;
   }
   exercisesForSavedWorkout(day.exercises, log, activePlan.id).forEach((exercise, index) => {
-    els.exerciseList.append(createExerciseCard(exercise, index, log?.exercises?.[exercise.id]));
+    const saved = log?.exercises?.[exercise.id];
+    const choice = log?.exerciseChoices?.[exercise.id];
+    els.exerciseList.append(createExerciseCard(exercise, index, saved || (choice ? { variantId: choice } : undefined)));
   });
 }
 
@@ -1863,6 +1893,7 @@ function setupExerciseAlternatives(card, exercise, savedExercise) {
       }
       applyExerciseVariant(card, exercise, variant, { resetSets: true });
       updatePreviousExerciseState(card, exercise);
+      if (exercise.id === "trap-bar-deadlift") applyThursdaySelection();
       picker.classList.add("is-hidden");
       toggle.setAttribute("aria-expanded", "false");
       markWorkoutDirty();
@@ -2379,8 +2410,12 @@ function hasSetContent(set) {
 function collectWorkoutRecord() {
   const dayKey = dateToDayKey(selectedDate);
   const exercises = {};
+  const exerciseChoices = {};
   $$(".exercise-card", els.exerciseList).forEach((card) => {
     const sets = collectSetRows(card);
+    if (card.dataset.variantId && card.dataset.variantId !== card.dataset.exerciseId) {
+      exerciseChoices[card.dataset.exerciseId] = card.dataset.variantId;
+    }
     if (sets.some(hasSetContent)) {
       const exerciseLog = {
         name: card.dataset.variantName || card.dataset.exerciseName,
@@ -2421,6 +2456,7 @@ function collectWorkoutRecord() {
     dayKey,
     planId: activePlan.id,
     warmup,
+    ...(Object.keys(exerciseChoices).length ? { exerciseChoices } : {}),
     exercises,
     extraActivities,
     response: {
@@ -2542,7 +2578,7 @@ function loadResponseFields(log) {
 }
 
 function updateWarmupCount() {
-  const inputs = $$("[data-warmup-index]", els.warmupList);
+  const inputs = $$(".check-row:not(.is-hidden) [data-warmup-index]", els.warmupList);
   const complete = inputs.filter((input) => input.checked).length;
   els.warmupCount.textContent = `${complete} / ${inputs.length}`;
   updateSessionProgress();
@@ -2550,7 +2586,7 @@ function updateWarmupCount() {
 
 function updateSessionProgress() {
   const checks = [
-    ...$$(".set-done input", els.exerciseList),
+    ...$$(".exercise-card:not(.is-hidden) .set-row:not(.is-hidden) .set-done input", els.exerciseList),
     ...$$(".set-done input", els.extraActivityList),
   ];
   const completed = checks.filter((check) => check.checked).length;
@@ -2792,6 +2828,7 @@ function renderLongRunRoadmap() {
 }
 
 function renderProgress() {
+  void weeklyReviewUi?.refresh();
   const select = $("#stats-exercise");
   const choices = progressExerciseOptions(
     getAllExercises(activePlan.days), activeWorkoutLogs(), progressSelections.get(activePlan.id),
@@ -3173,7 +3210,9 @@ async function importData(file) {
       "This will replace the records stored in this browser. Continue only if you have exported anything you want to keep.",
     );
     if (!approved) return;
+    weeklyReviewUi?.cancel();
     state = result.state;
+    state.aiReviewConsent = null;
     draftSession = null;
     await changePlan(state.settings.activePlanId || "form-flow", false, true);
     showToast("Backup restored.");
@@ -3245,6 +3284,7 @@ async function eraseLocalData() {
     "Permanently erase every workout, body measurement, sleep record, and preference stored by this app in this browser?",
   );
   if (!approved) return;
+  weeklyReviewUi?.cancel();
   localStorage.removeItem(VAULT_STORAGE_KEY);
   localStorage.removeItem(STORAGE_KEY);
   localStorage.setItem(UNLOCK_BLOCK_STORAGE_KEY, "1");
@@ -3258,6 +3298,7 @@ async function eraseLocalData() {
 
 async function lockApp() {
   if (storageMode !== "encrypted") return;
+  weeklyReviewUi?.cancel();
   await saveWorkoutDraftNow();
   await saveQueue;
   localStorage.setItem(UNLOCK_BLOCK_STORAGE_KEY, "1");
@@ -3362,7 +3403,7 @@ function timerFinished() {
     // Visual and vibration feedback remain available if audio is blocked.
   }
   navigator.vibrate?.([120, 80, 120]);
-  showToast("Rest complete. Next set.");
+  showToast("Rest complete · Ready for your next set", "timer-finished");
 }
 
 function bindEvents() {
@@ -3420,6 +3461,15 @@ function bindEvents() {
     await persistState();
     renderToday();
   }));
+  $$(".workout-steps a").forEach((link) => {
+    link.addEventListener("click", (event) => {
+      event.preventDefault();
+      const target = $(link.getAttribute("href"));
+      if (target.tagName === "DETAILS") target.open = true;
+      target.scrollIntoView({ block: "start" });
+      (target.tagName === "DETAILS" ? target.querySelector("summary") : target).focus({ preventScroll: true });
+    });
+  });
   els.warmupList.addEventListener("change", updateWarmupCount);
   els.loadSession.addEventListener("click", loadLastSession);
   $("#save-workout").addEventListener("click", saveWorkout);
@@ -3583,6 +3633,9 @@ function bindEvents() {
 
 async function init() {
   await initializeVault();
+  weeklyReviewUi = mountReviewUi({ host: $("#weekly-ai-review"), getState: () => state,
+    getPlan: () => activePlan, persist: persistState,
+    isUnlocked: () => storageMode !== "encrypted" || Boolean(vaultKey), config: reviewConfig });
   syncPrivacyUi();
   document.body.dataset.activeView = activeView;
   els.trainingDate.value = selectedDate;

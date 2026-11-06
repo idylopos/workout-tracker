@@ -410,7 +410,7 @@ test("preserves chest and back volumes while using low-fatigue Friday core work"
   assert.equal(wednesday[4].measurement, "weight_reps");
   assert.equal(friday.find((exercise) => exercise.id === "cable-scaption").sets, 3);
   assert.equal(friday.find((exercise) => exercise.id === "cable-chest-fly").sets, 2);
-  assert.equal(friday.find((exercise) => exercise.id === "supine-heel-slide").sets, 2);
+  assert.equal(friday.find((exercise) => exercise.id === "bird-dog").sets, 2);
   assert.equal(friday.some((exercise) => exercise.id === "reverse-crunch"), false);
   assert.equal(friday.find((exercise) => exercise.id === "suitcase-carry").sets, 2);
   assert.equal(friday.find((exercise) => exercise.id === "suitcase-carry").measurement, "weight_distance");
@@ -438,7 +438,7 @@ test("preserves chest and back volumes while using low-fatigue Friday core work"
   assert.equal(directBackSets, 12);
   assert.equal(
     tuesday.find((exercise) => exercise.id === "kneeling-cable-crunch").sets +
-      friday.find((exercise) => exercise.id === "supine-heel-slide").sets,
+      friday.find((exercise) => exercise.id === "bird-dog").sets,
     5,
   );
 });

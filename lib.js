@@ -1,3 +1,5 @@
+import { normalizeReviews, normalizeReviewProfile, normalizeReviewConsent, validateStoredReviews } from "./review-storage.js";
+
 export const APP_VERSION = 1;
 export const STORAGE_KEY = "formflow.training.v1";
 
@@ -7,12 +9,12 @@ export const EXTRA_ACTIVITY_MEASUREMENTS = ["duration", "duration_calories", "di
 export const STRENGTH_PROGRESSION = {
   effort: "Finish compound working sets with 2–3 RIR and isolation working sets with 1–3 RIR. Stop earlier or reduce load when sets reach 0–1 RIR instead of the compound target; do not chase failure. Power, mobility, cardio, and pull-up work follow their own prescriptions. End jumps and swings before speed or landing quality deteriorates.",
   load: "When every planned working set reaches the top of its rep range at the target RIR with stable technique and symptoms in two sessions, add the smallest available load and restart near the lower end of the range.",
-  volume: "Full weekly targets are about 12–13 fractional chest sets, 12 direct lat/mid-back sets plus rear-delt work, and 6 direct dynamic rectus-abdominis sets. Do not add volume while establishing consistent effort and recovery. For newly added work, perform 2 sets on the first two exposures before using the full prescription.",
+  volume: "Full weekly targets are about 12–13 fractional chest sets, 12 direct lat/mid-back sets plus rear-delt work, and 3 direct dynamic rectus-abdominis sets. Do not add volume while establishing consistent effort and recovery. For newly added work, perform 2 sets on the first two exposures before using the full prescription.",
 };
 
 export const OPTIONAL_RECOVERY_RULE = {
   sleepHours: 7,
-  copy: "Keep optional Zone 2 cycling, Saturday swimming, and Saturday accessory add-ons off by default until weekly average sleep is at least 7 hours and joints, legs, and usual energy have returned to baseline the following morning for two stable weeks. Then add only one optional item at a time. Monday HIIT remains planned, at least 6 hours after lifting. Record sleep, run RPE, and following-morning response; missing entries do not establish recovery. If performance repeatedly falls or recovery remains worse than usual, take an easier week: reduce strength working sets by roughly one-third to one-half, keep runs easy, pause progression, and temporarily ease or skip HIIT if needed. These are practical adjustment rules, not fixed medical thresholds.",
+  copy: "Keep optional Wednesday Zone 2 cardio, Saturday swimming, and Saturday accessory add-ons off by default until weekly average sleep is at least 7 hours and joints, legs, and usual energy have returned to baseline the following morning for two stable weeks. Then add only one optional item at a time. Monday HIIT remains planned, at least 6 hours after lifting. Record sleep, run RPE, and following-morning response; missing entries do not establish recovery. If performance repeatedly falls or recovery remains worse than usual, take an easier week: reduce strength working sets by roughly one-third to one-half, keep runs easy, pause progression, and temporarily ease or skip HIIT if needed. These are practical adjustment rules, not fixed medical thresholds.",
 };
 
 export const RUN_QUALITY_PROGRESSION = {
@@ -411,6 +413,22 @@ export const EXERCISE_GUIDANCE = {
     "Use a comfortable saddle height and begin with several easy minutes.",
     "Ride steadily at RPE 2–3, where full sentences remain easy.",
     "This is optional recovery volume; skip it when sleep, legs, running, or joints are not normal.",
+    "Choose one alternative: incline treadmill walking, StairMaster, or elliptical. Use the same easy effort and recovery gate.",
+  ),
+  "zone-2-incline-walk": guidance(
+    "Start at an easy walking speed and a gentle incline.",
+    "Adjust speed and incline to keep full sentences easy.",
+    "Lower the incline or stop if you cannot keep the effort easy.",
+  ),
+  "zone-2-stairmaster": guidance(
+    "Start at a low step rate.",
+    "Keep the pace easy enough to speak in full sentences.",
+    "Choose another option if the lowest pace is too demanding.",
+  ),
+  "zone-2-elliptical": guidance(
+    "Start with low resistance and a comfortable stride.",
+    "Keep the pace easy enough to speak in full sentences.",
+    "Reduce resistance if the effort creeps up.",
   ),
   "kettlebell-swing": guidance(
     "Place the bell slightly ahead, hinge to grip it, and hike it back between the thighs.",
@@ -420,7 +438,13 @@ export const EXERCISE_GUIDANCE = {
   "trap-bar-deadlift": guidance(
     "Stand centered in the bar, brace, and take the handles with the whole foot planted.",
     "Push the floor away and stand tall, then hinge and bend the knees to return the bar under control.",
-    "Keep the load close and spine steady; do not jerk from the floor or lean back at lockout.",
+    "Keep the load close and your spine steady. If stiffness builds during warm-up sets, reduce the load. Skip the lift if discomfort keeps increasing or spreads down a leg.",
+    "If your back still feels stiff, choose Seated leg curl in Alternatives for 2 × 8–12 easy, controlled reps. Skip kettlebell hinges, swings and trap-bar warm-up sets that evening. Keep hip thrusts only if comfortable.",
+  ),
+  "seated-leg-curl": guidance(
+    "Adjust the backrest so the machine pivot lines up with your knee. Secure the thigh pad and place the roller just above your heels.",
+    "Try a few easy reps. Keep your pelvis against the seat as you bend your knees, then return slowly. Use a comfortable range and leave at least 3 reps in reserve.",
+    "Skip this exercise if sitting or curling increases back symptoms or brings on leg pain or tingling. Check how you feel the next morning.",
   ),
   "barbell-hip-thrust": guidance(
     "Place the upper back on a bench, pad the bar, and set feet so the shins are near vertical at the top.",
@@ -468,12 +492,12 @@ export const EXERCISE_GUIDANCE = {
     "Lie on your back with knees bent, feet on the floor, and arms relaxed. Find a comfortable neutral lower-back position and gently brace.",
     "Exhale as you slowly slide one heel away along the floor, then return and alternate. Keep the pelvis still; log repetitions per side.",
     "Use a short range without arching or curling the back. Breathe normally and stop if back pain worsens, tingling appears, or pain spreads down the leg. Progress range only after symptom-stable sessions and following mornings.",
-    "Choose one alternative, not extra sets: Bird Dog, 2 × 5–6/side with 3–5-sec holds if shoulders tolerate hands-and-knees support; or supine abdominal bracing, 2 × 5 gentle 5–10-sec holds with normal breathing. No option is guaranteed suitable for a disc condition; seek individualized physiotherapy advice for ongoing symptoms.",
   ),
   "bird-dog": guidance(
     "Start on hands and knees, hands under shoulders and knees under hips. Keep a comfortable neutral spine.",
     "Gently brace and reach one arm and the opposite leg only as far as the trunk stays still. Hold 3–5 seconds, return, and alternate; log reps per side.",
-    "Do not arch or rotate the back. Use a leg-only reach if needed; choose supine bracing if shoulder support is uncomfortable. Stop for worsening back pain or spreading leg symptoms.",
+    "Do not arch or rotate the back. Use a leg-only reach if needed. Stop for worsening back pain or spreading leg symptoms.",
+    "If supporting your weight on your hands bothers your shoulders, choose supine heel slides in Alternatives. Do 2 × 6–8 per side in place of Bird Dog. Supine bracing is also available.",
   ),
   "supine-abdominal-bracing": guidance(
     "Lie on your back with knees bent and feet supported. Keep your back in a comfortable position.",
@@ -532,23 +556,39 @@ export const EXERCISE_GUIDANCE = {
   ),
 };
 
+const lift = (id, name, prescription, sets, rest = 90, measurement = "weight_reps", options = {}) => ({
+  id,
+  name,
+  prescription,
+  sets,
+  rest,
+  measurement,
+  category: "Strength",
+  ...options,
+});
+
+const birdDog = lift("bird-dog", "Bird Dog", "2 × 5–6 / side · 3–5-sec holds · log reps per side", 2, 60, "reps");
+const heelSlide = lift("supine-heel-slide", "Supine heel slide with abdominal bracing", "2 × 6–8 / side · slow, short-range slides · log reps per side", 2, 60, "reps");
+const supineBracing = lift("supine-abdominal-bracing", "Supine abdominal bracing", "2 × 5 holds · 5–10 sec each · breathe normally; log holds as reps", 2, 60, "reps");
+
 export const EXERCISE_ALTERNATIVES = {
-  "supine-heel-slide": [
-    {
-      id: "bird-dog",
-      name: "Bird Dog",
-      prescription: "2 × 5–6 / side · 3–5-sec holds · keep trunk still; shoulder support must be comfortable",
-      sets: 2,
-      measurement: "reps",
-    },
-    {
-      id: "supine-abdominal-bracing",
-      name: "Supine abdominal bracing",
-      prescription: "2 × 5 holds · 5–10 sec each · breathe normally; log holds as reps",
-      sets: 2,
-      measurement: "reps",
-    },
+  "zone-2-cycle": [
+    ["zone-2-incline-walk", "Incline treadmill walk"],
+    ["zone-2-stairmaster", "StairMaster"],
+    ["zone-2-elliptical", "Elliptical"],
+  ].map(([id, name]) => ({
+    id,
+    name: `Optional Zone 2 · ${name}`,
+    prescription: "25–40 min at RPE 2–3 · only after the optional-session recovery gate is met",
+    sets: 1,
+    measurement: "duration",
+  })),
+  "trap-bar-deadlift": [
+    { id: "seated-leg-curl", name: "Seated leg curl", prescription: "2 × 8–12 · controlled return · at least 3 reps in reserve", sets: 2, measurement: "weight_reps" },
   ],
+  "bird-dog": [heelSlide, supineBracing],
+  // Older workouts stored the selected variant under the heel-slide slot.
+  "supine-heel-slide": [birdDog, supineBracing],
   "assisted-nordic": [
     {
       id: "seated-or-lying-leg-curl",
@@ -687,17 +727,6 @@ export function countQualifiedLongRuns(workoutLogs, targetDistance = 10, exercis
   ).length;
 }
 
-const lift = (id, name, prescription, sets, rest = 90, measurement = "weight_reps", options = {}) => ({
-  id,
-  name,
-  prescription,
-  sets,
-  rest,
-  measurement,
-  category: "Strength",
-  ...options,
-});
-
 const activity = (id, name, prescription, measurement = "duration", options = {}) => ({
   id,
   name,
@@ -790,7 +819,7 @@ export const WEEK_PLAN = {
     kicker: "Pull-up skill · recovery",
     estimate: "60–80 min",
     tone: "orange",
-    sequenceNote: "Optional cycling stays off by default until the sleep and following-morning recovery gate is met. Complete Mobility A last and keep it easy—not a second leg workout.",
+    sequenceNote: "Optional Zone 2 cardio stays off by default until the sleep and following-morning recovery gate is met. Complete Mobility A last and keep it easy—not a second leg workout.",
     warmup: [
       "Easy bicycle · 3 min",
       "Serratus wall slide · 1 × 8",
@@ -842,22 +871,28 @@ export const WEEK_PLAN = {
   thursday: {
     label: "Thursday",
     short: "THU",
-    focus: "Legs B + Run 2",
+    focus: "Morning run + evening Legs B",
     kicker: "Posterior chain · run quality",
     estimate: "75–100 min total",
     tone: "pink",
-    sequenceNote: "Block 1: lift first. Block 2: quality run first; omit swings initially and use 2 hip-thrust sets while adapting. Separate sessions by about 6 hours. Keep Monday HIIT; do not progress Thursday running and lower-body lifting together. Use an easy Thursday when fatigue is above normal.",
+    sequenceNote: "Run in the morning and lift in the evening. Allow about 6 hours or more between sessions. Keep the Block 1 run easy. In Block 2, alternate tempo and intervals, omit swings initially and use 2 hip-thrust sets while adapting. Keep Monday HIIT. Progress only one of Thursday running and lower-body lifting at a time. Run easy when fatigue is above normal.",
     warmup: [
-      "Easy bicycle · 3–5 min",
+      "Evening lifting warm-up · easy bicycle for 3–5 min. If your back is stiff, use Seated leg curl under Trap-bar deadlift → Alternatives. Skip the kettlebell drills, working swings and trap-bar ramp. Warm up with a few light leg curls instead.",
       "Ankle rocks · 8/side",
       "Bodyweight hip hinge · 8",
       "Bodyweight box squat · 8",
       "Low step-down · 5/side",
       "Light kettlebell deadlift · 5",
-      "Light kettlebell swing · 2 × 5",
+      "Light kettlebell swing · 2 × 5 only when swings are planned and the hinge feels comfortable",
       "Trap-bar ramp · 40% × 6, 60% × 4, 75% × 2, optional 85% × 1",
     ],
     exercises: [
+      activity(
+        "run-2",
+        "Run 2",
+        `Block 1: 25–35 min easy at RPE 2–4 · Block 2 alternates completed quality sessions: ${RUN_QUALITY_PROGRESSION.base}`,
+        "distance_time",
+      ),
       lift("kettlebell-swing", "Kettlebell swing", "Block 1: 2–3 × 8–12 · Block 2: omit initially; optional only after recovery is stable", 3, 90),
       lift("trap-bar-deadlift", "Trap-bar deadlift", "3 × 4–6", 3, 180),
       lift("barbell-hip-thrust", "Barbell hip thrust", "Block 1: 3 × 8–12 · Block 2: 2 × 8–12 while adapting to quality running", 3, 150),
@@ -865,12 +900,6 @@ export const WEEK_PLAN = {
       lift("hip-abduction", "Machine or cable hip abduction", "2 × 12–20", 2, 75),
       lift("seated-calf-raise", "Seated calf raise", "2 × 10–15", 2, 75),
       lift("tibialis-raise", "Tibialis raise", "2 × 12–20", 2, 60),
-      activity(
-        "run-2",
-        "Run 2",
-        `Block 1: 25–35 min easy at RPE 2–4 · Block 2 alternates completed quality sessions: ${RUN_QUALITY_PROGRESSION.base}`,
-        "distance_time",
-      ),
       activity("pelvic-floor", "Pelvic-floor routine", "5 breaths; 8 × 5-sec holds; 8 quick contractions", "duration", {
         category: "Recovery",
       }),
@@ -913,7 +942,7 @@ export const WEEK_PLAN = {
         60,
         "weight_distance",
       ),
-      lift("supine-heel-slide", "Supine heel slide with abdominal bracing", "2 × 6–8 / side · slow, short-range slides · keep trunk still; log reps per side", 2, 60, "reps"),
+      birdDog,
       lift("mobility-b-chest", "Mobility B · Doorway chest stretch", "2 rounds · 45 sec / side", 2, 0, "completion", {
         category: "Mobility",
       }),
@@ -1022,6 +1051,9 @@ export function createDefaultState() {
     sleepLogs: [],
     dailySleepLogs: [],
     dailyCheckIns: {},
+    aiReviews: [],
+    aiReviewProfile: normalizeReviewProfile(),
+    aiReviewConsent: null,
   };
 }
 
@@ -1111,6 +1143,9 @@ export function normalizeState(value) {
       : [],
     bodyLogs: Array.isArray(value.bodyLogs) ? value.bodyLogs : [],
     sleepLogs: Array.isArray(value.sleepLogs) ? value.sleepLogs : [],
+    aiReviews: normalizeReviews(value.aiReviews),
+    aiReviewProfile: normalizeReviewProfile(value.aiReviewProfile),
+    aiReviewConsent: normalizeReviewConsent(value.aiReviewConsent),
     dailySleepLogs: Array.isArray(value.dailySleepLogs) ? value.dailySleepLogs : [],
     dailyCheckIns:
       value.dailyCheckIns && typeof value.dailyCheckIns === "object" && !Array.isArray(value.dailyCheckIns)
@@ -1151,6 +1186,7 @@ export function bodyMeasurementPoints(entries, field) {
 
 export function validateBackup(value) {
   if (!value || typeof value !== "object") return { valid: false, reason: "The file does not contain a JSON object." };
+  if (!validateStoredReviews(value.aiReviews)) return { valid: false, reason: "AI review records are malformed." };
   if (Number(value.version) !== APP_VERSION) {
     return { valid: false, reason: `Unsupported backup version. Expected version ${APP_VERSION}.` };
   }
@@ -1485,20 +1521,19 @@ export function findExerciseHistory(
     recordsByPlanAndDate.set(`${log.planId || "form-flow"}::${log.date}`, log);
   });
 
+  // The same performed movement can be saved under either Friday core slot.
+  const slotIds = [exerciseId];
+  if (planId === "form-flow" && variantId && [birdDog.id, heelSlide.id].includes(exerciseId)) {
+    slotIds.push(exerciseId === birdDog.id ? heelSlide.id : birdDog.id);
+  }
   return [...recordsByPlanAndDate.values()]
-    .filter(
-      (log) => {
-        const exercise = log.exercises?.[exerciseId];
-        return (
-          (log.planId || "form-flow") === planId &&
-          log.date < beforeDate &&
-          exercise?.sets?.length &&
-          (!variantId || (exercise.variantId || exerciseId) === variantId)
-        );
-      },
-    )
+    .filter(log => (log.planId || "form-flow") === planId && log.date < beforeDate)
     .sort((a, b) => b.date.localeCompare(a.date))
-    .map((log) => ({ ...log.exercises[exerciseId], date: log.date }));
+    .flatMap(log => slotIds.flatMap(id => {
+      const exercise = log.exercises?.[id];
+      if (!exercise?.sets?.length || (variantId && (exercise.variantId || id) !== variantId)) return [];
+      return [{ ...exercise, date: log.date }];
+    }));
 }
 
 export function findPreviousExerciseLog(...args) {
@@ -1654,13 +1689,18 @@ function hasExerciseResults(exercise) {
 }
 
 export function progressExerciseOptions(exercises, workoutLogs, preferredId) {
-  const choices = exercises.map((exercise) => {
-    const dates = Object.values(workoutLogs)
-      .filter((log) => hasExerciseResults(log.exercises?.[exercise.id]))
-      .map((log) => log.date)
-      .sort();
-    return { ...exercise, sessions: dates.length, latestDate: dates.at(-1) || "" };
-  });
+  const byId = new Map(exercises.map(exercise => [exercise.id, { ...exercise, sessions: 0, latestDate: "" }]));
+  for (const log of Object.values(workoutLogs)) {
+    for (const [slotId, entry] of Object.entries(log.exercises || {})) {
+      if (!hasExerciseResults(entry)) continue;
+      const id = entry.variantId || slotId;
+      const option = byId.get(id) || { id, name: entry.variantName || entry.name || id, sessions: 0, latestDate: "" };
+      option.sessions++;
+      if (log.date > option.latestDate) option.latestDate = log.date;
+      byId.set(id, option);
+    }
+  }
+  const choices = [...byId.values()];
   const logged = choices.filter((exercise) => exercise.sessions)
     .sort((a, b) => b.latestDate.localeCompare(a.latestDate) || a.name.localeCompare(b.name));
   const unlogged = choices.filter((exercise) => !exercise.sessions)
@@ -1673,17 +1713,14 @@ export function progressExerciseOptions(exercises, workoutLogs, preferredId) {
 
 export function summarizeExercise(workoutLogs, exerciseId) {
   const allEntries = Object.values(workoutLogs)
-    .filter((log) => hasExerciseResults(log.exercises?.[exerciseId]))
-    .sort((a, b) => a.date.localeCompare(b.date))
-    .map((log) => {
-      const exercise = log.exercises[exerciseId];
-      const metric = bestSetMetric(exercise.measurement, exercise.sets);
-      return {
+    .flatMap(log => Object.entries(log.exercises || {})
+      .filter(([slotId, entry]) => hasExerciseResults(entry) && (entry.variantId || slotId) === exerciseId)
+      .map(([, entry]) => ({
         date: log.date,
-        measurement: exercise.measurement,
-        ...metric,
-      };
-    });
+        measurement: entry.measurement,
+        ...bestSetMetric(entry.measurement, entry.sets),
+      })))
+    .sort((a, b) => a.date.localeCompare(b.date));
   if (!allEntries.length) {
     return { sessions: 0, latest: "—", best: "—", volume: "—", metric: null, points: [] };
   }
@@ -1736,15 +1773,18 @@ export function formatPace(secondsPerKm) {
 
 // Keep the original core exercise editable when revisiting a pre-change Friday.
 export function exercisesForSavedWorkout(exercises, log, planId = "form-flow") {
-  const legacy = log?.exercises?.["reverse-crunch"];
-  if (planId !== "form-flow" || !legacy) return exercises;
+  const saved = log?.exercises;
+  if (planId !== "form-flow" || (!saved?.["reverse-crunch"] && !saved?.[heelSlide.id])) return exercises;
   return exercises.flatMap(exercise => {
-    if (exercise.id !== "supine-heel-slide") return [exercise];
-    const original = {
-      id: "reverse-crunch", name: legacy.name || "Reverse crunch",
-      prescription: "Previously logged exercise · retained from this workout",
-      sets: legacy.sets?.length || 3, rest: 75, measurement: legacy.measurement || "reps", category: "Strength",
-    };
-    return log.exercises[exercise.id] ? [original, exercise] : [original];
+    if (exercise.id !== birdDog.id) return [exercise];
+    const core = [];
+    const crunch = saved["reverse-crunch"];
+    if (crunch) {
+      core.push(lift("reverse-crunch", crunch.name || "Reverse crunch",
+        "Previously logged exercise · retained from this workout", crunch.sets?.length || 3, 75, crunch.measurement || "reps"));
+    }
+    if (saved[heelSlide.id]) core.push(heelSlide);
+    if (saved[birdDog.id]) core.push(exercise);
+    return core;
   });
 }

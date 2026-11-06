@@ -4670,6 +4670,44 @@ body[data-active-view="today"] .timer {
   outline-offset: -3px;
 }
 
+/* Keep guidance available without competing with workout controls. */
+.workout-steps {
+  display: flex;
+  gap: 8px;
+  margin: 16px 0;
+}
+.workout-steps a {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: var(--ink);
+  background: var(--card);
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+}
+.workout-steps a:hover { background: var(--paper); }
+#training-step, #warmup-step, #review-step { scroll-margin-top: 90px; }
+.context-help > summary, .roadmap-summary {
+  min-height: 44px;
+  padding: 12px 0;
+  color: var(--ink-soft);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.context-help-content { display: grid; gap: 12px; padding: 0 0 12px; }
+.context-help-content p { margin: 0; line-height: 1.5; }
+.roadmap-summary { padding: 14px 16px; }
+.context-help > summary:focus-visible, .roadmap-summary:focus-visible,
+.workout-steps a:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+
 /* Next-session loads keep the workout record beside the decision. */
 .load-picker { display: grid; gap: 12px; margin-top: 18px; }
 .load-picker .load-record { margin: 0; font-weight: 650; }
@@ -4686,3 +4724,50 @@ body[data-active-view="today"] .timer {
 .load-history-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 8px 0; }
 .load-history-row > span { font-size: 13px; margin-right: 4px; }
 .load-history-row .button { min-height: 44px; padding: 8px 12px; }
+
+/* Optional weekly review follows the existing Progress panels. */
+.ai-review-panel { margin-bottom: 24px; }
+.ai-review-panel [hidden] { display: none !important; }
+.ai-review-panel .panel-head p { margin: 6px 0 0; }
+#ai-review-content { border-top: 1px solid var(--line, #d9ded5); padding-top: 20px; }
+.ai-review-controls { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.ai-review-panel label { display: grid; gap: 8px; margin: 12px 0; font-size: 14px; font-weight: 600; }
+.ai-review-panel select, .ai-review-panel textarea, .ai-review-panel input[type="password"] { width: 100%; max-width: 100%; box-sizing: border-box; padding: 12px; border: 1px solid var(--line, #d9ded5); border-radius: 10px; background: var(--paper, #fff); color: inherit; font: inherit; }
+.ai-review-panel p, .ai-review-panel li { line-height: 1.7; overflow-wrap: anywhere; }
+.ai-review-panel details { margin: 16px 0; }
+.ai-review-panel summary { cursor: pointer; padding: 8px 0; font-weight: 600; }
+.ai-review-panel .ai-review-consent { display: flex; align-items: flex-start; gap: 10px; }
+.ai-review-consent input { margin-top: 5px; flex-shrink: 0; }
+.ai-review-actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 20px 0 12px; }
+.ai-review-notice { background: #edf1e5; padding: 12px 16px; border-radius: 10px; }
+#ai-review-status { min-height: 24px; }
+#ai-review-status[data-error="true"] { color: #9b3630; }
+.ai-review-report { margin-top: 20px; padding-top: 8px; border-top: 1px solid var(--line, #d9ded5); }
+.ai-review-report h3 { margin-top: 28px; }
+.ai-review-report h4 { margin: 0 0 12px; }
+.ai-review-recommendation { padding: 16px; margin: 12px 0; border: 1px solid var(--line, #d9ded5); border-radius: 12px; }
+.ai-review-evidence { font-size: 13px; color: var(--muted, #586358); }
+.ai-review-evidence pre { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 12px; max-height: 240px; overflow: auto; }
+.ai-review-footnote { font-size: 12px; color: var(--muted, #586358); }
+#ai-review-history-list { display: grid; gap: 10px; justify-items: start; }
+.ai-review-report code { overflow-wrap: anywhere; }
+@media (max-width: 680px) {
+  .ai-review-controls { grid-template-columns: 1fr; gap: 0; }
+  .ai-review-panel .panel-head { align-items: flex-start; gap: 12px; }
+  .ai-review-panel .panel-head > button { flex-shrink: 0; }
+  .ai-review-actions > button { flex: 1 1 180px; }
+}
+
+.toast[data-tone="timer-finished"] {
+  background: var(--lime);
+  color: var(--ink);
+  border: 2px solid var(--ink);
+  box-shadow: 0 0 0 4px var(--lime), var(--shadow);
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.timer.is-finished .timer-display strong,
+.timer.is-finished .timer-play {
+  color: var(--ink);
+}

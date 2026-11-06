@@ -42,3 +42,16 @@ test("Progress recognizes completed mobility and bodyweight reps without inventi
   } } };
   assert.deepEqual(progressExerciseOptions(exercises, recorded).logged.map((exercise) => exercise.id), ["nordic", "row"]);
 });
+
+test("a leg curl logged instead of a deadlift has its own exercise history", () => {
+  const deadlift = { id: "trap-bar-deadlift", name: "Trap-bar deadlift" };
+  const workout = { date: "2026-11-05", exercises: { [deadlift.id]: {
+    variantId: "seated-leg-curl", variantName: "Seated leg curl",
+    measurement: "weight_reps", sets: [{ weight: 15, reps: 10 }],
+  } } };
+  const logs = { thursday: workout };
+  const options = progressExerciseOptions([deadlift], logs);
+  assert.deepEqual(options.logged.map(option => option.name), ["Seated leg curl"]);
+  assert.equal(summarizeExercise(logs, deadlift.id).sessions, 0);
+  assert.equal(summarizeExercise(logs, "seated-leg-curl").sessions, 1);
+});

@@ -1,7 +1,8 @@
 # Form / Flow workout tracker
 
 A private, mobile-first workout and health log built around the included evidence-based weekly program. It is a static
-site: no account, server, database, or paid service is required.
+site: no account, server, database, or paid service is required for workout logging. Optional Weekly AI Review can use
+a separately configured backend and OpenAI API; its default mock mode requires neither.
 
 ## Add another weekly plan
 
@@ -67,8 +68,8 @@ Every built-in exercise includes a collapsible **Quick form guide** covering set
 and a substitute when appropriate. Folder-based plans can provide the same guidance in `plan.json`.
 Exercises with a substitute advertise **alternative available** in the guide header. Assisted Nordic hamstrings also
 show an **Alternatives** button for logging machine curls, slider/stability-ball curls, or bridge walkouts without
-replacing the planned exercise or rewriting earlier logs. Friday now uses supine heel slides with abdominal bracing
-in place of reverse crunches, with Bird Dog and supine bracing available through the same Alternatives picker.
+replacing the planned exercise or rewriting earlier logs. Friday uses Bird Dog by default. When hands-and-knees support bothers
+your shoulders, choose supine heel slides in **Alternatives**. Supine abdominal bracing is also available.
 
 Pull-up sessions include a six-step performance roadmap with separate same-day technique and following-morning
 recovery checks. The Week view groups the 16 long-run stages into four phases, retains each workout’s assigned stage,
@@ -129,14 +130,33 @@ storage without deleting them.
 Use **Data → Download backup** regularly. Importing a valid Form / Flow JSON backup replaces the records currently stored
 in that browser.
 
-The app contains no analytics, advertising, accounts, external fonts, or third-party scripts. Its Content Security Policy
-allows only same-site plan files and blocks third-party connections. GitHub receives the public app and public plan files,
-but it does not receive anything visitors enter into the app.
+The app contains no analytics, advertising, external fonts, or third-party scripts. By default its Content Security Policy
+allows only same-site connections. Configuring Weekly AI Review adds exactly the configured backend origin. With explicit
+opt-in and a manual real-review request, selected completed records, notes, goals/constraints, recorded health measurements,
+computed comparisons, and previous recommendation decisions go to that backend and OpenAI. Drafts, vault passphrases,
+encryption keys, and unrelated preferences are excluded. Mock mode sends nothing. Reviews and decisions use the same local
+storage/encrypted vault and portable JSON backup as workout records. The backend keeps no permanent workout database;
+successful responses may remain in process memory for up to ten minutes to avoid duplicate API spend. OpenAI's API data
+retention policies apply. GitHub serves public app/plan files, not the optional review endpoint.
 
 Exported JSON backups are intentionally portable and are not passphrase-encrypted, so treat them as private health data.
 Backup filenames and the local source plan are excluded by
 `.gitignore` to help prevent accidental publication. Use **Data → Erase local data** before giving someone access to a
 shared browser profile or device.
+
+## Weekly AI Review
+
+Open **Progress → AI Review**. The default period is the last completed Monday–Sunday week in **Asia/Singapore**;
+choose **이번 주 · 진행 중** for the partial current week. Reviews are in Korean, and compare the selected plan's completed
+records with the preceding four weeks. Missing entries stay unknown and unsaved drafts are excluded.
+
+The default **모의 응답 · 전송 없음** mode is a clearly labelled, local demonstration, not live AI advice. Saved reviews can be
+reopened without another request. Changed inputs show a stale notice; **명시적으로 다시 분석** explicitly regenerates a review.
+For each recommendation choose **적용함 / 아직 / 건너뜀**; this records a decision without changing workout targets or
+progression rules. Later reviews carry those decisions forward. Goals and user-reported constraints can be edited in the panel.
+
+See [WEEKLY_AI_REVIEW.md](WEEKLY_AI_REVIEW.md) for exact backend, API key, authentication, endpoint, CSP, and deployment setup.
+No secret belongs in the static app, GitHub Pages variables, or chat. This implementation does not deploy the service.
 
 ## Checks
 
