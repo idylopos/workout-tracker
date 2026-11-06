@@ -1,3 +1,6 @@
+import { loadReviewContext, mountLoadPicker } from "./load-picker.js";
+import { mountReviewUi } from "./review-ui.js";
+import { reviewConfig } from "./review-config.js";
 import {
   APP_VERSION,
   EXERCISE_ALTERNATIVES,
@@ -135,6 +138,7 @@ let coachingKey = null;
 let coachingIndex = 0;
 let coachingIds = [];
 let coachingBusy = false;
+let weeklyReviewUi = null;
 const savedThisVisit = new Set();
 const progressSelections = new Map();
 
@@ -524,6 +528,7 @@ function normalizePlan(raw, expectedId) {
   return {
     id,
     name: String(raw.name || id),
+    version: raw.version === undefined && raw.revision === undefined ? null : String(raw.version ?? raw.revision).slice(0, 80),
     description: String(raw.description || ""),
     days,
     longRuns: Array.isArray(raw.longRuns) ? raw.longRuns.map(String).slice(0, 52) : [],
@@ -1234,7 +1239,8 @@ function renderCoachingAdvice() {
   const needsLoad = (["increase", "reduce"].includes(advice.action) || advice.nextStep === 3) && exercise.coachingPlan.kind !== "run";
   const field = exercise.coachingPlan.kind === "pullup" ? "assistance" : "weight";
   $("#coaching-content").innerHTML = `<h3>${escapeHtml(advice.title)}</h3><p>${escapeHtml(advice.detail)}</p>${needsLoad ?
-    `<label class="wide-label"><span>Next ${field === "assistance" ? "assistance" : "load"} (kg)</span><input id="coach-load" type="number" min="0" step="any" inputmode="decimal" /><small>Choose a value available on your equipment. Nothing changes until you accept.</small></label>` : ""}`;
+    `<div id="coach-load-picker"></div>` : ""}`;
+  if (needsLoad) mountLoadPicker($("#coach-load-picker"), loadReviewContext(log, id, state.workoutLogs, advice));
   if (advice.action !== "pending") coachingButton("Use this next time", async () => {
     const target = nextSessionTarget(log, id, advice, $("#coach-load")?.value ?? "");
     if (!target) { $("#coaching-status").textContent = `Enter ${field === "assistance" ? advice.nextStep === 3 ? "less assistance" : "more assistance" : advice.action === "increase" ? "a higher load" : "a lower load"} than the logged working sets.`; return; }
@@ -2822,6 +2828,7 @@ function renderLongRunRoadmap() {
 }
 
 function renderProgress() {
+  void weeklyReviewUi?.refresh();
   const select = $("#stats-exercise");
   const choices = progressExerciseOptions(
     getAllExercises(activePlan.days), activeWorkoutLogs(), progressSelections.get(activePlan.id),
@@ -3203,7 +3210,9 @@ async function importData(file) {
       "This will replace the records stored in this browser. Continue only if you have exported anything you want to keep.",
     );
     if (!approved) return;
+    weeklyReviewUi?.cancel();
     state = result.state;
+    state.aiReviewConsent = null;
     draftSession = null;
     await changePlan(state.settings.activePlanId || "form-flow", false, true);
     showToast("Backup restored.");
@@ -3275,6 +3284,7 @@ async function eraseLocalData() {
     "Permanently erase every workout, body measurement, sleep record, and preference stored by this app in this browser?",
   );
   if (!approved) return;
+  weeklyReviewUi?.cancel();
   localStorage.removeItem(VAULT_STORAGE_KEY);
   localStorage.removeItem(STORAGE_KEY);
   localStorage.setItem(UNLOCK_BLOCK_STORAGE_KEY, "1");
@@ -3288,6 +3298,7 @@ async function eraseLocalData() {
 
 async function lockApp() {
   if (storageMode !== "encrypted") return;
+  weeklyReviewUi?.cancel();
   await saveWorkoutDraftNow();
   await saveQueue;
   localStorage.setItem(UNLOCK_BLOCK_STORAGE_KEY, "1");
@@ -3622,6 +3633,9 @@ function bindEvents() {
 
 async function init() {
   await initializeVault();
+  weeklyReviewUi = mountReviewUi({ host: $("#weekly-ai-review"), getState: () => state,
+    getPlan: () => activePlan, persist: persistState,
+    isUnlocked: () => storageMode !== "encrypted" || Boolean(vaultKey), config: reviewConfig });
   syncPrivacyUi();
   document.body.dataset.activeView = activeView;
   els.trainingDate.value = selectedDate;

@@ -1,0 +1,64 @@
+name: Native apps
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: native-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: macos-26
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check source and web behavior
+        run: |
+          npm run lint
+          npm test
+      - name: Test shared training logic
+        run: swift test --package-path packages/FormFlowCore
+      - name: Select an installed iPhone Simulator
+        run: |
+          xcrun simctl list devices available -j > "$RUNNER_TEMP/formflow-devices.json"
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          inventory = json.loads((Path(os.environ['RUNNER_TEMP']) / 'formflow-devices.json').read_text())
+          choices = [device for runtime, devices in inventory['devices'].items()
+                     if 'iOS-' in runtime and int(runtime.split('iOS-')[1].split('-')[0]) >= 26
+                     for device in devices if device['name'].startswith('iPhone') and device['isAvailable']]
+          if not choices:
+              raise SystemExit('Install an iOS 26 or newer iPhone Simulator runtime.')
+          with open(os.environ['GITHUB_ENV'], 'a') as output:
+              output.write(f"FORMFLOW_SIMULATOR_ID={choices[0]['udid']}\n")
+          PY
+      - name: Test iPhone persistence and user workflows
+        run: |
+          xcodebuild -project native/FormFlow.xcodeproj -scheme FormFlowiOS \
+            -destination "platform=iOS Simulator,id=$FORMFLOW_SIMULATOR_ID" \
+            -derivedDataPath "$RUNNER_TEMP/formflow-build" \
+            -resultBundlePath "$RUNNER_TEMP/formflow-tests.xcresult" \
+            CODE_SIGNING_ALLOWED=NO test
+      - name: Build Watch app
+        run: |
+          xcodebuild -project native/FormFlow.xcodeproj -scheme FormFlowWatch \
+            -destination 'generic/platform=watchOS Simulator' \
+            -derivedDataPath "$RUNNER_TEMP/formflow-build" CODE_SIGNING_ALLOWED=NO build
+      - name: Preserve test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-test-results
+          path: ${{ runner.temp }}/formflow-tests.xcresult
+          if-no-files-found: ignore

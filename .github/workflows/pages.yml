@@ -29,8 +29,12 @@ jobs:
         with:
           node-version: 22
       - name: Run checks
-        run: npm test
+        run: |
+          npm run lint
+          npm test
       - name: Build static site
+        env:
+          AI_REVIEW_ENDPOINT: ${{ vars.AI_REVIEW_ENDPOINT }}
         run: npm run build
       - name: Configure Pages
         uses: actions/configure-pages@v5

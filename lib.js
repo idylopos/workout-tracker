@@ -1,3 +1,5 @@
+import { normalizeReviews, normalizeReviewProfile, normalizeReviewConsent, validateStoredReviews } from "./review-storage.js";
+
 export const APP_VERSION = 1;
 export const STORAGE_KEY = "formflow.training.v1";
 
@@ -1049,6 +1051,9 @@ export function createDefaultState() {
     sleepLogs: [],
     dailySleepLogs: [],
     dailyCheckIns: {},
+    aiReviews: [],
+    aiReviewProfile: normalizeReviewProfile(),
+    aiReviewConsent: null,
   };
 }
 
@@ -1138,6 +1143,9 @@ export function normalizeState(value) {
       : [],
     bodyLogs: Array.isArray(value.bodyLogs) ? value.bodyLogs : [],
     sleepLogs: Array.isArray(value.sleepLogs) ? value.sleepLogs : [],
+    aiReviews: normalizeReviews(value.aiReviews),
+    aiReviewProfile: normalizeReviewProfile(value.aiReviewProfile),
+    aiReviewConsent: normalizeReviewConsent(value.aiReviewConsent),
     dailySleepLogs: Array.isArray(value.dailySleepLogs) ? value.dailySleepLogs : [],
     dailyCheckIns:
       value.dailyCheckIns && typeof value.dailyCheckIns === "object" && !Array.isArray(value.dailyCheckIns)
@@ -1178,6 +1186,7 @@ export function bodyMeasurementPoints(entries, field) {
 
 export function validateBackup(value) {
   if (!value || typeof value !== "object") return { valid: false, reason: "The file does not contain a JSON object." };
+  if (!validateStoredReviews(value.aiReviews)) return { valid: false, reason: "AI review records are malformed." };
   if (Number(value.version) !== APP_VERSION) {
     return { valid: false, reason: `Unsupported backup version. Expected version ${APP_VERSION}.` };
   }

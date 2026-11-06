@@ -292,6 +292,8 @@
             </div>
           </div>
 
+          <article class="panel ai-review-panel" id="weekly-ai-review" aria-label="Weekly AI Review"></article>
+
           <article class="panel progress-overview-panel">
             <div class="panel-head">
               <div>
@@ -453,7 +455,7 @@
               <div>
                 <p class="eyebrow">EXPORT</p>
                 <h2>Take a complete copy.</h2>
-                <p>Downloads workouts, current workout drafts, reusable activities, body measurements, sleep, and settings in one JSON file.</p>
+                <p>Downloads workouts, drafts, reusable activities, body measurements, sleep, AI reviews and decisions, and settings in one JSON file.</p>
               </div>
               <button class="button button-dark" type="button" id="export-data">Download backup</button>
             </article>
@@ -488,8 +490,11 @@
             <div>
               <strong>Private by design</strong>
               <p>
-                This app has no analytics, accounts, or database. It only loads public plan files from this site. Workout
-                records and drafts stay in this browser and are never uploaded. Passphrase protection is optional; when
+                This app has no analytics or cloud record database. Records and drafts stay in this browser. Optional
+                AI Review sends selected completed records, notes, health measurements, goals, and prior decisions to
+                your configured backend and OpenAI only when you opt in and request a real review. Mock mode sends nothing.
+                API usage may consume credits. The backend does not store a permanent workout history; OpenAI API data
+                retention policies apply. Passphrases and encryption keys never leave this browser. Passphrase protection is optional; when
                 enabled, records are encrypted before browser storage and the temporary unlock stores a non-exportable
                 key, never the passphrase. Export a backup regularly and erase the app before handing off a shared device.
               </p>
