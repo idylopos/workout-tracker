@@ -121,6 +121,60 @@ export function measurementFields(measurement) {
   return [...(MEASUREMENT_TYPES[measurement]?.fields || []), ...optionalCardioFields(measurement)];
 }
 
+const setMeasurementKeys = [...new Set([
+  ...Object.values(MEASUREMENT_TYPES).flatMap(({ fields }) => fields.map(({ key }) => key)),
+  ...CARDIO_METRIC_FIELDS.map(({ key }) => key),
+])];
+
+export function hasSetContent(set) {
+  return set?.completed === true || setMeasurementKeys.some((key) => {
+    const value = set?.[key];
+    return (typeof value === "number" || (typeof value === "string" && value.trim() !== "")) &&
+      Number.isFinite(Number(value));
+  });
+}
+
+export function workoutRecordKind(log) {
+  if (!log) return "empty";
+  const activities = [...Object.values(log.exercises || {}), ...(log.extraActivities || [])];
+  if ((Array.isArray(log.warmup) && log.warmup.includes(true)) ||
+    activities.some((entry) => entry?.sets?.some(hasSetContent))) return "workout";
+  const response = log.response || {};
+  if ((typeof response.notes === "string" && response.notes.trim()) ||
+    ["yes", "no", "unknown"].includes(response.readiness) ||
+    ["painDuring", "painLater", "painNext"].some((key) => normalizeResponseRating(response[key], response.scaleVersion) !== "")) return "note";
+  return "empty";
+}
+
+export function changeSetMeasurement(currentSets, fromMeasurement, toMeasurement) {
+  const targetFields = new Map(measurementFields(toMeasurement).map((field) => [field.key, field]));
+  const sourceFields = measurementFields(fromMeasurement);
+  const sourceHasWeight = sourceFields.some((field) => field.key === "weight");
+  const removedFields = new Set();
+  const sets = currentSets.map((current) => {
+    const set = { completed: current.completed };
+    const weight = measurementValue(sourceHasWeight ? current.weight : current.retainedWeight);
+    if (weight !== null) set[targetFields.has("weight") ? "weight" : "retainedWeight"] = weight;
+    for (const field of sourceFields) {
+      if (field.key === "weight") continue;
+      const value = current[field.key];
+      if (value === "" || value == null) continue;
+      const target = targetFields.get(field.key);
+      if (!target) {
+        removedFields.add(field.label);
+      } else if (field.key === "distance" && field.unit !== target.unit) {
+        // Carries are recorded in metres and cardio distances in kilometres.
+        const distance = field.unit === "m" ? value / 1000 : value * 1000;
+        set.distance = Number(distance.toPrecision(15));
+      } else {
+        set[field.key] = value;
+      }
+    }
+    return set;
+  });
+  return { sets, removedFields: [...removedFields] };
+}
+
 export function summarizeCardioSet(set) {
   const recorded = (key) => set[key] !== "" && set[key] !== null && set[key] !== undefined && Number.isFinite(Number(set[key]));
   const parts = [];
@@ -1154,28 +1208,30 @@ export function normalizeState(value) {
   };
 }
 
-function missingBodyMeasurement(value) {
+function missingMeasurement(value) {
   return value === undefined || value === null || (typeof value === "string" && value.trim() === "");
 }
 
-export function bodyMeasurementValue(value) {
-  if (missingBodyMeasurement(value) || !["number", "string"].includes(typeof value)) return null;
+function measurementValue(value) {
+  if (missingMeasurement(value) || !["number", "string"].includes(typeof value)) return null;
   const number = Number(value);
   return Number.isFinite(number) && number >= 0 ? number : null;
 }
 
+export { measurementValue as bodyMeasurementValue };
+
 export function mergeBodyMeasurement(existing, entry) {
-  const provided = ["weight", "waist"].filter((field) => !missingBodyMeasurement(entry[field]));
-  if (!provided.length || provided.some((field) => bodyMeasurementValue(entry[field]) === null)) return null;
+  const provided = ["weight", "waist"].filter((field) => !missingMeasurement(entry[field]));
+  if (!provided.length || provided.some((field) => measurementValue(entry[field]) === null)) return null;
   const merged = existing?.date === entry.date ? { ...existing } : { date: entry.date };
-  provided.forEach((field) => { merged[field] = bodyMeasurementValue(entry[field]); });
+  provided.forEach((field) => { merged[field] = measurementValue(entry[field]); });
   return merged;
 }
 
 export function bodyMeasurementPoints(entries, field) {
   const sorted = [...entries].sort((a, b) => a.date.localeCompare(b.date));
   return sorted.flatMap((entry, index) => {
-    const value = bodyMeasurementValue(entry[field]);
+    const value = measurementValue(entry[field]);
     return value === null ? [] : [{
       date: entry.date,
       value,
@@ -1223,8 +1279,8 @@ export function validateBackup(value) {
   const validNumber = (number) => Number.isFinite(Number(number)) && Number(number) >= 0;
   const bodyValid = value.bodyLogs.every(
     (entry) => entry && validDate(entry.date) &&
-      ["weight", "waist"].every((field) => missingBodyMeasurement(entry[field]) || bodyMeasurementValue(entry[field]) !== null) &&
-      ["weight", "waist"].some((field) => bodyMeasurementValue(entry[field]) !== null),
+      ["weight", "waist"].every((field) => missingMeasurement(entry[field]) || measurementValue(entry[field]) !== null) &&
+      ["weight", "waist"].some((field) => measurementValue(entry[field]) !== null),
   );
   const sleepValid = value.sleepLogs.every(
     (entry) => entry && validDate(entry.week) && validNumber(entry.hours) && Number(entry.hours) <= 24,
@@ -1305,7 +1361,7 @@ export function findOutstandingRecoveryLogs(workoutLogs, today = toIsoDate(), lo
       const hasFollowingMorning =
         ["yes", "no"].includes(response.readiness) ||
         (response.readiness !== "unknown" && response.painNext !== undefined && response.painNext !== null && response.painNext !== "");
-      return !hasFollowingMorning && Object.keys(log.exercises || {}).length > 0;
+      return !hasFollowingMorning && workoutRecordKind(log) === "workout";
     })
     .sort(([, a], [, b]) => b.date.localeCompare(a.date))
     .map(([key, log]) => ({ key, date: log.date, dayKey: log.dayKey || dateToDayKey(log.date) }));
@@ -1376,7 +1432,7 @@ export function summarizeProgressOverview(workoutLogs = {}, dailySleepLogs = [],
   const currentEnd = toIsoDate(addDays(todayDate, 1));
   const previousStart = toIsoDate(addDays(todayDate, -55));
   const recentSleepStart = toIsoDate(addDays(todayDate, -6));
-  const logs = Object.values(workoutLogs || {}).filter((log) => log?.date);
+  const logs = Object.values(workoutLogs || {}).filter((log) => log?.date && workoutRecordKind(log) === "workout");
   const sessionsInRange = (start, end) =>
     new Set(logs.filter((log) => log.date >= start && log.date < end).map((log) => log.date)).size;
   const currentLogs = logs
@@ -1507,6 +1563,19 @@ export function progressDisclosureOpen({ open, hasData, previousHasData, scopeCh
   return scopeChanged || (hasData && previousHasData === false) ? hasData : open;
 }
 
+export function matchingSessionExercises(log, exerciseId, variantId) {
+  // The same performed movement can be saved under either Friday core slot.
+  const slotIds = [exerciseId];
+  if ((log.planId || "form-flow") === "form-flow" && variantId && [birdDog.id, heelSlide.id].includes(exerciseId)) {
+    slotIds.push(exerciseId === birdDog.id ? heelSlide.id : birdDog.id);
+  }
+  return slotIds.flatMap(id => {
+    const exercise = log.exercises?.[id];
+    if (!exercise?.sets?.some(hasSetContent) || (variantId && (exercise.variantId || id) !== variantId)) return [];
+    return [exercise];
+  });
+}
+
 export function findExerciseHistory(
   workoutLogs,
   exerciseId,
@@ -1521,19 +1590,10 @@ export function findExerciseHistory(
     recordsByPlanAndDate.set(`${log.planId || "form-flow"}::${log.date}`, log);
   });
 
-  // The same performed movement can be saved under either Friday core slot.
-  const slotIds = [exerciseId];
-  if (planId === "form-flow" && variantId && [birdDog.id, heelSlide.id].includes(exerciseId)) {
-    slotIds.push(exerciseId === birdDog.id ? heelSlide.id : birdDog.id);
-  }
   return [...recordsByPlanAndDate.values()]
     .filter(log => (log.planId || "form-flow") === planId && log.date < beforeDate)
     .sort((a, b) => b.date.localeCompare(a.date))
-    .flatMap(log => slotIds.flatMap(id => {
-      const exercise = log.exercises?.[id];
-      if (!exercise?.sets?.length || (variantId && (exercise.variantId || id) !== variantId)) return [];
-      return [{ ...exercise, date: log.date }];
-    }));
+    .flatMap(log => matchingSessionExercises(log, exerciseId, variantId).map(exercise => ({ ...exercise, date: log.date })));
 }
 
 export function findPreviousExerciseLog(...args) {
@@ -1542,7 +1602,8 @@ export function findPreviousExerciseLog(...args) {
 
 export function findPreviousSession(workoutLogs, dayKey, beforeDate, planId = "form-flow") {
   return Object.values(workoutLogs)
-    .filter((log) => (log.planId || "form-flow") === planId && log.dayKey === dayKey && log.date < beforeDate)
+    .filter((log) => (log.planId || "form-flow") === planId && log.dayKey === dayKey && log.date < beforeDate &&
+      workoutRecordKind(log) === "workout")
     .sort((a, b) => b.date.localeCompare(a.date))[0] || null;
 }
 
@@ -1619,38 +1680,40 @@ export function summarizeCardioRange(workoutLogs, startDate, endDate, cardioExer
   return totals;
 }
 
+function bestLoadedSetMetric(measurement, sets) {
+  const isCarry = measurement === "weight_distance";
+  const quantityField = isCarry ? "distance" : "reps";
+  let best = null;
+  let volume = 0;
+  let largestUnweighedQuantity = 0;
+  for (const set of sets) {
+    const quantity = measurementValue(set[quantityField]);
+    if (quantity === null || quantity === 0) continue;
+    const weight = measurementValue(set.weight);
+    if (weight === null) {
+      largestUnweighedQuantity = Math.max(largestUnweighedQuantity, quantity);
+      continue;
+    }
+    const work = weight * quantity;
+    const value = isCarry ? work : weight * (1 + quantity / 30);
+    volume += work;
+    if (!best || value > best.value) {
+      best = { value, label: `${weight} kg × ${quantity}${isCarry ? " m" : ""}` };
+    }
+  }
+  if (best) return { ...best, volume };
+  const unit = isCarry ? "m" : largestUnweighedQuantity === 1 ? "rep" : "reps";
+  const label = largestUnweighedQuantity ? `${largestUnweighedQuantity} ${unit} · weight unrecorded` : "—";
+  return { value: null, label, volume: null };
+}
+
 function bestSetMetric(measurement, sets = []) {
   if (!sets.length) return { value: 0, label: "—", volume: 0 };
   if (measurement === "completion") {
     const completed = sets.filter((set) => set.completed).length;
     return { value: completed, label: `${completed} / ${sets.length} rounds`, volume: completed };
   }
-  if (measurement === "weight_reps") {
-    const evaluated = sets.map((set) => {
-      const weight = numeric(set.weight);
-      const reps = numeric(set.reps);
-      return {
-        value: weight * (1 + reps / 30),
-        label: `${weight || 0} kg × ${reps || 0}`,
-        volume: weight * reps,
-      };
-    });
-    const best = [...evaluated].sort((a, b) => b.value - a.value)[0];
-    return { ...best, volume: evaluated.reduce((sum, set) => sum + set.volume, 0) };
-  }
-  if (measurement === "weight_distance") {
-    const evaluated = sets.map((set) => {
-      const weight = numeric(set.weight);
-      const distance = numeric(set.distance);
-      return {
-        value: weight * distance,
-        label: `${weight || 0} kg × ${distance || 0} m`,
-        volume: weight * distance,
-      };
-    });
-    const best = [...evaluated].sort((a, b) => b.value - a.value)[0];
-    return { ...best, volume: evaluated.reduce((sum, set) => sum + set.volume, 0) };
-  }
+  if (measurement === "weight_reps" || measurement === "weight_distance") return bestLoadedSetMetric(measurement, sets);
   if (measurement === "assisted_reps") {
     const best = sets.map((set) => numeric(set.reps)).sort((a, b) => b - a)[0];
     const total = sets.reduce((sum, set) => sum + numeric(set.reps), 0);
@@ -1726,15 +1789,16 @@ export function summarizeExercise(workoutLogs, exerciseId) {
   }
   const latestMeasurement = allEntries.at(-1).measurement;
   const entries = allEntries.filter((entry) => entry.measurement === latestMeasurement);
-  const best = [...entries].sort((a, b) => b.value - a.value)[0];
-  const totalVolume = entries.reduce((sum, entry) => sum + entry.volume, 0);
+  const measuredEntries = entries.filter((entry) => entry.value !== null);
+  const best = [...measuredEntries].sort((a, b) => b.value - a.value)[0];
+  const totalVolume = measuredEntries.reduce((sum, entry) => sum + entry.volume, 0);
   return {
     sessions: allEntries.length,
     latest: entries.at(-1).label,
-    best: best.label,
-    volume: Number.isInteger(totalVolume) ? totalVolume.toLocaleString() : totalVolume.toFixed(1),
+    best: best?.label || "—",
+    volume: !best ? "—" : Number.isInteger(totalVolume) ? totalVolume.toLocaleString() : totalVolume.toFixed(1),
     metric: exerciseTrendMetric(latestMeasurement),
-    points: entries.map((entry) => ({ date: entry.date, value: entry.value, label: entry.label })),
+    points: measuredEntries.map((entry) => ({ date: entry.date, value: entry.value, label: entry.label })),
   };
 }
 
@@ -1743,9 +1807,13 @@ function exerciseTrendMetric(measurement) {
     completion: { title: "Completed rounds", unit: "rounds", totalLabel: "Total rounds" },
     weight_reps: {
       title: "Estimated max", unit: "kg", totalLabel: "Total work (kg × reps)",
+      emptyHint: "Record weight and reps together to see your estimated max.",
       note: "Estimated from load × (1 + reps ÷ 30), not a tested maximum. Compare sets with similar technique and effort.",
     },
-    weight_distance: { title: "Best set work", unit: "kg × m", totalLabel: "Total work (kg × m)" },
+    weight_distance: {
+      title: "Best set work", unit: "kg × m", totalLabel: "Total work (kg × m)",
+      emptyHint: "Record weight and distance together to see set work.",
+    },
     assisted_reps: {
       title: "Most reps in one set", unit: "reps", totalLabel: "Total reps",
       note: "This reps-only trend does not account for changes in assistance.",

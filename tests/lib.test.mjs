@@ -13,6 +13,7 @@ import {
   dateToDayKey,
   evaluateLongRunProgress,
   findPreviousExerciseLog,
+  findPreviousSession,
   findOutstandingRecoveryLogs,
   getDailyCheckInItems,
   getAllExercises,
@@ -28,6 +29,7 @@ import {
   summarizeProgressOverview,
   summarizeWeeklySleep,
   validateBackup,
+  workoutRecordKind,
 } from "../lib.js";
 
 test("shows the rest timer outside Today only while active or finished", () => {
@@ -696,18 +698,18 @@ test("summarizes time, calories, and RPE for extra cardio", () => {
 test("summarizes a four-week training and recovery snapshot", () => {
   const summary = summarizeProgressOverview(
     {
-      previous: { date: "2026-07-20", exercises: { squat: { sets: [{}] } } },
+      previous: { date: "2026-07-20", exercises: { squat: { sets: [{ completed: true }] } } },
       first: {
         date: "2026-08-10",
-        exercises: { squat: { sets: [{}] } },
+        exercises: { squat: { sets: [{ completed: true }] } },
         response: { scaleVersion: 2, painNext: 0 },
       },
       second: {
         date: "2026-08-24",
-        exercises: { squat: { sets: [{}] } },
+        exercises: { squat: { sets: [{ completed: true }] } },
         response: { scaleVersion: 2, painNext: 1 },
       },
-      duplicateDate: { date: "2026-08-24", exercises: { press: { sets: [{}] } } },
+      duplicateDate: { date: "2026-08-24", exercises: { press: { sets: [{ completed: true }] } } },
     },
     [
       { date: "2026-08-24", hours: 7 },
@@ -728,12 +730,35 @@ test("summarizes a four-week training and recovery snapshot", () => {
   assert.equal(summary.insight.tone, "positive");
 });
 
+test("distinguishes untouched records and day notes from partial workouts", () => {
+  const empty = {
+    date: "2026-08-24", dayKey: "monday", warmup: [false],
+    exercises: { squat: { sets: [{ completed: false, reps: "", weight: null, unit: "kg" }] } },
+    response: { notes: " ", scaleVersion: 2, painDuring: "" },
+  };
+  const note = { ...empty, date: "2026-08-17", response: { notes: "Skipped today" } };
+  const workout = { ...empty, date: "2026-08-10", exercises: { squat: { sets: [{ reps: 5 }] } } };
+  assert.equal(workoutRecordKind(empty), "empty");
+  assert.equal(workoutRecordKind(note), "note");
+  assert.equal(workoutRecordKind({ ...empty, response: { painDuring: 0 } }), "note");
+  assert.equal(workoutRecordKind(workout), "workout");
+  assert.equal(workoutRecordKind({ ...empty, warmup: [false, true] }), "workout");
+  assert.equal(workoutRecordKind({ ...empty, exercises: { press: { sets: [{ completed: true }] } } }), "workout");
+  assert.equal(workoutRecordKind({ ...empty, extraActivities: [{ sets: [{ averageHeartRate: 120 }] }] }), "workout");
+  const logs = { empty, note, workout };
+  const overview = summarizeProgressOverview(logs, [], "2026-08-25");
+  assert.equal(overview.workouts, 1);
+  assert.equal(overview.activeWeeks, 1);
+  assert.equal(overview.dueReviews, 0);
+  assert.equal(findPreviousSession(logs, "monday", "2026-08-31"), workout);
+});
+
 test("prioritizes due recovery context in the progress snapshot", () => {
   const summary = summarizeProgressOverview(
     {
       recent: {
         date: "2026-08-29",
-        exercises: { squat: { sets: [{}] } },
+        exercises: { squat: { sets: [{ completed: true }] } },
       },
     },
     [

@@ -44,7 +44,7 @@ export function createReviewClient({ getState, getPlan, persist, isUnlocked, end
     if (owner.aiReviews.length >= MAX_STORED_REVIEWS) {
       throw new ReviewError("storage_limit", "리뷰 저장 한도(500개)에 도달했습니다. 기존 리뷰와 백업은 그대로 유지됩니다. 추가 요청은 전송하지 않았습니다.");
     }
-    if (!payload.workouts.some((log) => log.date >= payload.period.start && log.date <= payload.period.end)) {
+    if (!payload.metrics.current.recordedWorkouts) {
       throw new ReviewError("insufficient_data", "이 기간에는 완료된 운동 기록이 없습니다. 운동을 저장한 뒤 다시 확인해 주세요. 작성 중인 초안은 분석하지 않습니다.");
     }
     let response;

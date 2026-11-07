@@ -30,6 +30,8 @@
   --shadow: 0 16px 45px rgba(23, 33, 27, 0.09);
   --radius: 18px;
   --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --rest-timer-width: 190px;
+  --rest-timer-inset: 22px;
   font-family:
     Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
@@ -246,12 +248,31 @@ main {
   margin-bottom: 28px;
 }
 
-.page-head h1 {
+.page-head h1,
+.today-greeting {
   max-width: 760px;
   margin-bottom: 0;
   font-size: clamp(38px, 5.2vw, 68px);
   font-weight: 830;
   line-height: 0.98;
+}
+
+.today-greeting {
+  letter-spacing: -0.025em;
+}
+
+.today-overview {
+  display: flex;
+  flex-direction: column;
+  reading-flow: flex-visual;
+}
+
+.today-overview .page-head {
+  order: -2;
+}
+
+.today-overview .daily-checkin-reminder {
+  order: -1;
 }
 
 .eyebrow {
@@ -380,7 +401,7 @@ textarea {
   letter-spacing: 0.1em;
 }
 
-.session-hero h2 {
+.session-hero h1 {
   max-width: 750px;
   margin-bottom: 13px;
   font-size: clamp(34px, 5vw, 64px);
@@ -406,9 +427,11 @@ textarea {
   width: 132px;
   height: 132px;
   place-content: center;
-  border: 10px solid rgba(255, 255, 255, 0.12);
-  border-bottom-color: var(--lime);
+  border: 10px solid transparent;
   border-radius: 50%;
+  background:
+    linear-gradient(var(--ink), var(--ink)) padding-box,
+    conic-gradient(var(--lime) var(--progress, 0%), #68746b 0) border-box;
   text-align: center;
 }
 
@@ -816,6 +839,10 @@ textarea {
 .exercise-section-head h2 {
   margin-bottom: 0;
   font-size: 30px;
+}
+
+.workout-set-count {
+  display: none;
 }
 
 .exercise-section-head > p {
@@ -1947,6 +1974,13 @@ dialog.coaching-dialog {
   box-shadow: var(--shadow);
 }
 
+@media (width > 680px) {
+  .save-bar {
+    /* The centered workout column can already have enough space for the timer in its right gutter. */
+    margin-right: max(0px, calc(var(--rest-timer-width) + var(--rest-timer-inset) + 16px - (50vw - 50%)));
+  }
+}
+
 .save-bar strong,
 .save-bar span {
   display: block;
@@ -2387,7 +2421,7 @@ dialog.coaching-dialog {
 .week-card {
   display: grid;
   width: 100%;
-  grid-template-columns: 94px minmax(0, 1fr) auto;
+  grid-template-columns: 94px minmax(0, 1fr);
   align-items: center;
   gap: 18px;
   min-height: 110px;
@@ -2451,6 +2485,13 @@ dialog.coaching-dialog {
   letter-spacing: 0;
 }
 
+.week-card-details {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
 .week-card-copy > * {
   display: block;
 }
@@ -2475,6 +2516,7 @@ dialog.coaching-dialog {
 }
 
 .week-card-status {
+  flex: none;
   min-width: 62px;
   padding: 6px 9px;
   border: 1px solid var(--line);
@@ -2860,6 +2902,15 @@ dialog.coaching-dialog {
   background: var(--lime);
 }
 
+.backup-download {
+  margin-top: 16px;
+}
+
+.backup-download p {
+  margin: 0 0 8px;
+  font-size: 14px;
+}
+
 .data-card-privacy {
   min-height: 270px;
   grid-column: 1 / -1;
@@ -2964,19 +3015,15 @@ dialog.coaching-dialog {
   --timer-progress: 1;
   position: fixed;
   z-index: 40;
-  right: 22px;
+  right: var(--rest-timer-inset);
   bottom: 22px;
-  width: 190px;
+  width: var(--rest-timer-width);
   overflow: hidden;
   border: 1px solid var(--ink);
   border-radius: 16px;
   background: var(--ink);
   color: #fff;
   box-shadow: var(--shadow);
-}
-
-body[data-active-view="today"] .timer {
-  bottom: 104px;
 }
 
 .timer.is-context-hidden {
@@ -3230,13 +3277,29 @@ body[data-active-view="today"] .timer {
   width: min(520px, calc(100% - 28px));
   max-height: calc(100dvh - 28px);
   margin: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
   transform: translate(-50%, -50%);
 }
 
-.daily-checkin-shell {
+.daily-checkin-dialog[open] {
+  display: flex;
+  flex-direction: column;
+}
+
+.daily-checkin-body {
   display: grid;
   gap: 16px;
-  padding: 26px;
+  padding: 26px 26px 10px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.daily-checkin-footer {
+  display: grid;
+  flex: none;
+  gap: 16px;
+  padding: 6px 26px 26px;
 }
 
 .daily-checkin-head {
@@ -3678,8 +3741,12 @@ body[data-active-view="today"] .timer {
     transform: none;
   }
 
-  .daily-checkin-shell {
-    padding: 22px 18px max(20px, env(safe-area-inset-bottom));
+  .daily-checkin-body {
+    padding: 22px 18px 10px;
+  }
+
+  .daily-checkin-footer {
+    padding: 6px 18px max(20px, env(safe-area-inset-bottom));
   }
 
   .daily-checkin-question {
@@ -3698,6 +3765,31 @@ body[data-active-view="today"] .timer {
 
   .checkin-rating-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 460px) and (max-height: 540px) {
+  .daily-checkin-body {
+    gap: 10px;
+    padding: 14px 18px 6px;
+  }
+
+  .daily-checkin-question {
+    min-height: 0;
+  }
+
+  .daily-checkin-footer {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 18px max(8px, env(safe-area-inset-bottom));
+    border-top: 1px solid var(--line);
+  }
+
+  .daily-checkin-actions {
+    display: flex;
+    flex: 1;
+    flex-wrap: wrap;
   }
 }
 
@@ -3736,6 +3828,25 @@ body[data-active-view="today"] .timer {
     font-size: 40px;
   }
 
+  .today-overview .page-head,
+  .today-overview .daily-checkin-reminder {
+    order: 0;
+  }
+
+  .today-overview .page-head > div:first-child {
+    display: none;
+  }
+
+  .today-overview .page-controls {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(138px, 0.8fr);
+  }
+
+  .today-overview .page-controls select,
+  .today-overview .page-controls input {
+    min-width: 0;
+  }
+
   .date-control {
     width: 100%;
   }
@@ -3764,7 +3875,7 @@ body[data-active-view="today"] .timer {
     padding: 28px 22px 24px;
   }
 
-  .session-hero h2 {
+  .session-hero h1 {
     font-size: 38px;
   }
 
@@ -3855,6 +3966,14 @@ body[data-active-view="today"] .timer {
 
   .exercise-section-head {
     display: block;
+  }
+
+  .workout-set-count {
+    display: block;
+    margin: 3px 0;
+    color: var(--ink-soft);
+    font-size: 14px;
+    font-variant-numeric: tabular-nums;
   }
 
   .exercise-section-head > p {
@@ -4027,8 +4146,14 @@ body[data-active-view="today"] .timer {
   }
 
   .save-bar {
+    position: static;
     bottom: calc(78px + var(--safe-bottom));
-    margin-top: 84px;
+    margin-top: 16px;
+  }
+
+  .save-bar.has-pending-work,
+  .save-bar[data-status="error"] {
+    position: sticky;
   }
 
   .save-bar > div {
@@ -4130,7 +4255,20 @@ body[data-active-view="today"] .timer {
     height: 98px;
   }
 
+  .week-card-details {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
+  }
+
   .week-card-status {
+    min-width: 0;
+    padding: 2px 8px;
+    font-size: 12px;
+    letter-spacing: 0;
+  }
+
+  .week-card[data-record-kind="empty"] .week-card-status {
     display: none;
   }
 
@@ -4282,10 +4420,41 @@ body[data-active-view="today"] .timer {
   }
 
   body[data-active-view="today"] .timer {
-    right: 12px;
-    bottom: calc(142px + var(--safe-bottom));
-    left: 12px;
-    width: auto;
+    top: 7px;
+    right: 40px;
+    bottom: auto;
+    width: 140px;
+    border-radius: 10px;
+    box-shadow: none;
+  }
+
+  body[data-active-view="today"] .timer .timer-top {
+    grid-template-columns: 1fr 44px;
+    min-height: 44px;
+  }
+
+  body[data-active-view="today"] .timer-display {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px;
+    padding: 5px 8px;
+  }
+
+  body[data-active-view="today"] .timer-display strong {
+    font-size: 16px;
+  }
+
+  body[data-active-view="today"] .timer:not(.has-countdown) .timer-progress {
+    display: none;
+  }
+
+  body[data-active-view="today"] .timer.has-countdown {
+    width: 184px;
+  }
+
+  body[data-active-view="today"] .timer.is-expanded {
+    width: min(242px, calc(100vw - 112px));
   }
 
   .timer-top {
@@ -4305,6 +4474,46 @@ body[data-active-view="today"] .timer {
     top: 72px;
     bottom: auto;
     transform: translate(-50%, -12px);
+  }
+}
+
+@media (max-width: 460px) {
+  .today-overview .page-controls {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 680px) and (max-height: 480px) and (orientation: landscape) {
+  body[data-active-view="today"] main {
+    padding-top: 8px;
+  }
+
+  .session-hero-copy {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+    gap: 8px 12px;
+    padding: 12px 16px;
+  }
+
+  .session-hero h1 {
+    grid-area: 1 / 1;
+    margin: 0;
+    font-size: 28px;
+  }
+
+  .session-meta {
+    grid-area: 1 / 2;
+    gap: 4px;
+    margin: 0;
+  }
+
+  .session-hero p {
+    grid-column: 1 / -1;
+  }
+
+  .today-overview .workout-steps {
+    margin-block: 8px;
   }
 }
 
@@ -4411,7 +4620,7 @@ body[data-active-view="today"] .timer {
 
 #view-progress .is-empty .progress-overview-grid,
 #view-progress .progress-overview-panel.is-empty .panel-head,
-#view-progress .is-empty .metric-grid,
+#view-progress .cardio-stats-panel.is-empty .metric-grid,
 #view-progress .is-empty .trend-context,
 #view-progress .is-empty .chart-wrap canvas {
   display: none;

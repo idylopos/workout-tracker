@@ -1,6 +1,6 @@
 import {
   MEASUREMENT_TYPES, OPTIONAL_RECOVERY_RULE, PULL_UP_STEPS, RUN_QUALITY_PROGRESSION, STRENGTH_PROGRESSION,
-  normalizeResponseRating, recoveryReadiness,
+  normalizeResponseRating, recoveryReadiness, workoutRecordKind,
 } from "./lib.js";
 
 import { progressionAdvice } from "./progression.js";
@@ -80,10 +80,13 @@ function cleanTarget(target) {
       .map((field) => [field, numeric(target[field])])),
   };
 }
+function hasCompletedReviewSet(exercise) {
+  return Array.isArray(exercise?.sets) && Object.hasOwn(MEASUREMENT_TYPES, exercise.measurement) &&
+    exercise.sets.some((set) => set?.completed === true);
+}
 function cleanExercise(id, exercise, definitions, source = "planned", advice = null) {
-  if (!exercise || !Array.isArray(exercise.sets) || !MEASUREMENT_TYPES[exercise.measurement]) return null;
+  if (!hasCompletedReviewSet(exercise)) return null;
   const sets = exercise.sets.flatMap((set, index) => set?.completed === true ? [cleanSet(set, index, exercise.measurement)] : []);
-  if (!sets.length) return null;
   const definition = definitions.get(id);
   const name = text(exercise.name || exercise.variantName || id, 160);
   const variantId = text(exercise.variantId, 96);
@@ -295,16 +298,26 @@ function exerciseTrends(workouts, start) {
   });
 }
 
+function savedReviewRecords(logs, planId, start, end) {
+  const source = Object.entries(logs || {})
+    .filter(([, log]) => log && (log.planId || "form-flow") === planId && inRange(log.date, start, end) &&
+      workoutRecordKind(log) === "workout")
+    .sort(([a, one], [b, two]) => one.date.localeCompare(two.date) || a.localeCompare(b));
+  // The app has one saved workout per plan/date. Duplicated backup keys cannot inflate a review.
+  const byDate = new Map(source.map(([, log]) => [log.date, log]));
+  return [...byDate.values()];
+}
+
+export function hasReviewWorkouts(logs, planId, period) {
+  return savedReviewRecords(logs, planId, period.start, period.end).some((log) =>
+    Object.values(log.exercises || {}).some(hasCompletedReviewSet) || (log.extraActivities || []).some(hasCompletedReviewSet));
+}
+
 export function buildReviewPayload(state, plan, { mode = "completed", now = new Date() } = {}) {
   const period = reviewPeriod(mode, now);
   const snapshot = planSnapshot(state, plan);
   const definitions = new Map(Object.values(plan.days || {}).flatMap((day) => day.exercises || []).map((exercise) => [exercise.id, exercise]));
-  const source = Object.entries(state.workoutLogs || {})
-    .filter(([, log]) => log && (log.planId || "form-flow") === plan.id && inRange(log.date, period.comparisonStart, period.end))
-    .sort(([a, one], [b, two]) => one.date.localeCompare(two.date) || a.localeCompare(b));
-  // The app has one saved workout per plan/date. Duplicated backup keys cannot inflate a review.
-  const byDate = new Map(source.map(([, log]) => [log.date, log]));
-  const savedRecords = [...byDate.values()];
+  const savedRecords = savedReviewRecords(state.workoutLogs, plan.id, period.comparisonStart, period.end);
   const workouts = savedRecords.flatMap((log) => {
     const exercises = [
       ...Object.entries(log.exercises || {}).map(([id, exercise]) => cleanExercise(id, exercise, definitions, "planned",

@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { createDefaultState, WEEK_PLAN, MEASUREMENT_TYPES } from "../lib.js";
-import { buildReviewPayload, reviewPeriod, fingerprintReviewPayload, validateReviewPayload } from "../weekly-review.js";
+import { buildReviewPayload, reviewPeriod, hasReviewWorkouts, fingerprintReviewPayload, validateReviewPayload } from "../weekly-review.js";
 
 const now = new Date("2026-11-04T04:00:00Z");
 const plan = { id: "form-flow", name: "Current selected plan", days: {
@@ -42,12 +42,34 @@ test("partial and empty weeks state insufficient data without filling missing re
   assert.equal(validateReviewPayload(result), result);
 });
 
+test("the other-week shortcut matches checked workouts eligible for the selected plan's review", () => {
+  const state = createDefaultState();
+  state.workoutLogs = {
+    a: log("2026-10-27"),
+    z: log("2026-10-27", { exercises: { press: exercise({ sets: [set({ completed: false })] }) } }),
+    rest: log("2026-10-28", { exercises: {}, response: { notes: "Rest day" } }),
+    otherPlan: log("2026-10-29", { planId: "other" }),
+    cardio: log("2026-11-03", { exercises: {}, extraActivities: [
+      { id: "swim", name: "Swim", measurement: "duration", sets: [{ minutes: 15, completed: true }] },
+    ] }),
+    future: log("2026-11-06"),
+  };
+  state.workoutDrafts = { draft: log("2026-10-30") };
+  for (const [mode, expected] of [["completed", false], ["current", true]]) {
+    const result = payload(state, { mode });
+    assert.equal(hasReviewWorkouts(state.workoutLogs, plan.id, result.period), expected);
+    assert.equal(result.metrics.current.recordedWorkouts, Number(expected));
+  }
+});
+
 test("drafts, other plans, incomplete rows and duplicated saved keys cannot inflate completed metrics", () => {
   const state = createDefaultState();
   state.workoutLogs.a = log("2026-10-26", { exercises: { press: exercise({ sets: [set(), set({ completed: false, weight: 100 })] }) } });
   state.workoutLogs.duplicate = structuredClone(state.workoutLogs.a);
   state.workoutLogs.other = log("2026-10-27", { planId: "different-plan" });
   state.workoutLogs.uncompleted = log("2026-10-28", { exercises: { press: exercise({ sets: [set({ completed: false })] }) } });
+  state.workoutLogs.empty = log("2026-10-29", { exercises: {}, response: {} });
+  state.workoutLogs.note = log("2026-10-30", { exercises: {}, response: { notes: "Rest day" } });
   state.workoutDrafts.a = log("2026-10-26", { exercises: { press: exercise({ sets: [set({ weight: 999 })] }) } });
   state.workoutDrafts.onlyDraft = log("2026-10-29");
   const before = structuredClone(state);

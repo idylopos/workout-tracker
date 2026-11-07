@@ -33,7 +33,7 @@ For planned cardio and extra activities, expand **Machine & wearable metrics** t
 (minutes and seconds), calories (kcal), average RPM, and average heart rate (bpm). All readings are optional; values
 already shown in the main row are not repeated. Switching between cardio measurement options preserves entered
 readings. Saved readings reopen when you revisit the workout and are included in drafts and JSON backups.
-Optional machine readings are not copied by **Use Last**, **Fill empty sets from set 1**, or **Load last session**.
+Optional machine readings are not copied by **Use Last**, **Fill empty sets from set 1**, or **Fill from last session**.
 
 Select **Save this setup as a reusable activity** to add the configuration to the activity picker. Reusable activities
 and completed extra-cardio records are stored in the browser and included in JSON backups. The Week
@@ -50,7 +50,14 @@ weight or waist, then **Update measurements**. **Cancel** leaves the saved entry
 Changes on the Today screen are automatically saved as a local draft. If the browser reloads or discards the tab,
 the draft will be restored. Passphrase protection is optional under **Data**. When enabled, drafts and records are
 encrypted and **Keep unlocked for two hours** retains a non-exportable decryption key until the fixed expiry time.
-The passphrase itself is never stored. **Save workout** confirms the draft as a completed workout log.
+The passphrase itself is never stored. **Save workout** records a session once you log activity, including a partial
+workout. If you enter only notes or a joint response, **Save day note** keeps them with the date and excludes that
+day from workout totals.
+
+**Fill from last session** uses the previous logged workout for the same weekday and plan to fill blank fields in
+matching, unchecked sets. Today's entries, set count, effort, and notes are preserved. Changing **Measure** to
+**Reps only** remembers each set’s weight. Switching back to **Weight × reps** restores it, including after a
+reload. The app asks before discarding other recorded values that the new measurement cannot show.
 
 For repeated working sets, enter the first set and choose **Fill empty sets from set 1**. The app copies load and reps
 (or the equivalent primary measurements) into blank fields while leaving RIR/RPE and any values already entered alone.
@@ -92,8 +99,10 @@ about technique and asks about the hardest set's reserve only when set-level RIR
 RPE or a conversational-effort question. Already answered questions are skipped, with **Edit answers** available.
 Recommendations use the actual set targets and recovery; load and pull-up increases require two successive qualifying
 sessions at the same difficulty. The running stages keep their own advancement rules. **Use this next time** explicitly
-accepts a future target; **Keep my current plan** changes nothing. Load changes require an equipment-appropriate value
-from the user, and future rows are never marked complete. Past results are preserved. These suggestions do not automate
+accepts a future target. **Keep my current plan** keeps the existing prescription. Suggested loads and reps appear
+in the next workout. Checking a set records the suggestions
+in its blank fields and keeps any values you entered. Load changes require an equipment-appropriate value
+from the user. Past results are preserved. These suggestions do not automate
 Block 2 quality-run programming or custom folder plans.
 
 The web Next Session review shows completed working-set loads and up to five recent matching workouts beside the next-load choice.
@@ -149,6 +158,8 @@ shared browser profile or device.
 Open **Progress → AI Review**. The default period is the last completed Monday–Sunday week in **Asia/Singapore**;
 choose **이번 주 · 진행 중** for the partial current week. Reviews are in Korean, and compare the selected plan's completed
 records with the preceding four weeks. Missing entries stay unknown and unsaved drafts are excluded.
+The count beside the dates includes saved workouts with at least one checked set. For an empty week, the panel
+offers another eligible week or takes you to today's workout.
 
 The default **모의 응답 · 전송 없음** mode is a clearly labelled, local demonstration, not live AI advice. Saved reviews can be
 reopened without another request. Changed inputs show a stale notice; **명시적으로 다시 분석** explicitly regenerates a review.

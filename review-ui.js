@@ -1,5 +1,5 @@
 import { createReviewClient, REVIEW_CONSENT_VERSION } from "./review-client.js";
-import { reviewPeriod } from "./weekly-review.js";
+import { hasReviewWorkouts, reviewPeriod } from "./weekly-review.js";
 import { normalizeReviewProfile } from "./review-storage.js";
 
 const escape = (value) => String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;")
@@ -22,7 +22,7 @@ const errors = {
   invalid_request: "분석 데이터를 확인하지 못했습니다. 앱과 서버 버전을 확인해 주세요.",
 };
 
-export function mountReviewUi({ host, getState, getPlan, persist, isUnlocked, config }) {
+export function mountReviewUi({ host, getState, getPlan, persist, isUnlocked, config, openWorkout }) {
   const client = createReviewClient({ getState, getPlan, persist, isUnlocked, endpoint: config.endpoint });
   host.innerHTML = `<div class="panel-head"><div><p class="eyebrow">WEEKLY REFLECTION</p>
     <h2>AI Review</h2><p>Review your week and follow through on suggestions.</p></div>
@@ -30,7 +30,13 @@ export function mountReviewUi({ host, getState, getPlan, persist, isUnlocked, co
     <div id="ai-review-content" lang="ko" hidden>
       <div class="ai-review-controls"><label>분석 기간<select id="ai-review-period"><option value="completed">지난 완료 주</option><option value="current">이번 주 · 진행 중</option></select></label>
       <label>분석 모드<select id="ai-review-mode"><option value="mock">모의 응답 · 전송 없음</option>${config.endpoint ? '<option value="live">실제 API 분석</option>' : ""}</select></label></div>
-      <p id="ai-review-range"></p><p id="ai-review-mode-note" class="ai-review-notice"></p>
+      <p id="ai-review-range" aria-live="polite"></p>
+      <div id="ai-review-empty" hidden>
+        <p>리뷰하려면 세트를 하나 이상 완료로 표시한 뒤 운동을 저장하세요.</p>
+        <button class="button button-secondary" id="ai-review-other-week" type="button" hidden></button>
+        <button class="button button-secondary" id="ai-review-log" type="button">오늘 운동 기록하기</button>
+      </div>
+      <p id="ai-review-mode-note" class="ai-review-notice"></p>
       <details class="ai-review-profile"><summary>목표와 사용자 보고 사항</summary>
         <p>현재 진단을 뜻하지 않습니다. 필요하면 수정하고 저장하세요.</p>
         <label>목표<textarea id="ai-review-goals" rows="2" maxlength="1000"></textarea></label>
@@ -46,7 +52,7 @@ export function mountReviewUi({ host, getState, getPlan, persist, isUnlocked, co
         <small>접근 토큰은 이 화면의 메모리에만 유지되며 백업에 포함되지 않습니다.</small>
         <button type="button" class="text-button" id="ai-review-revoke">전송 동의 철회</button>
       </div>
-      <div class="ai-review-actions"><button class="button button-dark" id="ai-review-run" type="button">리뷰 만들기</button>
+      <div class="ai-review-actions"><button class="button button-dark" id="ai-review-run" type="button" hidden>리뷰 만들기</button>
         <button class="button button-secondary" id="ai-review-regenerate" type="button" hidden>명시적으로 다시 분석</button>
         <button class="button button-secondary" id="ai-review-save-retry" type="button" hidden>저장 다시 시도</button></div>
       <p id="ai-review-status" role="status" aria-live="polite"></p>
@@ -68,7 +74,8 @@ export function mountReviewUi({ host, getState, getPlan, persist, isUnlocked, co
   }
   function busy(value) {
     host.setAttribute("aria-busy", String(value));
-    for (const selector of ["#ai-review-run", "#ai-review-regenerate", "#ai-review-period", "#ai-review-mode", "#ai-review-profile-save"]) $(selector).disabled = value;
+    for (const selector of ["#ai-review-run", "#ai-review-regenerate", "#ai-review-period", "#ai-review-mode",
+      "#ai-review-profile-save", "#ai-review-other-week", "#ai-review-log"]) $(selector).disabled = value;
   }
   function showMode() {
     const live = mode() === "live";
@@ -122,20 +129,40 @@ export function mountReviewUi({ host, getState, getPlan, persist, isUnlocked, co
       $("#ai-review-goals").value = profile.goals;
       $("#ai-review-constraints").value = profile.constraints;
     }
-    const period = reviewPeriod(periodMode());
-    $("#ai-review-range").textContent = `${period.start} ~ ${period.end} · Asia/Singapore${period.partial ? " · 진행 중인 주" : " · 월요일–일요일 완료 주"}`;
+    const runButton = $("#ai-review-run");
+    const regenerate = $("#ai-review-regenerate");
+    runButton.disabled = true;
+    regenerate.disabled = true;
     showMode();
     renderHistory();
     try {
       const prepared = await client.prepare(periodMode(), mode());
       if (ticket !== refreshTicket) return;
+      const { period, metrics } = prepared.payload;
+      const count = metrics.current.recordedWorkouts;
+      $("#ai-review-range").textContent = `${period.start} ~ ${period.end} · Asia/Singapore · ${period.partial ? "진행 중인 주" : "완료 주"} · 리뷰 가능한 운동 ${count}회`;
+      $("#ai-review-empty").hidden = count > 0;
+      if (!count) {
+        const otherMode = period.partial ? "completed" : "current";
+        const otherWeek = $("#ai-review-other-week");
+        const available = hasReviewWorkouts(getState().workoutLogs, getPlan().id, reviewPeriod(otherMode));
+        otherWeek.hidden = !available;
+        otherWeek.textContent = period.partial ? "지난주 운동 보기" : "이번 주 운동 보기";
+        $("#ai-review-log").hidden = available;
+      }
       retryRegenerate = false;
       renderResult(prepared.stored || null);
-      $("#ai-review-regenerate").hidden = !prepared.stored;
-      $("#ai-review-run").textContent = prepared.stored ? "저장된 리뷰 열기" : "리뷰 만들기";
-      status(prepared.stale ? "기록·계획·목표 또는 이전 제안 상태가 변경되었습니다. 저장된 리뷰는 이전 입력 기준입니다. 새 분석은 ‘명시적으로 다시 분석’을 눌러야 실행됩니다." :
+      regenerate.hidden = !count || !prepared.stored;
+      runButton.hidden = !count && !prepared.stored;
+      runButton.textContent = prepared.stored ? "저장된 리뷰 열기" : "리뷰 만들기";
+      if (!count) status(prepared.stored ? "저장 당시의 운동 기록으로 작성된 리뷰입니다." : "");
+      else status(prepared.stale ? "기록·계획·목표 또는 이전 제안 상태가 변경되었습니다. 저장된 리뷰는 이전 입력 기준입니다. 새 분석은 ‘명시적으로 다시 분석’을 눌러야 실행됩니다." :
         prepared.stored ? "저장된 리뷰입니다. 다시 열어도 API를 호출하지 않습니다." : "완료된 운동 기록을 분석합니다. 작성 중인 초안은 제외됩니다.");
-    } catch (error) { status(error.message, true); }
+      runButton.disabled = false;
+      regenerate.disabled = false;
+    } catch (error) {
+      if (ticket === refreshTicket) status(error.message, true);
+    }
   }
   async function run(regenerate) {
     if (client.busy) return;
@@ -153,13 +180,18 @@ export function mountReviewUi({ host, getState, getPlan, persist, isUnlocked, co
       }
       renderResult(outcome.review);
       renderHistory();
-      $("#ai-review-regenerate").hidden = false;
+      $("#ai-review-regenerate").hidden = !$("#ai-review-empty").hidden;
       $("#ai-review-run").textContent = "저장된 리뷰 열기";
       $("#ai-review-save-retry").hidden = outcome.saved !== false;
       status(outcome.saved === false ? "분석은 완료되었지만 이 브라우저에 저장하지 못했습니다. ‘저장 다시 시도’를 누르세요. API를 다시 호출하지 않습니다." :
+        outcome.reused && !$("#ai-review-empty").hidden ? "저장 당시의 운동 기록으로 작성된 리뷰입니다." :
         outcome.stale ? "저장된 리뷰를 열었습니다. 입력이 변경되어 새 분석은 별도로 실행해야 합니다." :
         outcome.reused ? "저장된 리뷰를 열었습니다. API 호출이 없습니다." : "리뷰가 저장되었습니다. 다음 주 제안의 적용 상태를 기록할 수 있습니다.");
     } catch (error) {
+      if (error.code === "insufficient_data") {
+        await refresh();
+        return;
+      }
       retryRegenerate = regenerate;
       status(errors[error.code] || (error.name === "TypeError" ? errors.network : error.message || "분석을 완료하지 못했습니다."), true);
       $("#ai-review-run").textContent = "다시 시도";
@@ -173,6 +205,13 @@ export function mountReviewUi({ host, getState, getPlan, persist, isUnlocked, co
   });
   $("#ai-review-period").addEventListener("change", () => void refresh());
   $("#ai-review-mode").addEventListener("change", () => void refresh());
+  $("#ai-review-other-week").addEventListener("click", () => {
+    const select = $("#ai-review-period");
+    select.value = periodMode() === "current" ? "completed" : "current";
+    select.focus();
+    void refresh();
+  });
+  $("#ai-review-log").addEventListener("click", openWorkout);
   $("#ai-review-run").addEventListener("click", () => void run(retryRegenerate));
   $("#ai-review-regenerate").addEventListener("click", () => void run(true));
   $("#ai-review-save-retry").addEventListener("click", async () => {

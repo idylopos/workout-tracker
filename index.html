@@ -40,57 +40,80 @@
         </div>
       </header>
 
+      <aside class="timer" id="rest-timer" aria-label="Rest timer">
+        <div class="timer-top">
+          <button class="timer-display" id="timer-toggle" type="button" aria-controls="timer-drawer" aria-expanded="false">
+            <span id="timer-label">REST</span>
+            <strong id="timer-time">01:30</strong>
+          </button>
+          <button class="timer-play" id="timer-play" type="button" aria-label="Start rest timer">▶</button>
+        </div>
+        <div class="timer-progress" aria-hidden="true"><div class="timer-progress-fill"></div></div>
+        <div class="timer-drawer" id="timer-drawer">
+          <div class="timer-presets" role="group" aria-label="Rest timer presets">
+            <button type="button" data-timer="60">1:00</button>
+            <button type="button" data-timer="90" class="is-active">1:30</button>
+            <button type="button" data-timer="120">2:00</button>
+            <button type="button" data-timer="180">3:00</button>
+          </div>
+          <button class="timer-reset" id="timer-reset" type="button">Reset</button>
+        </div>
+      </aside>
+
       <main>
         <section class="view is-active" id="view-today" aria-labelledby="today-heading">
-          <div class="page-head">
-            <div>
-              <p class="eyebrow" id="today-kicker">TODAY’S WORK</p>
-              <h1 id="today-heading">Ready when you are.</h1>
+          <div class="today-overview">
+            <article class="session-hero" id="session-hero">
+              <div class="session-hero-copy">
+                <div class="session-meta">
+                  <span id="session-day">MONDAY</span>
+                  <span id="session-estimate">70–90 MIN</span>
+                </div>
+                <h1 id="today-heading"><span id="session-focus">Legs A + bicycle HIIT</span></h1>
+                <p id="session-note">Keep the bicycle HIIT at least 6 hours after lifting.</p>
+              </div>
+              <div class="session-progress-wrap">
+                <div class="session-progress-ring" id="session-progress-ring"
+                  role="progressbar" aria-label="Workout set completion" aria-valuenow="0">
+                  <strong id="session-progress-value">0%</strong>
+                  <span>logged</span>
+                </div>
+              </div>
+            </article>
+
+            <nav class="workout-steps" aria-label="Workout steps">
+              <a href="#warmup-step">1 · Warm up</a>
+              <a href="#training-step">2 · Train</a>
+              <a href="#review-step">3 · Review &amp; save</a>
+            </nav>
+
+            <div class="page-head">
+              <div>
+                <p class="eyebrow" id="today-kicker">TODAY’S WORK</p>
+                <p class="today-greeting">Ready when you are.</p>
+              </div>
+              <div class="page-controls">
+                <label class="plan-control">
+                  <span>Workout plan</span>
+                  <select id="plan-select">
+                    <option value="form-flow">Form / Flow weekly plan</option>
+                  </select>
+                </label>
+                <label class="date-control">
+                  <span>Training date</span>
+                  <input id="training-date" type="date" />
+                </label>
+              </div>
             </div>
-            <div class="page-controls">
-              <label class="plan-control">
-                <span>Workout plan</span>
-                <select id="plan-select">
-                  <option value="form-flow">Form / Flow weekly plan</option>
-                </select>
-              </label>
-              <label class="date-control">
-                <span>Training date</span>
-                <input id="training-date" type="date" />
-              </label>
-            </div>
+
+            <button class="daily-checkin-reminder is-hidden" id="daily-checkin-reminder" type="button">
+              <span>
+                <small>DAILY CHECK-IN</small>
+                <strong id="daily-checkin-reminder-title">2 check-ins due</strong>
+              </span>
+              <span>Open <span aria-hidden="true">→</span></span>
+            </button>
           </div>
-
-          <button class="daily-checkin-reminder is-hidden" id="daily-checkin-reminder" type="button">
-            <span>
-              <small>DAILY CHECK-IN</small>
-              <strong id="daily-checkin-reminder-title">2 check-ins due</strong>
-            </span>
-            <span>Open <span aria-hidden="true">→</span></span>
-          </button>
-
-          <article class="session-hero" id="session-hero">
-            <div class="session-hero-copy">
-              <div class="session-meta">
-                <span id="session-day">MONDAY</span>
-                <span id="session-estimate">70–90 MIN</span>
-              </div>
-              <h2 id="session-focus">Legs A + bicycle HIIT</h2>
-              <p id="session-note">Keep the bicycle HIIT at least 6 hours after lifting.</p>
-            </div>
-            <div class="session-progress-wrap">
-              <div class="session-progress-ring" id="session-progress-ring">
-                <strong id="session-progress-value">0%</strong>
-                <span>logged</span>
-              </div>
-            </div>
-          </article>
-
-          <nav class="workout-steps" aria-label="Workout steps">
-            <a href="#warmup-step">1 · Warm up</a>
-            <a href="#training-step">2 · Train</a>
-            <a href="#review-step">3 · Review &amp; save</a>
-          </nav>
 
           <div class="today-toolbar">
             <div class="segmented phase-selector" role="group" aria-label="Running phase">
@@ -104,7 +127,7 @@
               </button>
             </div>
             <button class="button button-secondary" type="button" id="load-session-button">
-              Load last session
+              Fill from last session
             </button>
           </div>
 
@@ -163,6 +186,7 @@
             <div>
               <p class="eyebrow">02 · TRAIN</p>
               <h2>Working sets</h2>
+              <span class="workout-set-count" id="workout-set-count"></span>
             </div>
             <details class="context-help">
               <summary>How to log sets</summary>
@@ -214,7 +238,7 @@
             <p class="recovery-return-note">Log what you know now. We’ll ask about recovery at your next check-in. An evening update is optional.</p>
             <label class="wide-label">
               <span>Optional note</span>
-              <textarea id="session-notes" rows="2" placeholder="Where did you feel it? What did you change?"></textarea>
+              <textarea id="session-notes" rows="2" placeholder="What changed, or why did you skip today?"></textarea>
             </label>
           </details>
 
@@ -292,8 +316,6 @@
             </div>
           </div>
 
-          <article class="panel ai-review-panel" id="weekly-ai-review" aria-label="Weekly AI Review"></article>
-
           <article class="panel progress-overview-panel">
             <div class="panel-head">
               <div>
@@ -332,6 +354,8 @@
               </div>
             </div>
           </article>
+
+          <article class="panel ai-review-panel" id="weekly-ai-review" aria-label="Weekly AI Review"></article>
 
           <article class="panel exercise-stats-panel">
             <div class="panel-head">
@@ -457,7 +481,10 @@
                 <h2>Take a complete copy.</h2>
                 <p>Downloads workouts, drafts, reusable activities, body measurements, sleep, AI reviews and decisions, and settings in one JSON file.</p>
               </div>
-              <button class="button button-dark" type="button" id="export-data">Download backup</button>
+              <footer class="backup-download">
+                <p id="backup-file-privacy">Anyone with this backup file can read its contents.</p>
+                <button class="button button-dark" type="button" id="export-data" aria-describedby="backup-file-privacy">Download backup</button>
+              </footer>
             </article>
             <article class="data-card">
               <span class="data-card-index">02</span>
@@ -509,26 +536,6 @@
         <button type="button" data-nav="progress"><span>↗</span>Progress</button>
         <button type="button" data-nav="data"><span>⇅</span>Data</button>
       </nav>
-
-      <aside class="timer" id="rest-timer" aria-label="Rest timer">
-        <div class="timer-top">
-          <button class="timer-display" id="timer-toggle" type="button" aria-expanded="false">
-            <span id="timer-label">REST</span>
-            <strong id="timer-time">01:30</strong>
-          </button>
-          <button class="timer-play" id="timer-play" type="button" aria-label="Start rest timer">▶</button>
-        </div>
-        <div class="timer-progress" aria-hidden="true"><div class="timer-progress-fill"></div></div>
-        <div class="timer-drawer" id="timer-drawer">
-          <div class="timer-presets" role="group" aria-label="Rest timer presets">
-            <button type="button" data-timer="60">1:00</button>
-            <button type="button" data-timer="90" class="is-active">1:30</button>
-            <button type="button" data-timer="120">2:00</button>
-            <button type="button" data-timer="180">3:00</button>
-          </div>
-          <button class="timer-reset" id="timer-reset" type="button">Reset</button>
-        </div>
-      </aside>
 
       <div class="toast" id="toast" role="status" aria-live="polite"></div>
     </div>
@@ -632,7 +639,7 @@
     </dialog>
 
     <dialog class="daily-checkin-dialog" id="daily-checkin-dialog" aria-labelledby="daily-checkin-title">
-      <div class="daily-checkin-shell">
+      <div class="daily-checkin-body">
         <header class="daily-checkin-head">
           <div>
             <p class="eyebrow">DAILY CHECK-IN</p>
@@ -646,13 +653,15 @@
         </div>
         <div class="daily-checkin-question" id="daily-checkin-question"></div>
         <p class="daily-checkin-status" id="daily-checkin-status" role="status" aria-live="polite"></p>
+      </div>
+      <footer class="daily-checkin-footer">
         <div class="daily-checkin-actions">
           <button class="text-button" id="daily-checkin-unknown" type="button">Not sure</button>
           <button class="button button-secondary" id="daily-checkin-later" type="button">Later</button>
           <button class="button button-primary" id="daily-checkin-save" type="button">Save & continue</button>
         </div>
         <button class="daily-checkin-skip" id="daily-checkin-skip" type="button">Skip today</button>
-      </div>
+      </footer>
     </dialog>
 
     <template id="exercise-template">
@@ -718,6 +727,7 @@
             <div class="exercise-history-choices"></div>
           </section>
           <div class="previous-line" aria-live="polite"></div>
+          <p class="next-session-note" hidden></p>
           <div class="set-list"></div>
           <div class="set-actions">
             <button class="copy-first-set" type="button">Fill empty sets from set 1</button>

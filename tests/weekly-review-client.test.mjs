@@ -267,6 +267,18 @@ test("a draft alone is insufficient and never initiates a request", async () => 
   assert.equal(Object.keys(fixture.state.workoutDrafts).length, 1);
 });
 
+test("a week with zero eligible workouts can still open a saved review", async () => {
+  const fixture = harness();
+  const first = await fixture.client.request(liveOptions);
+  fixture.state.workoutLogs = {};
+  const prepared = await fixture.client.prepare("completed", "live");
+  assert.equal(prepared.payload.metrics.current.recordedWorkouts, 0);
+  assert.equal(prepared.stored.id, first.review.id);
+  assert.equal((await fixture.client.request(liveOptions)).reused, true);
+  await assert.rejects(fixture.client.request({ ...liveOptions, regenerate: true }), { code: "insufficient_data" });
+  assert.equal(fixture.calls.fetch, 1);
+});
+
 test("a response is marked stale when inputs changed while generation was in flight", async () => {
   const entered = deferred();
   const release = deferred();

@@ -20,6 +20,7 @@ import {
   addDays,
   bodyMeasurementPoints,
   bodyMeasurementValue,
+  changeSetMeasurement,
   createDefaultState,
   countQualifiedLongRuns,
   dateToDayKey,
@@ -31,9 +32,11 @@ import {
   formatDuration,
   getDailyCheckInItems,
   getAllExercises,
+  hasSetContent,
   normalizeResponseRating,
   recoveryReadiness,
   normalizeState,
+  matchingSessionExercises,
   measurementFields,
   mergeBodyMeasurement,
   optionalCardioFields,
@@ -52,6 +55,7 @@ import {
   summarizeWeeklySleep,
   toIsoDate,
   validateBackup,
+  workoutRecordKind,
 } from "./lib.js";
 import { recordedReserve, progressionAdvice, nextSessionTarget, isGuidedSessionQualified, guidedPerformanceQualified } from "./progression.js";
 import {
@@ -113,7 +117,6 @@ const BUILT_IN_PLAN = {
 };
 let state = createDefaultState();
 let selectedDate = toIsoDate();
-let draftSession = null;
 let activeView = "today";
 let resizeFrame = null;
 let activePlan = BUILT_IN_PLAN;
@@ -207,6 +210,7 @@ const els = {
   todayKicker: $("#today-kicker"),
   progressRing: $("#session-progress-ring"),
   progressValue: $("#session-progress-value"),
+  setCount: $("#workout-set-count"),
   warmupList: $("#warmup-list"),
   warmupCount: $("#warmup-count"),
   exerciseList: $("#exercise-list"),
@@ -218,6 +222,7 @@ const els = {
   sessionNotes: $("#session-notes"),
   saveBar: $(".save-bar"),
   saveStatus: $("#save-status"),
+  saveButton: $("#save-workout"),
   vaultSessionStatus: $("#vault-session-status"),
   toast: $("#toast"),
 };
@@ -252,6 +257,12 @@ function persistState() {
 function setSaveStatus(message, status = "default") {
   els.saveStatus.textContent = message;
   els.saveBar.dataset.status = status;
+}
+
+function updateSaveAction(record, hasDraft) {
+  const kind = workoutRecordKind(record);
+  els.saveButton.textContent = kind === "note" ? "Save day note" : "Save workout";
+  els.saveBar.classList.toggle("has-pending-work", hasDraft && kind !== "empty");
 }
 
 function showToast(message, tone = "success") {
@@ -575,7 +586,6 @@ async function changePlan(planId, announce = true, preserveProgression = false) 
     if (!preserveProgression) state.settings.longRunWeek = 1;
     longRunPreviewStage = null;
     longRunViewedPhase = null;
-    draftSession = null;
     await persistState();
     renderPlanSelect();
     renderLongRunOptions();
@@ -590,6 +600,7 @@ async function changePlan(planId, announce = true, preserveProgression = false) 
 }
 
 function switchView(view) {
+  if (view !== activeView && $("#daily-checkin-dialog").open) closeDailyCheckIn();
   activeView = view;
   document.body.dataset.activeView = view;
   $$(".view").forEach((section) => section.classList.toggle("is-active", section.id === `view-${view}`));
@@ -602,7 +613,6 @@ function switchView(view) {
 }
 
 function currentLog() {
-  if (draftSession?.date === selectedDate) return draftSession;
   const draft = state.workoutDrafts[workoutLogKey(selectedDate)];
   if (draft) return draft;
   return state.workoutLogs[workoutLogKey(selectedDate)] || null;
@@ -794,6 +804,7 @@ function dailyCheckInSummary() {
 
 function renderDailyCheckInStep() {
   const question = $("#daily-checkin-question");
+  $(".daily-checkin-body").scrollTop = 0;
   const save = $("#daily-checkin-save");
   const unknown = $("#daily-checkin-unknown");
   const later = $("#daily-checkin-later");
@@ -1069,13 +1080,17 @@ async function saveDailyCheckInAnswer({ unknown = false } = {}) {
 }
 
 function maybeOpenDailyCheckIn() {
+  if (activeView !== "today") return;
   const date = toIsoDate();
   const record = state.dailyCheckIns[date] || {};
   const items = dueDailyCheckInItems(date);
   updateDailyCheckInReminder();
   if (!shouldAutoOpenDailyCheckIn(dailyCheckInAutoShownDate, date, items, record.status)) return;
-  dailyCheckInAutoShownDate = date;
-  requestAnimationFrame(() => openDailyCheckIn({ automatic: true }));
+  requestAnimationFrame(() => {
+    if (activeView !== "today" || $("#daily-checkin-dialog").open) return;
+    dailyCheckInAutoShownDate = date;
+    openDailyCheckIn({ automatic: true });
+  });
 }
 
 function renderTrainingRules(day) {
@@ -1390,12 +1405,14 @@ function renderToday() {
 
   const saved = state.workoutLogs[workoutLogKey(selectedDate)];
   const savedDraft = state.workoutDrafts[workoutLogKey(selectedDate)];
+  const savedKind = workoutRecordKind(saved);
+  updateSaveAction(log, Boolean(savedDraft));
   $("#next-session-entry").classList.toggle("is-hidden", !Object.values(saved?.exercises || {}).some((exercise) => exercise.coachingPlan));
-  if (draftSession) {
-    setSaveStatus("Session loaded · review & save", "restored");
-  } else if (savedDraft) {
+  if (savedDraft) {
     setSaveStatus("Draft restored · review & save", "restored");
-  } else if (saved) {
+  } else if (savedKind === "note") {
+    setSaveStatus("Day note saved", "saved");
+  } else if (savedKind === "workout") {
     setSaveStatus(`Saved ${formatDate(saved.updatedAt?.slice(0, 10) || selectedDate)}`, "saved");
   } else {
     setSaveStatus(day.exercises.length ? "Not saved yet" : "Rest day");
@@ -1434,9 +1451,9 @@ function applyThursdaySelection() {
   const swing = $('[data-exercise-id="kettlebell-swing"]', els.exerciseList);
   if (swing) {
     const sets = collectSetRows(swing);
-    swing.classList.toggle("is-hidden", legCurl && !sets.some(hasSetContent));
+    swing.classList.toggle("is-hidden", legCurl && !sets.some(hasEnteredSetValues));
     $$(".set-row", swing).forEach((row, index) => {
-      row.classList.toggle("is-hidden", legCurl && !hasSetContent(sets[index]));
+      row.classList.toggle("is-hidden", legCurl && !hasEnteredSetValues(sets[index]));
     });
     for (const controls of $$(".exercise-toolbar, .exercise-history-picker, .set-actions", swing)) {
       controls.inert = legCurl;
@@ -1771,7 +1788,7 @@ function setupPullupGuide(card, exercise, savedExercise) {
   });
   $(".progression-apply", card).addEventListener("click", () => {
     const step = getPullupStep($(".progression-range", card).value);
-    const hasEnteredSets = collectSetRows(card).some(hasSetContent);
+    const hasEnteredSets = collectSetRows(card).some(hasEnteredSetValues);
     if (
       hasEnteredSets &&
       !window.confirm(`Changing to ${step.label} will clear the sets entered on this workout. Continue?`)
@@ -1884,7 +1901,7 @@ function setupExerciseAlternatives(card, exercise, savedExercise) {
         toggle.setAttribute("aria-expanded", "false");
         return;
       }
-      const hasEnteredSets = collectSetRows(card).some(hasSetContent);
+      const hasEnteredSets = collectSetRows(card).some(hasEnteredSetValues);
       if (
         hasEnteredSets &&
         !window.confirm(`Changing to ${variant.name} will clear the sets entered on this workout. Continue?`)
@@ -1949,11 +1966,15 @@ function previousImportSnapshot(card) {
   });
 }
 
+function hasEnteredSetValues(set) {
+  return Number.isFinite(set?.retainedWeight) || hasSetContent(set);
+}
+
 function loadExerciseHistoryEntry(card, exercise, earlier) {
   const snapshot = previousImportSnapshot(card);
   const changed = card.dataset.previousImportSnapshot
     ? snapshot !== card.dataset.previousImportSnapshot
-    : collectSetRows(card).some(hasSetContent) ||
+    : collectSetRows(card).some(hasEnteredSetValues) ||
       $(".progression-performance-qualified", card)?.checked ||
       $(".progression-recovery-qualified", card)?.checked;
   if (changed && !window.confirm("Replace the values entered for this exercise with this workout’s last set? Completion and RIR/RPE will be cleared.")) {
@@ -2071,20 +2092,8 @@ function createExerciseCard(exercise, index, savedExercise) {
   const sets = savedExercise?.sets?.length
     ? savedExercise.sets
     : Array.from({ length: Number(card.dataset.defaultSets) }, () => ({}));
-  const nextTarget = state.settings.nextSessionTargets?.[`${activePlan.id}:${exercise.id}`];
-  if (!savedExercise && nextTarget && selectedDate > nextTarget.sourceDate &&
-    nextTarget.measurement === measurement && (nextTarget.variantId || "") === (card.dataset.variantId === exercise.id ? "" : card.dataset.variantId || "") &&
-    (!pullupStep || !nextTarget.progressionStep || Number(nextTarget.progressionStep) === pullupStep.id)) {
-    if (["weight", "assistance"].includes(nextTarget.field) && Number.isFinite(nextTarget.value) && nextTarget.value >= 0) {
-      sets.forEach((set) => { set[nextTarget.field] = nextTarget.value; if (nextTarget.reps) set.reps = nextTarget.reps; });
-    }
-    const note = document.createElement("p");
-    note.className = "next-session-note";
-    note.textContent = `Next-session plan: ${nextTarget.title}. ${nextTarget.detail}`;
-    $(".previous-line", card).after(note);
-  }
-  renderSetRows(card, measurement, sets);
   if (exercise.progression === "pullup") setupPullupGuide(card, exercise, savedExercise);
+  renderSetRows(card, measurement, sets);
 
   if (shouldCollapseExerciseByDefault(exercise, savedExercise, window.matchMedia("(max-width: 680px)").matches)) {
     card.classList.add("is-collapsed");
@@ -2097,16 +2106,19 @@ function createExerciseCard(exercise, index, savedExercise) {
     button.setAttribute("aria-expanded", String(!collapsed));
   });
   select.addEventListener("change", () => {
-    const keepCardioMetrics = EXTRA_ACTIVITY_MEASUREMENTS.includes(card.dataset.measurement) &&
-      EXTRA_ACTIVITY_MEASUREMENTS.includes(select.value);
-    const sets = keepCardioMetrics
-      ? collectSetRows(card, card.dataset.measurement)
-      : Array.from({ length: Number(card.dataset.defaultSets) }, () => ({}));
+    const previous = card.dataset.measurement;
+    const { sets, removedFields } = changeSetMeasurement(collectSetRows(card, previous), previous, select.value);
+    if (removedFields.length && !window.confirm(
+      `Switch to ${MEASUREMENT_TYPES[select.value].label}? This will remove the recorded values for ${removedFields.join(", ")}. Cancel to keep them.`,
+    )) {
+      select.value = previous;
+      return;
+    }
     state.exerciseConfigs[exerciseConfigKey(exercise.id)] = select.value;
-    persistState();
     renderSetRows(card, select.value, sets);
     updatePreviousExerciseState(card, exercise);
     markWorkoutDirty();
+    void saveWorkoutDraftNow();
     updateSessionProgress();
   });
   $(".load-previous", card).addEventListener("click", () => {
@@ -2132,10 +2144,33 @@ function createExerciseCard(exercise, index, savedExercise) {
     setList.append(createSetRow(select.value, setList.children.length, {}, Number(card.dataset.rest), {
       cardioMetrics: card.dataset.category === "Cardio",
     }));
+    renderNextSessionTarget(card);
     updateCopyFirstSetButton(card, select.value);
     markWorkoutDirty();
+    updateSessionProgress();
   });
   return card;
+}
+
+function renderNextSessionTarget(card) {
+  const note = $(".next-session-note", card);
+  if (!note) return;
+  const { exerciseId, measurement, variantId, progressionStep } = card.dataset;
+  const target = state.settings.nextSessionTargets?.[`${activePlan.id}:${exerciseId}`];
+  const saved = state.workoutLogs[workoutLogKey(selectedDate)]?.exercises?.[exerciseId];
+  note.hidden = !target || Boolean(saved) || selectedDate <= target.sourceDate ||
+    measurement !== target.measurement || (variantId || exerciseId) !== (target.variantId || exerciseId) ||
+    (Boolean(target.progressionStep) && Number(progressionStep) !== Number(target.progressionStep));
+  if (note.hidden) return;
+  note.textContent = `Next-session plan: ${target.title}. ${target.detail}`;
+  if (!["weight", "assistance"].includes(target.field) || !Number.isFinite(target.value) || target.value < 0) return;
+  note.textContent += " Check a set to log the suggested values, or enter your own.";
+  for (const input of $$("[data-field]", card)) {
+    const field = input.dataset.field;
+    if (field !== target.field && !(field === "reps" && target.reps)) continue;
+    input.dataset.acceptedTarget = field === "reps" ? target.reps : target.value;
+    input.placeholder = input.dataset.acceptedTarget;
+  }
 }
 
 function renderSetRows(card, measurement, sets, options = {}) {
@@ -2149,6 +2184,7 @@ function renderSetRows(card, measurement, sets, options = {}) {
   sets.forEach((set, index) =>
     setList.append(createSetRow(measurement, index, set, Number(card.dataset.rest), rowOptions)),
   );
+  renderNextSessionTarget(card);
   updateCopyFirstSetButton(card, measurement);
 }
 
@@ -2169,6 +2205,19 @@ function repeatableFields(measurement) {
   return MEASUREMENT_TYPES[measurement].fields.filter((field) => !["rir", "rpe"].includes(field.key));
 }
 
+function fillEmptySetFields(row, fields, source) {
+  let filled = 0;
+  for (const { key } of fields) {
+    const input = $(`[data-field="${key}"]`, row);
+    const value = source[key];
+    if (input && input.value === "" && !input.validity.badInput && value !== "" && value != null) {
+      input.value = value;
+      filled++;
+    }
+  }
+  return filled;
+}
+
 function updateCopyFirstSetButton(card, measurement) {
   const button = $(".copy-first-set", card);
   if (!button) return;
@@ -2187,16 +2236,7 @@ function copyFirstSetIntoEmpty(card, measurement) {
     showToast("Enter set 1 first, then fill the remaining sets.", "error");
     return;
   }
-  let copied = 0;
-  rows.slice(1).forEach((row) => {
-    fields.forEach((field) => {
-      const input = $(`[data-field="${field.key}"]`, row);
-      if (input && input.value === "" && sourceValues[field.key] !== "") {
-        input.value = sourceValues[field.key];
-        copied += 1;
-      }
-    });
-  });
+  const copied = rows.slice(1).reduce((count, row) => count + fillEmptySetFields(row, fields, sourceValues), 0);
   if (!copied) {
     showToast("The remaining sets already have values.");
     return;
@@ -2283,7 +2323,10 @@ function createSetField(field, index, values) {
       ${field.unit ? `<small>${field.unit}</small>` : ""}
     </div>
   `;
-  $("input", label).value = values[field.key] ?? "";
+  const input = $("input", label);
+  input.value = values[field.key] ?? "";
+  // A whole-metre carry can have more precision than a cardio distance increment.
+  if (field.key === "distance" && input.validity.stepMismatch) input.step = "any";
   return label;
 }
 
@@ -2292,6 +2335,7 @@ function createSetRow(measurement, index, values, restSeconds, options = {}) {
   row.className = "set-row";
   row.classList.toggle("is-check-only", MEASUREMENT_TYPES[measurement].fields.length === 0);
   row.dataset.setIndex = index;
+  if (Number.isFinite(values.retainedWeight)) row.dataset.retainedWeight = values.retainedWeight;
   row.style.setProperty("--field-count", MEASUREMENT_TYPES[measurement].fields.length);
 
   const done = document.createElement("label");
@@ -2303,6 +2347,11 @@ function createSetRow(measurement, index, values, restSeconds, options = {}) {
   `;
   done.querySelector("input").addEventListener("change", (event) => {
     row.classList.toggle("is-done", event.target.checked);
+    if (event.target.checked) {
+      for (const field of $$("[data-accepted-target]", row)) {
+        if (!field.value && !field.validity.badInput) field.value = field.dataset.acceptedTarget;
+      }
+    }
     if (event.target.checked && restSeconds > 0) setTimer(restSeconds, true);
     markWorkoutDirty();
     updateSessionProgress();
@@ -2340,6 +2389,7 @@ function createSetRow(measurement, index, values, restSeconds, options = {}) {
   remove.addEventListener("click", () => {
     const list = row.parentElement;
     if (list.children.length <= 1) {
+      delete row.dataset.retainedWeight;
       $$("input", row).forEach((input) => {
         if (input.type === "checkbox") input.checked = false;
         else {
@@ -2394,6 +2444,7 @@ function collectSetRows(card, measurementOverride = "") {
   const fields = measurementFields(measurement);
   return $$(".set-row", card).map((row) => {
     const set = { completed: $(".set-done input", row).checked };
+    if (row.dataset.retainedWeight !== undefined) set.retainedWeight = Number(row.dataset.retainedWeight);
     fields.forEach((field) => {
       const input = $(`[data-field="${field.key}"]`, row);
       if (!input) return;
@@ -2401,10 +2452,6 @@ function collectSetRows(card, measurementOverride = "") {
     });
     return set;
   });
-}
-
-function hasSetContent(set) {
-  return set.completed || Object.entries(set).some(([key, value]) => key !== "completed" && value !== "");
 }
 
 function collectWorkoutRecord() {
@@ -2416,7 +2463,7 @@ function collectWorkoutRecord() {
     if (card.dataset.variantId && card.dataset.variantId !== card.dataset.exerciseId) {
       exerciseChoices[card.dataset.exerciseId] = card.dataset.variantId;
     }
-    if (sets.some(hasSetContent)) {
+    if (sets.some(hasEnteredSetValues)) {
       const exerciseLog = {
         name: card.dataset.variantName || card.dataset.exerciseName,
         measurement: $(".measurement-select", card).value,
@@ -2484,7 +2531,7 @@ async function saveWorkoutDraftNow() {
     ...collectWorkoutRecord(),
     draftedAt: new Date().toISOString(),
   };
-  draftSession = null;
+  updateSaveAction(state.workoutDrafts[key], true);
   const saved = await persistState();
   if (saved && revision === draftRevision) {
     workoutDirty = false;
@@ -2507,18 +2554,22 @@ async function saveWorkout() {
     showToast("Check the highlighted cardio reading before saving.", "error");
     return;
   }
+  const record = collectWorkoutRecord();
+  const kind = workoutRecordKind(record);
+  if (kind === "empty") {
+    showToast("Log activity or add a day note before saving.", "error");
+    return;
+  }
   clearTimeout(draftSaveTimer);
   draftSaveTimer = null;
   draftRevision += 1;
   workoutDirty = false;
   const key = workoutLogKey(selectedDate);
-  state.workoutLogs[key] = collectWorkoutRecord();
-  state.workoutLogs[key].savedAt = new Date().toISOString();
+  state.workoutLogs[key] = { ...record, savedAt: new Date().toISOString() };
   delete state.workoutDrafts[key];
-  draftSession = null;
   if (await persistState()) {
     savedThisVisit.add(key);
-    showToast("Workout saved on this device.");
+    showToast(kind === "note" ? "Day note saved on this device." : "Workout saved on this device.");
     renderToday();
     if (Object.values(state.workoutLogs[key].exercises).some((exercise) => exercise.coachingPlan && exercise.sets.some((set) => set.completed))) openCoaching(key);
   }
@@ -2591,28 +2642,43 @@ function updateSessionProgress() {
   ];
   const completed = checks.filter((check) => check.checked).length;
   const percentage = checks.length ? Math.round((completed / checks.length) * 100) : 0;
+  const count = checks.length
+    ? `${completed} of ${checks.length} ${checks.length === 1 ? "set" : "sets"} complete`
+    : "No sets planned";
   els.progressValue.textContent = `${percentage}%`;
-  els.progressRing.style.setProperty("--progress", `${percentage * 3.6}deg`);
+  els.progressRing.style.setProperty("--progress", `${percentage}%`);
+  els.progressRing.setAttribute("aria-valuenow", String(percentage));
+  els.progressRing.setAttribute("aria-valuetext", count);
+  els.setCount.textContent = count;
 }
 
 function loadLastSession() {
   const dayKey = dateToDayKey(selectedDate);
   const previous = findPreviousSession(state.workoutLogs, dayKey, selectedDate, activePlan.id);
   if (!previous) return;
-  draftSession = {
-    ...structuredClone(previous),
-    date: selectedDate,
-    dayKey,
-    planId: activePlan.id,
-    updatedAt: null,
-  };
-  [...Object.values(draftSession.exercises || {}), ...(draftSession.extraActivities || [])].forEach((entry) => {
-    const optionalFields = optionalCardioFields(entry.measurement);
-    (entry.sets || []).forEach((set) => optionalFields.forEach((field) => { delete set[field.key]; }));
-  });
-  renderToday();
+
+  let filled = 0;
+  for (const card of $$(".exercise-card:not(.is-hidden)", els.exerciseList)) {
+    const { exerciseId, variantId, measurement, progressionStep, longRunStage } = card.dataset;
+    const source = matchingSessionExercises(previous, exerciseId, variantId || exerciseId).find(entry =>
+      entry.measurement === measurement &&
+      (!progressionStep || Number(progressionStep) === Number(entry.progressionStep)) &&
+      (!longRunStage || Number(longRunStage) === Number(entry.progressionStage)),
+    );
+    if (!source) continue;
+    const fields = repeatableFields(measurement);
+    $$(".set-row", card).forEach((row, index) => {
+      if (source.sets[index] && !row.classList.contains("is-hidden") && !$(".set-done input", row).checked) {
+        filled += fillEmptySetFields(row, fields, source.sets[index]);
+      }
+    });
+  }
+  if (!filled) {
+    showToast("No matching empty set fields to fill from the last session.");
+    return;
+  }
   markWorkoutDirty();
-  showToast(`Loaded ${formatDate(previous.date)}. Review before saving.`);
+  showToast(`Filled ${filled} empty ${filled === 1 ? "field" : "fields"} from ${formatDate(previous.date)}.`);
 }
 
 function renderWeek() {
@@ -2632,29 +2698,35 @@ function renderWeek() {
     const day = activePlan.days[dayKey];
     const date = toIsoDate(addDays(base, index));
     const log = state.workoutLogs[workoutLogKey(date)];
+    const kind = workoutRecordKind(log);
     const completedSets = log
       ? [
           ...Object.values(log.exercises || {}).flatMap((exercise) => exercise.sets || []),
           ...(log.extraActivities || []).flatMap((activity) => activity.sets || []),
         ].filter((set) => set.completed).length
       : 0;
+    let status = dayKey === "sunday" ? "REST" : "OPEN";
+    if (kind === "note") status = "Day note";
+    if (kind === "workout") status = completedSets ? `${completedSets} set${completedSets === 1 ? "" : "s"} logged` : "Activity logged";
     const card = document.createElement("button");
     card.type = "button";
     card.className = "week-card";
     card.dataset.tone = day.tone;
+    card.dataset.recordKind = kind;
     card.innerHTML = `
       <span class="week-card-day">${escapeHtml(day.short)}<small>${formatDate(date, { month: "short", day: "numeric" })}</small></span>
-      <span class="week-card-copy">
-        <small>${escapeHtml(day.kicker)}</small>
-        <strong>${escapeHtml(day.focus)}</strong>
-        <span>${escapeHtml(day.estimate)}</span>
+      <span class="week-card-details">
+        <span class="week-card-copy">
+          <small>${escapeHtml(day.kicker)}</small>
+          <strong>${escapeHtml(day.focus)}</strong>
+          <span>${escapeHtml(day.estimate)}</span>
+        </span>
+        <span class="week-card-status ${kind === "workout" ? "is-logged" : ""}">${status}</span>
       </span>
-      <span class="week-card-status ${log ? "is-logged" : ""}">${log ? `${completedSets} sets` : dayKey === "sunday" ? "REST" : "OPEN"}</span>
     `;
     card.addEventListener("click", async () => {
       await saveWorkoutDraftNow();
       selectedDate = date;
-      draftSession = null;
       renderToday();
       switchView("today");
     });
@@ -2881,11 +2953,23 @@ function renderProgressOverview() {
   $("#progress-insight-action").dataset.target = action.target;
 }
 
+async function openTodayWorkout() {
+  await saveWorkoutDraftNow();
+  selectedDate = toIsoDate();
+  renderToday();
+  switchView("today");
+  const heading = $("#today-heading");
+  heading.setAttribute("tabindex", "-1");
+  heading.focus({ preventScroll: true });
+}
+
 function followProgressInsight() {
   const target = progressOverviewAction(
     summarizeProgressOverview(activeWorkoutLogs(), state.dailySleepLogs), dueDailyCheckInItems(),
   ).target;
-  if (target === "today" || target === "week") {
+  if (target === "today") {
+    void openTodayWorkout();
+  } else if (target === "week") {
     switchView(target);
     const heading = $(`#${target}-heading`);
     heading?.setAttribute("tabindex", "-1");
@@ -2909,14 +2993,15 @@ function renderExerciseStats() {
   $("#stat-best").textContent = stats.best;
   $("#stat-volume").textContent = stats.volume;
   $("#stat-volume-label").textContent = stats.metric?.totalLabel || "Total work";
-  const hasResults = stats.points.length > 0;
-  $(".exercise-stats-panel").classList.toggle("is-empty", !hasResults);
+  const hasPoints = stats.points.length > 0;
+  $(".exercise-stats-panel .metric-grid").classList.toggle("is-hidden", stats.sessions === 0);
+  $(".exercise-stats-panel").classList.toggle("is-empty", !hasPoints);
   const title = stats.metric ? `${stats.metric.title} (${stats.metric.unit})` : "Exercise history";
   $("#exercise-trend-title").textContent = title;
   $("#exercise-chart-value-label").textContent = title;
-  $("#exercise-trend-context").classList.toggle("is-hidden", !hasResults);
-  $("#exercise-chart-data").classList.toggle("is-hidden", !hasResults);
-  $("#exercise-chart").setAttribute("aria-hidden", String(!hasResults));
+  $("#exercise-trend-context").classList.toggle("is-hidden", !hasPoints);
+  $("#exercise-chart-data").classList.toggle("is-hidden", !hasPoints);
+  $("#exercise-chart").setAttribute("aria-hidden", String(!hasPoints));
   const latest = stats.points.at(-1);
   const previous = stats.points.at(-2);
   const datedResult = (point) => `${formatDate(point.date, { month: "short", day: "numeric", year: "numeric" })}: ${point.label}`;
@@ -2925,8 +3010,8 @@ function renderExerciseStats() {
     : latest ? `${datedResult(latest)}. Log another session to compare.` : "";
   $("#exercise-trend-note").textContent = [
     stats.metric?.note,
-    hasResults ? "One point per recorded session, equally spaced." : "",
-    stats.sessions > stats.points.length ? `Showing ${stats.points.length} of ${stats.sessions} sessions with the latest measurement type.` : "",
+    hasPoints ? "Points are spaced equally by session." : "",
+    stats.sessions > stats.points.length ? `Showing ${stats.points.length} of ${stats.sessions} sessions with the measurements needed for this chart.` : "",
   ].filter(Boolean).join(" ");
   renderChartValues($("#exercise-chart-values"), stats.points.map((point) => [
     formatDate(point.date, { month: "short", day: "numeric", year: "numeric" }),
@@ -2934,7 +3019,8 @@ function renderExerciseStats() {
     numberFormatter.format(point.value),
   ]));
   const empty = $("#exercise-chart-empty");
-  empty.classList.toggle("is-hidden", hasResults);
+  empty.textContent = stats.metric?.emptyHint || "Log a result for this exercise to start its history.";
+  empty.classList.toggle("is-hidden", hasPoints);
   drawLineChart($("#exercise-chart"), [{ points: stats.points, color: "#386b45" }], { axes: true });
 }
 
@@ -3213,7 +3299,6 @@ async function importData(file) {
     weeklyReviewUi?.cancel();
     state = result.state;
     state.aiReviewConsent = null;
-    draftSession = null;
     await changePlan(state.settings.activePlanId || "form-flow", false, true);
     showToast("Backup restored.");
   } catch (error) {
@@ -3376,6 +3461,7 @@ function updateTimerUi() {
   $("#timer-play").textContent = timer.running ? "Ⅱ" : "▶";
   $("#timer-play").setAttribute("aria-label", timer.running ? "Pause rest timer" : "Start rest timer");
   restTimer.style.setProperty("--timer-progress", String(progress));
+  restTimer.classList.toggle("has-countdown", timer.running || timer.remaining < timer.total);
   restTimer.classList.toggle("is-ending", ending);
   $("#timer-label").textContent = restTimer.classList.contains("is-finished") ? "REST DONE" : ending ? "FINAL 10s" : "REST";
   $$("[data-timer]").forEach((button) => button.classList.toggle("is-active", Number(button.dataset.timer) === timer.total));
@@ -3423,14 +3509,9 @@ function bindEvents() {
   });
   $("#open-coaching").addEventListener("click", () => openCoaching());
   $("#coaching-close").addEventListener("click", () => $("#coaching-dialog").close());
-  $$("[data-nav]").forEach((button) => button.addEventListener("click", async () => {
-    if (button.dataset.nav === "today") {
-      await saveWorkoutDraftNow();
-      selectedDate = toIsoDate();
-      draftSession = null;
-      renderToday();
-    }
-    switchView(button.dataset.nav);
+  $$("[data-nav]").forEach((button) => button.addEventListener("click", () => {
+    if (button.dataset.nav === "today") void openTodayWorkout();
+    else switchView(button.dataset.nav);
   }));
   $("#plan-select").addEventListener("change", async (event) => {
     await saveWorkoutDraftNow();
@@ -3440,7 +3521,6 @@ function bindEvents() {
     const nextDate = els.trainingDate.value || toIsoDate();
     await saveWorkoutDraftNow();
     selectedDate = nextDate;
-    draftSession = null;
     renderToday();
   });
   $$("[data-block]").forEach((button) => button.addEventListener("click", async () => {
@@ -3491,9 +3571,6 @@ function bindEvents() {
       event.preventDefault();
       void saveDailyCheckInAnswer();
     }
-  });
-  document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState === "visible") maybeOpenDailyCheckIn();
   });
   $("#view-today").addEventListener("input", (event) => {
     if (event.target.matches(".set-row input, #session-notes")) markWorkoutDirty();
@@ -3634,7 +3711,7 @@ function bindEvents() {
 async function init() {
   await initializeVault();
   weeklyReviewUi = mountReviewUi({ host: $("#weekly-ai-review"), getState: () => state,
-    getPlan: () => activePlan, persist: persistState,
+    getPlan: () => activePlan, persist: persistState, openWorkout: openTodayWorkout,
     isUnlocked: () => storageMode !== "encrypted" || Boolean(vaultKey), config: reviewConfig });
   syncPrivacyUi();
   document.body.dataset.activeView = activeView;

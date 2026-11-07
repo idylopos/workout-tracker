@@ -26,6 +26,47 @@ test("Progress exposes dates, recorded results, plotted estimates, and work unit
   assert.deepEqual(logs, before);
 });
 
+test("An unrecorded load preserves the performed reps and leaves load-based stats empty", () => {
+  for (const weight of [undefined, null, "", "  "]) {
+    const stats = summarizeExercise({
+      day: log("2026-09-16", "weight_reps", [{ completed: true }, { completed: true, reps: 8, weight }]),
+    }, "exercise");
+    assert.equal(stats.sessions, 1);
+    assert.equal(stats.latest, "8 reps · weight unrecorded");
+    assert.equal(stats.best, "—");
+    assert.equal(stats.volume, "—");
+    assert.deepEqual(stats.points, []);
+  }
+});
+
+test("Only sets with paired measurements contribute to estimated max and volume, including explicit zero", () => {
+  const stats = summarizeExercise({
+    loaded: log("2026-09-02", "weight_reps", [{ weight: 24, reps: 8 }, { reps: 10 }, { weight: 50 }]),
+    zero: log("2026-09-09", "weight_reps", [{ reps: 10 }, { weight: "0", reps: "7" }]),
+    recent: log("2026-09-16", "weight_reps", [{ reps: 1 }]),
+  }, "exercise");
+  assert.equal(stats.sessions, 3);
+  assert.equal(stats.latest, "1 rep · weight unrecorded");
+  assert.equal(stats.best, "24 kg × 8");
+  assert.equal(stats.volume, "192");
+  assert.deepEqual(stats.points, [
+    { date: "2026-09-02", value: 24 * (1 + 8 / 30), label: "24 kg × 8" },
+    { date: "2026-09-09", value: 0, label: "0 kg × 7" },
+  ]);
+});
+
+test("A carry with an unrecorded load retains its distance without inventing set work", () => {
+  const stats = summarizeExercise({
+    older: log("2026-09-09", "weight_distance", [{ weight: 0, distance: 10 }]),
+    recent: log("2026-09-16", "weight_distance", [{ distance: 20 }, { distance: 30 }]),
+  }, "exercise");
+  assert.equal(stats.sessions, 2);
+  assert.equal(stats.latest, "30 m · weight unrecorded");
+  assert.equal(stats.best, "0 kg × 10 m");
+  assert.equal(stats.volume, "0");
+  assert.deepEqual(stats.points, [{ date: "2026-09-09", value: 0, label: "0 kg × 10 m" }]);
+});
+
 test("Every exercise measurement names the quantity plotted and its aggregate unit", () => {
   const cases = [
     ["completion", { completed: true }, "rounds", "Total rounds", 1],

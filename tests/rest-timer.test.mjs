@@ -82,9 +82,11 @@ function setup() {
 
 test("rest bar starts full and shrinks with remaining time to empty", () => {
   const ui = setup();
+  assert.equal(ui.has("has-countdown"), false);
   assert.equal(ui.progress(), 1);
   assert.equal(ui.node("timer-time").textContent, "01:30");
   ui.run("startTimer()");
+  assert.equal(ui.has("has-countdown"), true);
   ui.advance(45_000);
   assert.equal(ui.progress(), 0.5);
   assert.equal(ui.node("timer-time").textContent, "00:45");
@@ -162,6 +164,7 @@ test("reset clears ending and done states, stops ticking and refills the bar", (
   ui.run("setTimer(60, true)");
   ui.advance(55_000);
   ui.run("setTimer(timer.total)");
+  assert.equal(ui.has("has-countdown"), false);
   assert.equal(ui.has("is-ending"), false);
   assert.equal(ui.progress(), 1);
   assert.equal(ui.jobs.size, 0);
