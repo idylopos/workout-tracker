@@ -3477,6 +3477,11 @@ function bindEvents() {
   els.trainingDate.addEventListener("change", async () => {
     const nextDate = els.trainingDate.value || toIsoDate();
     await saveWorkoutDraftNow();
+    // Do not replace the current form or clear its storage warning while edits remain unsaved.
+    if (workoutDirty) {
+      els.trainingDate.value = selectedDate;
+      return;
+    }
     selectedDate = nextDate;
     draftSession = null;
     renderToday();
