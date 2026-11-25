@@ -222,6 +222,10 @@ main {
   padding: 56px 0 150px;
 }
 
+body[data-active-view="today"] main:has(~ .timer.is-expanded:not(.is-context-hidden)) {
+  padding-bottom: 220px;
+}
+
 .view {
   display: none;
   animation: view-in 220ms ease both;
@@ -1931,55 +1935,70 @@ dialog.coaching-dialog {
   padding: 0 20px 20px;
 }
 
-.save-bar {
-  position: sticky;
-  z-index: 10;
-  bottom: 16px;
+.draft-status {
   display: flex;
   align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  margin-top: 12px;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.draft-status-icon::before {
+  content: "•";
+}
+
+.draft-status[data-status="saved"] .draft-status-icon::before,
+.draft-status[data-status="restored"] .draft-status-icon::before {
+  content: "✓";
+  color: var(--lime);
+}
+
+.draft-status[data-status="error"] {
+  color: #ffb8a8;
+  font-weight: 750;
+}
+
+.draft-status[data-status="error"] .draft-status-icon::before {
+  content: "!";
+}
+
+.workout-save {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
   justify-content: space-between;
-  gap: 9px;
+  gap: 12px;
   margin-top: 16px;
-  padding: 5px 7px 5px 11px;
-  border: 1px solid var(--ink);
-  border-radius: 12px;
-  background: var(--card);
-  box-shadow: var(--shadow);
 }
 
-.save-bar strong,
-.save-bar span {
-  display: block;
-}
-
-.save-bar strong {
-  overflow: hidden;
-  font-size: 11px;
-  line-height: 1.2;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.save-bar span {
-  display: none;
-}
-
-.save-bar .button {
-  min-height: 44px;
-  padding: 8px 14px;
-  border-radius: 10px;
-  box-shadow: 2px 2px 0 var(--ink);
+.workout-save p {
+  flex: 1 1 200px;
+  margin: 0;
+  color: var(--ink-soft);
   font-size: 13px;
 }
 
-.save-bar[data-status="restored"] {
-  border-color: #7d9bd4;
-  background: #f2f6ff;
+.workout-save .button {
+  min-height: 48px;
 }
 
-.save-bar[data-status="error"] {
-  border-color: #b44a3e;
+.workout-storage-alert {
+  position: fixed;
+  z-index: 59;
+  top: 86px;
+  left: 50%;
+  width: min(420px, calc(100% - 32px));
+  transform: translateX(-50%);
+  padding: 10px 14px;
+  border: 1px solid #b44a3e;
+  border-radius: 10px;
   background: #fff3ef;
+  color: #9d2e21;
+  font-size: 13px;
+  font-weight: 750;
 }
 
 .rest-card {
@@ -2975,10 +2994,6 @@ dialog.coaching-dialog {
   box-shadow: var(--shadow);
 }
 
-body[data-active-view="today"] .timer {
-  bottom: 104px;
-}
-
 .timer.is-context-hidden {
   display: none;
 }
@@ -3722,8 +3737,9 @@ body[data-active-view="today"] .timer {
     padding: 30px 0 calc(160px + var(--safe-bottom));
   }
 
-  body[data-active-view="today"] main {
-    padding-bottom: calc(78px + var(--safe-bottom));
+  /* Leave room for the fixed navigation and timer, including its controls when expanded. */
+  body[data-active-view="today"] main:has(~ .timer.is-expanded:not(.is-context-hidden)) {
+    padding-bottom: calc(248px + var(--safe-bottom));
   }
 
   .page-head {
@@ -4026,17 +4042,12 @@ body[data-active-view="today"] .timer {
     hyphens: none;
   }
 
-  .save-bar {
-    bottom: calc(78px + var(--safe-bottom));
-    margin-top: 84px;
+  .workout-save .button {
+    width: 100%;
   }
 
-  .save-bar > div {
-    min-width: 0;
-  }
-
-  .save-bar span {
-    display: none;
+  .workout-storage-alert {
+    top: 72px;
   }
 
   .week-controls {
@@ -4283,7 +4294,7 @@ body[data-active-view="today"] .timer {
 
   body[data-active-view="today"] .timer {
     right: 12px;
-    bottom: calc(142px + var(--safe-bottom));
+    bottom: calc(74px + var(--safe-bottom));
     left: 12px;
     width: auto;
   }
