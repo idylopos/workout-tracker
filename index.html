@@ -77,6 +77,10 @@
               </div>
               <h2 id="session-focus">Legs A + bicycle HIIT</h2>
               <p id="session-note">Keep the bicycle HIIT at least 6 hours after lifting.</p>
+              <div class="draft-status" id="draft-status" data-status="default" role="status" aria-live="polite">
+                <span class="draft-status-icon" aria-hidden="true"></span>
+                <span id="save-status">Not saved yet</span>
+              </div>
             </div>
             <div class="session-progress-wrap">
               <div class="session-progress-ring" id="session-progress-ring">
@@ -218,18 +222,15 @@
             </label>
           </details>
 
+          <div class="workout-save">
+            <p>Drafts save automatically. Save workout to add or update your completed record.</p>
+            <button class="button button-primary" type="button" id="save-workout">Save workout</button>
+          </div>
+
           <aside id="next-session-entry" class="next-session-entry is-hidden">
             <div><strong>What should I do next time?</strong><p>A few short answers, using the sets you’ve already logged.</p></div>
             <button type="button" class="button button-secondary" id="open-coaching">Review next session</button>
           </aside>
-
-          <div class="save-bar">
-            <div>
-              <strong id="save-status">Not saved yet</strong>
-              <span>All records stay in this browser.</span>
-            </div>
-            <button class="button button-primary" type="button" id="save-workout">Save workout</button>
-          </div>
         </section>
 
         <section class="view" id="view-week" aria-labelledby="week-heading">
@@ -530,6 +531,7 @@
         </div>
       </aside>
 
+      <div class="workout-storage-alert" id="workout-storage-alert" role="alert" hidden></div>
       <div class="toast" id="toast" role="status" aria-live="polite"></div>
     </div>
 

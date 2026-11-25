@@ -125,6 +125,7 @@ let storageMode = "local";
 let saveQueue = Promise.resolve();
 let workoutDirty = false;
 let draftSaveTimer = null;
+let finalSavePending = false;
 let draftRevision = 0;
 let longRunPreviewStage = null;
 let longRunViewedPhase = null;
@@ -216,7 +217,8 @@ const els = {
   longRunCallout: $("#long-run-callout"),
   phaseGuide: $("#phase-guide"),
   sessionNotes: $("#session-notes"),
-  saveBar: $(".save-bar"),
+  draftStatus: $("#draft-status"),
+  workoutStorageAlert: $("#workout-storage-alert"),
   saveStatus: $("#save-status"),
   vaultSessionStatus: $("#vault-session-status"),
   toast: $("#toast"),
@@ -251,7 +253,14 @@ function persistState() {
 
 function setSaveStatus(message, status = "default") {
   els.saveStatus.textContent = message;
-  els.saveBar.dataset.status = status;
+  els.draftStatus.dataset.status = status;
+  if (status === "error") {
+    els.workoutStorageAlert.textContent = message;
+    els.workoutStorageAlert.hidden = false;
+  } else if (status !== "saving") {
+    els.workoutStorageAlert.hidden = true;
+    els.workoutStorageAlert.textContent = "";
+  }
 }
 
 function showToast(message, tone = "success") {
@@ -1396,7 +1405,7 @@ function renderToday() {
   } else if (savedDraft) {
     setSaveStatus("Draft restored · review & save", "restored");
   } else if (saved) {
-    setSaveStatus(`Saved ${formatDate(saved.updatedAt?.slice(0, 10) || selectedDate)}`, "saved");
+    setSaveStatus(`Workout saved · ${formatDate(saved.updatedAt?.slice(0, 10) || selectedDate)}`, "saved");
   } else {
     setSaveStatus(day.exercises.length ? "Not saved yet" : "Rest day");
   }
@@ -2476,6 +2485,11 @@ function collectWorkoutRecord() {
 async function saveWorkoutDraftNow() {
   clearTimeout(draftSaveTimer);
   draftSaveTimer = null;
+  // Wait until an explicit final save commits or rolls back before taking a draft snapshot.
+  if (finalSavePending) {
+    await saveQueue;
+    return saveWorkoutDraftNow();
+  }
   if (!workoutDirty || (storageMode === "encrypted" && !vaultKey)) return saveQueue;
 
   const revision = draftRevision;
@@ -2496,6 +2510,7 @@ async function saveWorkoutDraftNow() {
 }
 
 async function saveWorkout() {
+  if (finalSavePending) return;
   const invalidMetric = $$(".has-cardio-metrics input[type=number]").find((input) =>
     input.validity.badInput || input.validity.rangeUnderflow || input.validity.rangeOverflow,
   );
@@ -2512,15 +2527,38 @@ async function saveWorkout() {
   draftRevision += 1;
   workoutDirty = false;
   const key = workoutLogKey(selectedDate);
-  state.workoutLogs[key] = collectWorkoutRecord();
-  state.workoutLogs[key].savedAt = new Date().toISOString();
+  const previousLog = state.workoutLogs[key];
+  const previousDraft = state.workoutDrafts[key];
+  const record = collectWorkoutRecord();
+  record.savedAt = new Date().toISOString();
+  const revision = draftRevision;
+  const button = $("#save-workout");
+  button.disabled = true;
+  finalSavePending = true;
+  setSaveStatus("Saving workout…", "saving");
+  state.workoutLogs[key] = record;
   delete state.workoutDrafts[key];
   draftSession = null;
-  if (await persistState()) {
-    savedThisVisit.add(key);
-    showToast("Workout saved on this device.");
-    renderToday();
-    if (Object.values(state.workoutLogs[key].exercises).some((exercise) => exercise.coachingPlan && exercise.sets.some((set) => set.completed))) openCoaching(key);
+  try {
+    if (await persistState()) {
+      savedThisVisit.add(key);
+      showToast("Workout saved on this device.");
+      if (revision === draftRevision && key === workoutLogKey(selectedDate)) {
+        renderToday();
+        if (Object.values(record.exercises).some((exercise) => exercise.coachingPlan && exercise.sets.some((set) => set.completed))) openCoaching(key);
+      }
+    } else {
+      if (previousLog) state.workoutLogs[key] = previousLog;
+      else delete state.workoutLogs[key];
+      if (previousDraft && !state.workoutDrafts[key]) state.workoutDrafts[key] = previousDraft;
+      if (key === workoutLogKey(selectedDate)) {
+        workoutDirty = true;
+        setSaveStatus("Workout not saved · keep this page open and try again", "error");
+      }
+    }
+  } finally {
+    finalSavePending = false;
+    button.disabled = false;
   }
 }
 
